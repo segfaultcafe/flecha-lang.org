@@ -1,6 +1,6 @@
 @import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
 @import '@fontsource-variable/atkinson-hyperlegible-next/wght-italic.css';
-@import '@fontsource-variable/fraunces/wght.css';
+@import '@fontsource-variable/bitter/wght.css';
 @import '@fontsource-variable/fira-code/wght.css';
 
 :root {
@@ -46,12 +46,12 @@ body::before {
 		url('../assets/fauna-jaguar.png'),
 		url('../assets/fauna-giant-otter.png');
 	background-position:
-		-3rem 14%,
-		92% 5%,
-		calc(100% + 3rem) 67%,
-		-5rem 78%,
-		52% calc(100% + 2rem),
-		76% 37%;
+		left 2rem top 14%,
+		right 2rem top 5%,
+		right 2rem top 67%,
+		left 2rem top 78%,
+		center bottom 1rem,
+		right 18% top 37%;
 	background-repeat: no-repeat;
 	background-size:
 		clamp(15rem, 24vw, 27rem) auto,
@@ -79,9 +79,9 @@ body::before {
 	box-shadow: 0 30px 80px rgba(8, 23, 18, 0.15);
 	padding: 0.75rem;
 }
-.hero h1 { color: var(--flecha-blue); font-family: 'Fraunces Variable', Georgia, serif; font-size: clamp(3.4rem, 7vw, 6.5rem) !important; font-weight: 760; line-height: 0.92 !important; letter-spacing: -0.04em !important; }
+.hero h1 { color: var(--flecha-blue); font-family: 'Bitter Variable', Georgia, serif; font-size: clamp(3.2rem, 6vw, 5.7rem) !important; font-weight: 760; line-height: 1.04 !important; letter-spacing: -0.025em !important; text-wrap: balance; }
 :root[data-theme='dark'] .hero h1 { color: var(--flecha-white); }
-html[lang='pt-BR'] .hero h1 { font-size: clamp(3rem, 6vw, 5.7rem) !important; }
+html[lang='pt-BR'] .hero h1 { font-size: clamp(2.8rem, 5.2vw, 4.8rem) !important; }
 .hero .tagline { font-size: clamp(1.05rem, 2vw, 1.28rem); line-height: 1.6; max-width: 42rem; }
 .hero .action.primary { background: var(--flecha-green); border-color: var(--flecha-green); color: var(--flecha-white); font-weight: 750; }
 .hero .action.primary:hover { background: #00ad43; border-color: #00ad43; }
@@ -95,7 +95,7 @@ html[lang='pt-BR'] .hero h1 { font-size: clamp(3rem, 6vw, 5.7rem) !important; }
 .status-band strong { display: block; font-size: 1.05rem; }
 .status-band span { color: var(--sl-color-gray-2); font-size: 0.86rem; }
 .split-section { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(2rem, 6vw, 5rem); align-items: center; margin: 5.5rem 0; }
-.split-section h2, .section-heading h2 { color: var(--flecha-blue); font-family: 'Fraunces Variable', Georgia, serif; font-size: clamp(2.3rem, 4vw, 3.8rem); font-weight: 700; line-height: 0.98; letter-spacing: -0.025em; margin: 0.7rem 0 1rem; }
+.split-section h2, .section-heading h2 { color: var(--flecha-blue); font-family: 'Bitter Variable', Georgia, serif; font-size: clamp(2.2rem, 3.8vw, 3.6rem); font-weight: 700; line-height: 1.08; letter-spacing: -0.02em; margin: 0.7rem 0 1rem; text-wrap: balance; }
 :root[data-theme='dark'] .split-section h2, :root[data-theme='dark'] .section-heading h2 { color: var(--flecha-white); }
 .split-section p, .section-heading p { color: var(--sl-color-gray-2); font-size: 1.04rem; line-height: 1.75; }
 .code-panel { border: 2px solid var(--flecha-blue); border-radius: 1.2rem; box-shadow: 0 24px 70px rgba(0, 39, 118, 0.18); overflow: hidden; }
@@ -118,13 +118,15 @@ html[lang='pt-BR'] .hero h1 { font-size: clamp(3rem, 6vw, 5.7rem) !important; }
 	.hero { padding-block: 3rem !important; }
 	body::before {
 		background-position:
-			-7rem 15%,
-			calc(100% + 3rem) 6%,
-			calc(100% + 6rem) 68%,
-			-7rem 82%,
-			50% calc(100% + 3rem),
-			calc(100% + 7rem) 38%;
-		background-size: 17rem auto, 13rem auto, 17rem auto, 18rem auto, 16rem auto, 19rem auto;
+			left 0.5rem top 15%,
+			right 0.5rem top 6%,
+			right 0.5rem top 68%,
+			left 0.5rem top 82%,
+			center bottom 0.5rem,
+			right 0.5rem top 38%;
+		background-size: 14rem auto, 11rem auto, 14rem auto, 15rem auto, 13rem auto, 15rem auto;
 		opacity: 0.055;
 	}
+	.hero h1 { font-size: clamp(2.6rem, 9vw, 4rem) !important; line-height: 1.06 !important; }
+	html[lang='pt-BR'] .hero h1 { font-size: clamp(2.35rem, 8vw, 3.6rem) !important; }
 }
