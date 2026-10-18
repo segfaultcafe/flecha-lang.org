@@ -8,6 +8,7 @@
     "start": "astro dev",
     "sync:content": "node scripts/sync-flecha-content.mjs",
     "check": "astro check",
+    "check:links": "node scripts/check-built-links.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "deploy": "npm run build && wrangler deploy",
