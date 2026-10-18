@@ -18,6 +18,27 @@ hero:
       variant: minimal
 ---
 
+import { Code } from 'astro-expressive-code/components';
+
+export const testExample = `module algorithms_test;
+
+@imports
+    :: root::containers::algorithms
+    :: lib::std::tests::testing
+    :: lib::std::tests::asserts;
+
+test index_of_finds_the_first_match(&testing::UnitTest t) {
+    [5]i32 values = [10, 20, 30, 20, 40];
+
+    index, found := algorithms::index_of<i32>(values[:], 20);
+    asserts::is_true(t, found, "index_of finds a present value");
+
+    usize expected = 1;
+    asserts::equal<usize>(
+        t, &expected, &index, "index_of returns the first match"
+    );
+}`;
+
 <div class="splash-copy">
 	<div class="status-band">
 		<div><strong>v0.1.2</strong><span>Latest tagged release</span></div>
@@ -27,24 +48,13 @@ hero:
 
 	<section class="split-section">
 		<div>
-			<div class="eyebrow">The language</div>
-			<h2>Systems code with fewer hidden moves.</h2>
-			<p>Flecha makes low-level work visible: explicit allocation, checked references and slices, ownership contracts, and native output without a garbage-collected runtime.</p>
-			<p>Its compiler pairs those controls with readable diagnostics and a growing static-analysis pipeline.</p>
+			<div class="eyebrow">Testable by design</div>
+			<h2>Generics, modules, and assertions in one native workflow.</h2>
+			<p>Flecha tests are ordinary typed code with first-class <code>test</code> declarations. Import reusable modules, exercise generic algorithms over slices, and verify results with the standard assertion library.</p>
+			<p>Run the suite with <code>flecha test</code> and get the same compiler checks as production code.</p>
 		</div>
 		<div class="code-panel">
-			<div class="code-panel__bar"><i></i><i></i><i></i>factorial.fl</div>
-			<pre><code>{`i32 factorial(i32 n) {
-    if n <= 1 {
-        return 1;
-    }
-    return n * factorial(n - 1);
-}
-
-void main() {
-    result := factorial(5);
-    stdoutln(result);
-}`}</code></pre>
+			<Code code={testExample} lang="flecha" meta='title="algorithms_test.fl"' />
 		</div>
 	</section>
 
