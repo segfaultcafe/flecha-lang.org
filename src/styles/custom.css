@@ -1,8 +1,7 @@
-@import '@fontsource/iosevka/400.css';
-@import '@fontsource/iosevka/500.css';
-@import '@fontsource/iosevka/600.css';
-@import '@fontsource/iosevka/700.css';
-@import '@fontsource/iosevka/800.css';
+@import '@fontsource/space-mono/400.css';
+@import '@fontsource/space-mono/400-italic.css';
+@import '@fontsource/space-mono/700.css';
+@import '@fontsource/space-mono/700-italic.css';
 
 :root {
 	--flecha-green: #009739;
@@ -20,8 +19,8 @@
 	--sl-color-gray-5: #d9dee6;
 	--sl-color-gray-6: #f2f4f7;
 	--sl-color-black: #ffffff;
-	--sl-font: 'Iosevka', monospace;
-	--sl-font-mono: 'Iosevka', monospace;
+	--sl-font: 'Space Mono', monospace;
+	--sl-font-mono: 'Space Mono', monospace;
 	--sl-content-width: 54rem;
 }
 :root[data-theme='dark'] {
@@ -37,7 +36,17 @@
 	--sl-color-gray-6: #0b2a3b;
 	--sl-color-black: #001a2d;
 }
-body { letter-spacing: 0; }
+body { isolation: isolate; letter-spacing: -0.012em; position: relative; }
+body::before {
+	background: url('../assets/brazilian-fauna-contours.png') center 9rem / min(112rem, 145vw) auto no-repeat;
+	content: '';
+	inset: 0;
+	opacity: 0.055;
+	pointer-events: none;
+	position: fixed;
+	z-index: -1;
+}
+:root[data-theme='dark'] body::before { filter: grayscale(1) invert(1); opacity: 0.045; }
 .site-title { color: var(--flecha-blue); font-weight: 800 !important; letter-spacing: -0.025em; }
 :root[data-theme='dark'] .site-title { color: var(--flecha-white); }
 .site-title::before { content: '➤'; color: var(--flecha-yellow); font-size: 1.05rem; text-shadow: 0 0 0.5px var(--flecha-green); transform: rotate(-9deg); }
@@ -49,9 +58,9 @@ body { letter-spacing: 0; }
 	box-shadow: 0 30px 80px rgba(8, 23, 18, 0.15);
 	padding: 0.75rem;
 }
-.hero h1 { color: var(--flecha-blue); font-size: clamp(3.2rem, 8vw, 6.75rem) !important; line-height: 0.92 !important; letter-spacing: -0.045em !important; }
+.hero h1 { color: var(--flecha-blue); font-size: clamp(3rem, 6vw, 5.25rem) !important; line-height: 0.96 !important; letter-spacing: -0.045em !important; }
 :root[data-theme='dark'] .hero h1 { color: var(--flecha-white); }
-html[lang='pt-BR'] .hero h1 { font-size: clamp(3rem, 7vw, 6rem) !important; }
+html[lang='pt-BR'] .hero h1 { font-size: clamp(2.8rem, 5.5vw, 4.85rem) !important; }
 .hero .tagline { font-size: clamp(1.05rem, 2vw, 1.28rem); line-height: 1.6; max-width: 42rem; }
 .hero .action.primary { background: var(--flecha-green); border-color: var(--flecha-green); color: var(--flecha-white); font-weight: 750; }
 .hero .action.primary:hover { background: #00ad43; border-color: #00ad43; }
@@ -86,4 +95,5 @@ html[lang='pt-BR'] .hero h1 { font-size: clamp(3rem, 7vw, 6rem) !important; }
 @media (max-width: 52rem) {
 	.status-band, .split-section, .feature-grid, .route-grid { grid-template-columns: 1fr; }
 	.hero { padding-block: 3rem !important; }
+	body::before { background-position: center 6rem; background-size: 240vw auto; opacity: 0.045; }
 }
