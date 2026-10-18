@@ -1,7 +1,7 @@
-@import '@fontsource/space-mono/400.css';
-@import '@fontsource/space-mono/400-italic.css';
-@import '@fontsource/space-mono/700.css';
-@import '@fontsource/space-mono/700-italic.css';
+@import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';
+@import '@fontsource-variable/atkinson-hyperlegible-next/wght-italic.css';
+@import '@fontsource-variable/fraunces/wght.css';
+@import '@fontsource-variable/fira-code/wght.css';
 
 :root {
 	--flecha-green: #009739;
@@ -19,8 +19,8 @@
 	--sl-color-gray-5: #d9dee6;
 	--sl-color-gray-6: #f2f4f7;
 	--sl-color-black: #ffffff;
-	--sl-font: 'Space Mono', monospace;
-	--sl-font-mono: 'Space Mono', monospace;
+	--sl-font: 'Atkinson Hyperlegible Next Variable', ui-sans-serif, system-ui, sans-serif;
+	--sl-font-mono: 'Fira Code Variable', ui-monospace, monospace;
 	--sl-content-width: 54rem;
 }
 :root[data-theme='dark'] {
@@ -36,17 +36,38 @@
 	--sl-color-gray-6: #0b2a3b;
 	--sl-color-black: #001a2d;
 }
-body { isolation: isolate; letter-spacing: -0.012em; position: relative; }
+body { isolation: isolate; letter-spacing: 0; position: relative; }
 body::before {
-	background: url('../assets/brazilian-fauna-contours.png') center 9rem / min(112rem, 145vw) auto no-repeat;
+	background-image:
+		url('../assets/fauna-caracara.png'),
+		url('../assets/fauna-toucan.png'),
+		url('../assets/fauna-capybara.png'),
+		url('../assets/fauna-tapir.png'),
+		url('../assets/fauna-jaguar.png'),
+		url('../assets/fauna-giant-otter.png');
+	background-position:
+		-3rem 14%,
+		92% 5%,
+		calc(100% + 3rem) 67%,
+		-5rem 78%,
+		52% calc(100% + 2rem),
+		76% 37%;
+	background-repeat: no-repeat;
+	background-size:
+		clamp(15rem, 24vw, 27rem) auto,
+		clamp(11rem, 18vw, 20rem) auto,
+		clamp(14rem, 23vw, 25rem) auto,
+		clamp(15rem, 25vw, 28rem) auto,
+		clamp(14rem, 22vw, 24rem) auto,
+		clamp(15rem, 26vw, 29rem) auto;
 	content: '';
 	inset: 0;
-	opacity: 0.055;
+	opacity: 0.07;
 	pointer-events: none;
 	position: fixed;
 	z-index: -1;
 }
-:root[data-theme='dark'] body::before { filter: grayscale(1) invert(1); opacity: 0.045; }
+:root[data-theme='dark'] body::before { filter: grayscale(1) invert(1); opacity: 0.055; }
 .site-title { color: var(--flecha-blue); font-weight: 800 !important; letter-spacing: -0.025em; }
 :root[data-theme='dark'] .site-title { color: var(--flecha-white); }
 .site-title::before { content: '➤'; color: var(--flecha-yellow); font-size: 1.05rem; text-shadow: 0 0 0.5px var(--flecha-green); transform: rotate(-9deg); }
@@ -58,9 +79,9 @@ body::before {
 	box-shadow: 0 30px 80px rgba(8, 23, 18, 0.15);
 	padding: 0.75rem;
 }
-.hero h1 { color: var(--flecha-blue); font-size: clamp(3rem, 6vw, 5.25rem) !important; line-height: 0.96 !important; letter-spacing: -0.045em !important; }
+.hero h1 { color: var(--flecha-blue); font-family: 'Fraunces Variable', Georgia, serif; font-size: clamp(3.4rem, 7vw, 6.5rem) !important; font-weight: 760; line-height: 0.92 !important; letter-spacing: -0.04em !important; }
 :root[data-theme='dark'] .hero h1 { color: var(--flecha-white); }
-html[lang='pt-BR'] .hero h1 { font-size: clamp(2.8rem, 5.5vw, 4.85rem) !important; }
+html[lang='pt-BR'] .hero h1 { font-size: clamp(3rem, 6vw, 5.7rem) !important; }
 .hero .tagline { font-size: clamp(1.05rem, 2vw, 1.28rem); line-height: 1.6; max-width: 42rem; }
 .hero .action.primary { background: var(--flecha-green); border-color: var(--flecha-green); color: var(--flecha-white); font-weight: 750; }
 .hero .action.primary:hover { background: #00ad43; border-color: #00ad43; }
@@ -74,7 +95,7 @@ html[lang='pt-BR'] .hero h1 { font-size: clamp(2.8rem, 5.5vw, 4.85rem) !importan
 .status-band strong { display: block; font-size: 1.05rem; }
 .status-band span { color: var(--sl-color-gray-2); font-size: 0.86rem; }
 .split-section { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(2rem, 6vw, 5rem); align-items: center; margin: 5.5rem 0; }
-.split-section h2, .section-heading h2 { color: var(--flecha-blue); font-size: clamp(2.1rem, 4vw, 3.5rem); line-height: 1.03; letter-spacing: -0.035em; margin: 0.7rem 0 1rem; }
+.split-section h2, .section-heading h2 { color: var(--flecha-blue); font-family: 'Fraunces Variable', Georgia, serif; font-size: clamp(2.3rem, 4vw, 3.8rem); font-weight: 700; line-height: 0.98; letter-spacing: -0.025em; margin: 0.7rem 0 1rem; }
 :root[data-theme='dark'] .split-section h2, :root[data-theme='dark'] .section-heading h2 { color: var(--flecha-white); }
 .split-section p, .section-heading p { color: var(--sl-color-gray-2); font-size: 1.04rem; line-height: 1.75; }
 .code-panel { border: 2px solid var(--flecha-blue); border-radius: 1.2rem; box-shadow: 0 24px 70px rgba(0, 39, 118, 0.18); overflow: hidden; }
@@ -95,5 +116,15 @@ html[lang='pt-BR'] .hero h1 { font-size: clamp(2.8rem, 5.5vw, 4.85rem) !importan
 @media (max-width: 52rem) {
 	.status-band, .split-section, .feature-grid, .route-grid { grid-template-columns: 1fr; }
 	.hero { padding-block: 3rem !important; }
-	body::before { background-position: center 6rem; background-size: 240vw auto; opacity: 0.045; }
+	body::before {
+		background-position:
+			-7rem 15%,
+			calc(100% + 3rem) 6%,
+			calc(100% + 6rem) 68%,
+			-7rem 82%,
+			50% calc(100% + 3rem),
+			calc(100% + 7rem) 38%;
+		background-size: 17rem auto, 13rem auto, 17rem auto, 18rem auto, 16rem auto, 19rem auto;
+		opacity: 0.055;
+	}
 }
