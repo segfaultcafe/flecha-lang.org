@@ -1,0 +1,72 @@
+---
+title: Linguagem de programação Flecha
+description: Memória explícita. Diagnósticos fortes. Código nativo.
+template: splash
+hero:
+  title: Programe perto do metal. Mantenha a intenção visível.
+  tagline: Flecha é uma linguagem de sistemas, estaticamente tipada e em estágio inicial, voltada à execução previsível, operações explícitas de memória e alvos nativos.
+  image:
+    file: ../../../assets/flecha-logo.png
+    alt: Logotipo da Flecha
+  actions:
+    - text: Instalar a Flecha
+      link: /pt-br/install/
+      icon: right-arrow
+    - text: Ler a documentação
+      link: /pt-br/docs/
+      icon: open-book
+      variant: minimal
+---
+
+<div class="splash-copy">
+	<div class="status-band">
+		<div><strong>v0.1.2</strong><span>Versão marcada mais recente</span></div>
+		<div><strong>Alvos nativos</strong><span>Compilação baseada em LLVM</span></div>
+		<div><strong>Estágio inicial</strong><span>APIs e sintaxe ainda podem evoluir</span></div>
+	</div>
+
+	<section class="split-section">
+		<div>
+			<div class="eyebrow">A linguagem</div>
+			<h2>Código de sistemas com menos movimentos ocultos.</h2>
+			<p>Flecha torna o trabalho de baixo nível visível: alocação explícita, referências e fatias verificadas, contratos de propriedade e saída nativa sem runtime com coleta de lixo.</p>
+			<p>O compilador combina esse controle com diagnósticos legíveis e uma infraestrutura crescente de análise estática.</p>
+		</div>
+		<div class="code-panel">
+			<div class="code-panel__bar"><i></i><i></i><i></i>factorial.fl</div>
+			<pre><code>{`i32 factorial(i32 n) {
+    if n <= 1 {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+void main() {
+    result := factorial(5);
+    stdoutln(result);
+}`}</code></pre>
+		</div>
+	</section>
+
+	<div class="section-heading">
+		<div class="eyebrow">Construída para clareza</div>
+		<h2>Controle direto, apoiado pelas verificações do compilador.</h2>
+	</div>
+	<div class="feature-grid">
+		<div class="feature-card"><div class="feature-icon">&amp;T</div><b>Memória explícita</b><p>Referências, fatias, alocação bruta em código inseguro, contratos de propriedade e análise de atribuição definida.</p></div>
+		<div class="feature-card"><div class="feature-icon">!?</div><b>Diagnósticos fortes</b><p>Tokenizer, parser, analisador semântico e pipeline de lowering projetados para explicar problemas no código-fonte.</p></div>
+		<div class="feature-card"><div class="feature-icon">→</div><b>Nativa por padrão</b><p>Emita LLVM IR, objetos ou executáveis nativos do host. O runtime e a biblioteca padrão acompanham os arquivos de versão.</p></div>
+	</div>
+
+	<section class="section-heading">
+		<div class="eyebrow">Escolha um caminho</div>
+		<h2>Da primeira compilação aos detalhes internos.</h2>
+		<p>Comece com um compilador funcional, aprenda a sintaxe central e aprofunde-se nas notas de implementação e na especificação.</p>
+		<div class="route-grid">
+			<a class="route-card" href="/pt-br/install/"><strong>Instalar</strong><span>Compile do código-fonte e verifique o toolchain.</span></a>
+			<a class="route-card" href="/pt-br/learn/"><strong>Aprender</strong><span>Escreva, verifique e compile seu primeiro programa.</span></a>
+			<a class="route-card" href="/pt-br/docs/"><strong>Documentação</strong><span>Explore recursos, ferramentas, ABI e notas de projeto.</span></a>
+			<a class="route-card" href="/pt-br/examples/"><strong>Exemplos</strong><span>Veja programas executáveis sincronizados do repositório do compilador.</span></a>
+		</div>
+	</section>
+</div>

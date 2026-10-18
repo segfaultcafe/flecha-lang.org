@@ -1,0 +1,50 @@
+---
+title: "Iteration"
+description: A Flecha source example from the compiler repository.
+editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/iteration.fl
+---
+
+[View source on GitHub](https://github.com/segfaultcafe/flecha/blob/master/examples/iteration.fl)
+
+```flecha title="iteration.fl"
+i32 main() {
+    [3]i32 values = [10, 20, 30];
+
+    // A single binding receives each index (usize).
+    for index := range values {
+        stdoutln(values[index]);
+    }
+
+    // Two inferred bindings: usize index and i32 value.
+    for (index, value) := range values {
+        stdoutln(index);
+        stdoutln(value);
+    }
+
+    // Typed declarations use '='. Each value is an independent copy.
+    for (u32 index, i32 value) = range values {
+        value++;
+        stdoutln(value);
+    }
+
+    // '_' discards a binding.
+    i32 total = 0;
+    for (_, value) := range values {
+        total = total + value;
+    }
+    if total != 60 { return 1; }
+
+    // Use a counted loop to modify the original array.
+    loop usize index = 0; index < values.len(); index++ {
+        if index == 1 { proceed; } // still executes index++
+        values[index]++;
+    }
+    if values[0] != 11 or values[1] != 20 or values[2] != 31 { return 2; }
+
+    // Inclusive bounds are valid for a numeric counter.
+    loop u32 x = 1; x <= 3; x++ {
+        stdoutln(x);
+    }
+    return 0;
+}
+```

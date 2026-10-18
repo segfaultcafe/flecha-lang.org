@@ -1,0 +1,47 @@
+---
+title: "Diagnostics · Checked References"
+description: A Flecha source example from the compiler repository.
+editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/diagnostics/checked_references.fl
+---
+
+[View source on GitHub](https://github.com/segfaultcafe/flecha/blob/master/examples/diagnostics/checked_references.fl)
+
+```flecha title="diagnostics/checked_references.fl"
+// Intentionally rejected. Each function illustrates a separate rule.
+// Check: build/flecha --emit-llvm examples/diagnostics/checked_references.fl
+
+void missing_initializer() {
+    &u8 ref; // FLECHA-S0027
+}
+
+void moved_handle() {
+    u8 value = 3;
+    ref := &value;
+    moved := ref;
+    *ref = 4; // FLECHA-S0028
+}
+
+u8 conflicting_access() {
+    u8 value = 3;
+    ref := &value;
+    value = 4; // FLECHA-S0029
+    return *ref;
+}
+
+void escaping_local() {
+    u8 value = 3;
+    ref := &value;
+    {
+        u8 inner = 4;
+        ref = &inner; // FLECHA-S0030: owner has a shorter lexical lifetime.
+    }
+}
+
+unsafe void raw_to_reference(*u8 pointer) {
+    ref := &*pointer; // FLECHA-S0031
+}
+
+void out_of_range() {
+    u8 value = 256; // FLECHA-S0032
+}
+```

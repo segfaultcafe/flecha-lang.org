@@ -1,40 +1,72 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: Flecha programming language
+description: Explicit memory. Strong diagnostics. Native code.
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  title: Build close to the metal. Keep intent in view.
+  tagline: Flecha is an early-stage, statically typed systems language for predictable execution, explicit memory operations, and direct access to native targets.
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/flecha-logo.png
+    alt: Flecha logo
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Install Flecha
+      link: /install/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
+    - text: Read the docs
+      link: /docs/
+      icon: open-book
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+<div class="splash-copy">
+	<div class="status-band">
+		<div><strong>v0.1.2</strong><span>Latest tagged release</span></div>
+		<div><strong>Native targets</strong><span>LLVM-backed compilation</span></div>
+		<div><strong>Early stage</strong><span>APIs and syntax can still evolve</span></div>
+	</div>
 
-## Next steps
+	<section class="split-section">
+		<div>
+			<div class="eyebrow">The language</div>
+			<h2>Systems code with fewer hidden moves.</h2>
+			<p>Flecha makes low-level work visible: explicit allocation, checked references and slices, ownership contracts, and native output without a garbage-collected runtime.</p>
+			<p>Its compiler pairs those controls with readable diagnostics and a growing static-analysis pipeline.</p>
+		</div>
+		<div class="code-panel">
+			<div class="code-panel__bar"><i></i><i></i><i></i>factorial.fl</div>
+			<pre><code>{`i32 factorial(i32 n) {
+    if n <= 1 {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
-</CardGrid>
+void main() {
+    result := factorial(5);
+    stdoutln(result);
+}`}</code></pre>
+		</div>
+	</section>
+
+	<div class="section-heading">
+		<div class="eyebrow">Built for clarity</div>
+		<h2>Direct control, backed by compiler checks.</h2>
+	</div>
+	<div class="feature-grid">
+		<div class="feature-card"><div class="feature-icon">&amp;T</div><b>Explicit memory</b><p>Checked references, slices, raw allocation in unsafe code, ownership contracts, and definite-assignment analysis.</p></div>
+		<div class="feature-card"><div class="feature-icon">!?</div><b>Strong diagnostics</b><p>A tokenizer, parser, semantic analyzer, and lowering pipeline designed to surface source-level problems clearly.</p></div>
+		<div class="feature-card"><div class="feature-icon">→</div><b>Native by default</b><p>Emit LLVM IR, objects, or host-native executables. The runtime and standard library ship with release archives.</p></div>
+	</div>
+
+	<section class="section-heading">
+		<div class="eyebrow">Choose a path</div>
+		<h2>From first build to language internals.</h2>
+		<p>Start with a working compiler, learn the core syntax, then go as deep as the implementation notes and specification.</p>
+		<div class="route-grid">
+			<a class="route-card" href="/install/"><strong>Install</strong><span>Build from source and verify the toolchain.</span></a>
+			<a class="route-card" href="/learn/"><strong>Learn</strong><span>Write, check, and compile your first Flecha program.</span></a>
+			<a class="route-card" href="/docs/"><strong>Docs</strong><span>Explore language features, tooling, ABI, and design notes.</span></a>
+			<a class="route-card" href="/examples/"><strong>Examples</strong><span>Browse runnable programs synced from the compiler repo.</span></a>
+		</div>
+	</section>
+</div>
