@@ -1,5 +1,6 @@
 ---
 title: "Definite assignment"
+description: "Typed value declarations may omit their initializer:"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/definite_assignment.md
 ---
 Typed value declarations may omit their initializer:

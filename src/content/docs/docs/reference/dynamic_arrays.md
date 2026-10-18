@@ -1,5 +1,6 @@
 ---
 title: "Runtime arrays and the first standard-library container"
+description: "Runtime-sized storage uses new(count) in an unsafe context. count has type usize and is evaluated exactly once, before attempting allocation. The result is…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/dynamic_arrays.md
 ---
 Runtime-sized storage uses `new<[]T>(count)` in an unsafe context. `count` has type

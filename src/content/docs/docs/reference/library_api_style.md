@@ -1,5 +1,6 @@
 ---
 title: "Flecha built-in and library API style"
+description: "These rules govern APIs supplied to Flecha programs by the language and its libraries: primitive members, compiler built-ins, the runtime-facing prelude, and…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/library_api_style.md
 ---
 These rules govern APIs supplied to Flecha programs by the language and its

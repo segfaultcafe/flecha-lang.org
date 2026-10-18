@@ -1,6 +1,6 @@
 ---
-title: "Factorial"
-description: A Flecha source example from the compiler repository.
+title: "Factorial example"
+description: "Learn factorial in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/factorial.fl
 ---
 

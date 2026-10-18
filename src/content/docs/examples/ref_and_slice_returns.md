@@ -1,6 +1,6 @@
 ---
-title: "Ref And Slice Returns"
-description: A Flecha source example from the compiler repository.
+title: "Ref And Slice Returns example"
+description: "Learn ref and slice returns in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/ref_and_slice_returns.fl
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: "Fixed arrays"
+description: "Fixed arrays are implemented with inline contiguous storage. [N]T contains exactly N elements of type T; both the element type and length participate in type…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/fixed_arrays.md
 ---
 Fixed arrays are implemented with inline contiguous storage. `[N]T` contains

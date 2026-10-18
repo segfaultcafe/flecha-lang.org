@@ -1,5 +1,6 @@
 ---
 title: "Deferred calls"
+description: "Defer function(arguments); captures a direct function call now and executes it when the current lexical scope exits. See the runnable example."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/defer.md
 ---
 `defer function(arguments);` captures a direct function call now and executes it

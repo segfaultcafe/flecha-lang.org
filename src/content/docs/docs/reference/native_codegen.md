@@ -1,5 +1,6 @@
 ---
 title: "Native code generation"
+description: "The native compiler selects LLVM's host target triple and creates a TargetMachine for that target. Its data layout is attached to the generated module before…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/native_codegen.md
 ---
 The native compiler selects LLVM's host target triple and creates a

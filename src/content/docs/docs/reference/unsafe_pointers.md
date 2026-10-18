@@ -1,5 +1,6 @@
 ---
 title: "Unsafe contexts and raw pointers"
+description: "Raw pointer declarations, parameters, returns, address creation, and indirect reads/writes are implemented. See the runnable example. Safe scalar and…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/unsafe_pointers.md
 ---
 Raw pointer declarations, parameters, returns, address creation, and indirect

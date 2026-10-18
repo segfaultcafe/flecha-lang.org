@@ -1,5 +1,6 @@
 ---
 title: "External functions"
+description: "An extern function is a declaration whose implementation is supplied to the native linker. It ends with a semicolon and has no Flecha body:"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/extern.md
 ---
 An `extern` function is a declaration whose implementation is supplied to the

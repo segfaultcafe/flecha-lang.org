@@ -1,6 +1,6 @@
 ---
-title: "Native Functions"
-description: A Flecha source example from the compiler repository.
+title: "Native Functions example"
+description: "Learn native functions in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/native_functions.fl
 ---
 

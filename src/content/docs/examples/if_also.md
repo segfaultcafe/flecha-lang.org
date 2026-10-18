@@ -1,6 +1,6 @@
 ---
-title: "If Also"
-description: A Flecha source example from the compiler repository.
+title: "If Also example"
+description: "Learn if also in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/if_also.fl
 ---
 

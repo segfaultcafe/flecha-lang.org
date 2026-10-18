@@ -1,6 +1,7 @@
 // @ts-check
 import { readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
 
 const flechaGrammar = JSON.parse(
@@ -9,20 +10,61 @@ const flechaGrammar = JSON.parse(
 
 export default defineConfig({
 	site: 'https://flecha-lang.org',
+	redirects: {
+		'/examples/modules/src/main/': '/examples/standard-library/',
+		'/examples/dynamic_array/src/main/': '/examples/dynamic-array/',
+	},
 	integrations: [
+		sitemap({
+			filter: (page) => {
+				const pathname = new URL(page).pathname;
+				if (!pathname.startsWith('/pt-br/')) return true;
+				return new Set([
+					'/pt-br/',
+					'/pt-br/install/',
+					'/pt-br/learn/',
+					'/pt-br/docs/',
+					'/pt-br/examples/',
+					'/pt-br/releases/',
+				]).has(pathname);
+			},
+		}),
 		starlight({
 			title: 'Flecha',
 			description:
 				'A statically typed systems programming language for explicit memory, predictable execution, and native targets.',
 			favicon: '/favicon.svg',
 			customCss: ['./src/styles/custom.css'],
-			components: { Header: './src/components/Header.astro' },
+			components: {
+				Head: './src/components/Head.astro',
+				Header: './src/components/Header.astro',
+			},
 			locales: {
 				root: { label: 'English', lang: 'en' },
 				'pt-br': { label: 'Português (Brasil)', lang: 'pt-BR' },
 			},
 			defaultLocale: 'root',
-			head: [{ tag: 'meta', attrs: { name: 'theme-color', content: '#081712' } }],
+			head: [
+				{ tag: 'meta', attrs: { name: 'theme-color', content: '#081712' } },
+				{
+					tag: 'meta',
+					attrs: { property: 'og:image', content: 'https://flecha-lang.org/flecha-social.png' },
+				},
+				{
+					tag: 'meta',
+					attrs: { property: 'og:image:alt', content: 'The yellow Flecha arrow on a dark green field' },
+				},
+				{ tag: 'meta', attrs: { property: 'og:image:width', content: '1254' } },
+				{ tag: 'meta', attrs: { property: 'og:image:height', content: '1254' } },
+				{
+					tag: 'meta',
+					attrs: { name: 'twitter:image', content: 'https://flecha-lang.org/flecha-social.png' },
+				},
+				{
+					tag: 'meta',
+					attrs: { name: 'twitter:image:alt', content: 'The yellow Flecha arrow on a dark green field' },
+				},
+			],
 			social: [
 				{
 					icon: 'github',

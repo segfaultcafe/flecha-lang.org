@@ -1,5 +1,6 @@
 ---
 title: "Raw-pointer ownership contracts"
+description: "Own and lend describe cleanup responsibility at function boundaries and in structure fields. They do not change the raw-pointer representation or ABI. const…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/ownership_contracts.md
 ---
 `own` and `lend` describe cleanup responsibility at function boundaries and in

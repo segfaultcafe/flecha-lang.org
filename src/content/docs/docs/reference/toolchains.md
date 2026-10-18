@@ -1,5 +1,6 @@
 ---
 title: "Supported toolchains"
+description: "Flecha 0.1.1 uses explicit major-version ranges for source builds and pinned major-version baselines for release production. Patch releases within a listed…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/toolchains.md
 ---
 Flecha 0.1.1 uses explicit major-version ranges for source builds and pinned

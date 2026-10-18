@@ -1,5 +1,6 @@
 ---
 title: "Raw allocation: new and free"
+description: "New(value) and free(pointer) use the process-wide system allocation service. Both require an unsafe function or an explicit unsafe block. There is no public…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/raw_allocation.md
 ---
 `new<T>(value)` and `free(pointer)` use the process-wide system allocation

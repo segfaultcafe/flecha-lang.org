@@ -1,5 +1,6 @@
 ---
 title: "Longbow"
+description: "Longbow is Flecha's project tool. The initial binary creates program and library projects, checks/builds local source, and runs executables. It delegates…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/longbow.md
 ---
 Longbow is Flecha's project tool. The initial binary creates program and library

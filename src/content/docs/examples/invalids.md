@@ -1,6 +1,6 @@
 ---
-title: "Invalids"
-description: A Flecha source example from the compiler repository.
+title: "Invalids example"
+description: "Learn invalids in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/invalids.fl
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: "Semantic analysis"
+description: "Flecha processes source in three stages: the tokenizer produces ranged tokens, the parser builds the move-only syntax tree, and SemanticAnalyzer binds and…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/semantic_analysis.md
 ---
 ## Pipeline

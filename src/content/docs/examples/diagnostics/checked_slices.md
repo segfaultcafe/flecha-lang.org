@@ -1,6 +1,6 @@
 ---
-title: "Diagnostics · Checked Slices"
-description: A Flecha source example from the compiler repository.
+title: "Checked Slices diagnostics"
+description: "See the Flecha compiler diagnostics produced by invalid checked slices programs."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/diagnostics/checked_slices.fl
 ---
 

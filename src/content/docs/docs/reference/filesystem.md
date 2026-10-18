@@ -1,5 +1,6 @@
 ---
 title: "Filesystem"
+description: "Import the standard I/O modules with lib::std::io::filesystem and lib::std::io::errors:"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/filesystem.md
 ---
 Import the standard I/O modules with `lib::std::io::filesystem` and

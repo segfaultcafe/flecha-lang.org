@@ -1,6 +1,6 @@
 ---
-title: "Stdout"
-description: A Flecha source example from the compiler repository.
+title: "Stdout example"
+description: "Learn stdout in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/stdout.fl
 ---
 

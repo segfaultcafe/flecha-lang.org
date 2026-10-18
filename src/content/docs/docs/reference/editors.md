@@ -1,5 +1,6 @@
 ---
 title: "Editor installation"
+description: "Flecha releases provide a ready-to-install Visual Studio Code extension and a Neovim runtime plugin. Both currently provide syntax highlighting, filetype…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/editors.md
 ---
 Flecha releases provide a ready-to-install Visual Studio Code extension and a

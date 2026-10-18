@@ -1,5 +1,6 @@
 ---
 title: "Flecha standard-library development guidelines"
+description: "These guidelines apply to Flecha source in std/. Follow the naming conventions in library API style as well."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/std_development.md
 ---
 These guidelines apply to Flecha source in `std/`. Follow the naming conventions

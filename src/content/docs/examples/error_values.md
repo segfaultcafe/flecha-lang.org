@@ -1,6 +1,6 @@
 ---
-title: "Error Values"
-description: A Flecha source example from the compiler repository.
+title: "Error Values example"
+description: "Learn error values in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/error_values.fl
 ---
 

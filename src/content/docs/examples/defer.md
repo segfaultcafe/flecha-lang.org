@@ -1,6 +1,6 @@
 ---
-title: "Defer"
-description: A Flecha source example from the compiler repository.
+title: "Defer example"
+description: "Learn defer in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/defer.fl
 ---
 

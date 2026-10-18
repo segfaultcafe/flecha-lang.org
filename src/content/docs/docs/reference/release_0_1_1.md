@@ -1,5 +1,6 @@
 ---
 title: "Flecha 0.1.1 stabilization milestone"
+description: "Flecha 0.1.1 is a focused stabilization release. It strengthens the first public release without starting another language-feature wave."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/release_0_1_1.md
 ---
 Flecha 0.1.1 is a focused stabilization release. It strengthens the first

@@ -1,6 +1,6 @@
 ---
-title: "Checked References"
-description: A Flecha source example from the compiler repository.
+title: "Checked References example"
+description: "Learn checked references in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/checked_references.fl
 ---
 

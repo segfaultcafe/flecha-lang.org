@@ -1,5 +1,6 @@
 ---
 title: "LLVM code generation"
+description: "The LLVM backend consumes the lowered lowering::BoundProgram; parsing, name lookup, generic specialization, semantic checks, borrow checking, and allocation…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/llvm_codegen.md
 ---
 The LLVM backend consumes the lowered `lowering::BoundProgram`; parsing, name

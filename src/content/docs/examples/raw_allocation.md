@@ -1,6 +1,6 @@
 ---
-title: "Raw Allocation"
-description: A Flecha source example from the compiler repository.
+title: "Raw Allocation example"
+description: "Learn raw allocation in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/raw_allocation.fl
 ---
 

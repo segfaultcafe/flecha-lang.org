@@ -1,6 +1,6 @@
 ---
-title: "Numeric Casts"
-description: A Flecha source example from the compiler repository.
+title: "Numeric Casts example"
+description: "Learn numeric casts in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/numeric_casts.fl
 ---
 

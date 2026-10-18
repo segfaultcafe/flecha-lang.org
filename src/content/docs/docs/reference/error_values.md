@@ -1,5 +1,6 @@
 ---
 title: "Error values"
+description: "Implemented on feat/error-values. Error values are allocation-free, copyable values. Functions return them directly or in tuples; callers inspect and…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/error_values.md
 ---
 Implemented on `feat/error-values`. Error values are allocation-free, copyable

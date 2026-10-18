@@ -1,5 +1,6 @@
 ---
 title: "Enums"
+description: "Enums are nominal, allocation-free scalar value types. Each enum chooses an integer backing type, declares a closed set of named variants, and may select one…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/enums.md
 ---
 Enums are nominal, allocation-free scalar value types. Each enum chooses an

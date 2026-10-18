@@ -1,5 +1,6 @@
 ---
 title: "Tuples, multiple results, and destructuring"
+description: "Tuples are positional values with two or more elements. A type lists element types, and a value lists expressions in the same order:"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/tuples.md
 ---
 Tuples are positional values with two or more elements. A type lists element

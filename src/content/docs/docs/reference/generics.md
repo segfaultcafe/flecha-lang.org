@@ -1,5 +1,6 @@
 ---
 title: "Generics"
+description: "Flecha implements compile-time specialization of functions and structures. Type parameters are ordinary identifiers declared between ; T is not a keyword or a…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/generics.md
 ---
 Flecha implements compile-time specialization of functions and structures. Type

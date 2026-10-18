@@ -1,6 +1,6 @@
 ---
-title: "Diagnostics · Fixed Arrays"
-description: A Flecha source example from the compiler repository.
+title: "Fixed Arrays diagnostics"
+description: "See the Flecha compiler diagnostics produced by invalid fixed arrays programs."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/diagnostics/fixed_arrays.fl
 ---
 

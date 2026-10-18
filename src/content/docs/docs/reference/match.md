@@ -1,5 +1,6 @@
 ---
 title: "Enum matching"
+description: "Match is an exhaustive expression for nominal scalar enums. It evaluates its input exactly once, selects one arm, and evaluates only that arm."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/match.md
 ---
 `match` is an exhaustive expression for nominal scalar enums. It evaluates its
