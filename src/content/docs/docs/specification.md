@@ -107,7 +107,7 @@ i32 add(i32 left, i32 right) {
     return left + right;
 }
 
-unsafe void write_register(*volatile u32 address, u32 value) {
+unsafe void write_value(lend *u32 address, u32 value) {
     *address = value;
     return;
 }
@@ -178,12 +178,18 @@ declarations without an expected type. Partial inference is rejected.
 
 An omitted or empty capture list is captureless: names in the body resolve from
 module scope, not the surrounding local scope. Local values must be listed
-explicitly. The implemented capture mode is `copy`:
+explicitly. Snapshot and checked-reference captures are supported:
 
 ```flecha
 i32 factor = 2;
 Mapper scaled = [copy factor](value) => {
     return value * factor;
+};
+
+i32 count = 0;
+Mapper incremented = [&count, &const factor](value) => {
+    count = count + 1;
+    return value * factor + count;
 };
 ```
 
@@ -195,9 +201,21 @@ mutated independently when its source binding was writable.
 
 Copy captures reject borrowed handles, callable values, and other noncopyable
 values. A raw pointer may be copied only by an `unsafe` anonymous function;
-owning and lending raw-resource contracts remain future capture modes. Callable
-values remain move-only, and moving a closure transfers its environment and
-cleanup responsibility exactly once. `once` functions remain future work.
+owning and lending raw-resource contracts remain future capture modes.
+
+`&name` creates an exclusive checked borrow of writable storage. `&const name`
+creates a shared, read-only borrow. The loan lasts until the closure's last use,
+including when the closure moves into another variable or a callable-containing
+array, tuple, or structure. A closure cannot be stored somewhere that outlives
+the captured storage. Returning a borrowing closure requires a matching
+`<- parameter` contract, and calls propagate that origin into the returned
+callable value. Borrowed reference, slice, and string-view parameters are
+stored in the environment by value so returned closures retain the underlying
+borrow rather than the creator's parameter slot.
+
+Callable values remain move-only, and moving a closure transfers its
+environment and cleanup responsibility exactly once. `once` functions remain
+future work.
 
 ## 6. Return and yield
 
@@ -521,23 +539,42 @@ future allocation APIs.
 
 ## 12. Unsafe code
 
-Unsafe operations include behavior the compiler cannot fully validate, such as dereferencing raw pointers, accessing volatile memory, constructing values from unchecked representations, and calling functions with caller-maintained safety requirements.
+Unsafe operations include behavior the compiler cannot fully validate. The
+implemented model covers raw-address creation, raw-pointer dereferences, and
+calls with caller-maintained safety requirements. Volatile memory access and
+unchecked representation construction remain future features.
 
 An `unsafe` function places safety obligations on its caller:
 
 ```flecha
-unsafe void write_register(*volatile u32 address, u32 value) {
+unsafe void write_value(lend *u32 address, u32 value) {
     *address = value;
     return;
+}
+
+unsafe void destroy_value(own *u32 address) {
+    free(address);
+    return;
+}
+
+unsafe (own *u32, error) create_value(u32 initial) {
+    return new<u32>(initial);
 }
 ```
 
 Calling it requires an explicit unsafe context:
 
 ```flecha
-void configure_device() {
+u32 create_and_read() {
     unsafe {
-        write_register(0x40001000 as *volatile u32, 1);
+        address, allocation_error := create_value(0);
+        if allocation_error != none {
+            return 0;
+        }
+        write_value(address, 1);
+        result := *address;
+        destroy_value(address);
+        return result;
     }
 }
 ```
@@ -545,10 +582,12 @@ void configure_device() {
 An ordinary safe function may internally use a small unsafe block while preserving a safe external contract:
 
 ```flecha
-u32 read_device(*volatile const u32 address) {
+u32 increment(u32 value) {
     unsafe {
-        return *address;
+        pointer := &raw value;
+        write_value(pointer, value + 1);
     }
+    return value;
 }
 ```
 
@@ -560,19 +599,22 @@ permission from unsafe callers. The shorthand `unsafe copy(...)` is rejected;
 use a block instead. Ordinary nested blocks also create lexical scopes.
 
 Raw address creation is explicit: `&raw value` produces a raw pointer and
-requires an unsafe context. `&value` creates a checked reference.
-The volatile and integer-address examples above remain future features.
+requires an unsafe context. `&value` creates a checked reference. Volatile
+memory access and integer-to-pointer casts remain future features. The
+`volatile` word is reserved by the tokenizer, but types such as
+`*volatile u32` are not accepted by the parser yet.
 See [unsafe contexts and pointers](/docs/reference/unsafe_pointers/).
 
 ## 13. Pointers, arrays, and slices
 
-The intended pointer syntax keeps qualifiers inside the type rather than attaching them to individual declarations:
+The implemented pointer syntax distinguishes target constness from a fixed
+pointer binding:
 
 ```flecha
 *u8
 *const u8
-*volatile u32
-*volatile const u32
+const *u8
+const *const u8
 ```
 
 The parser and type model represent recursive pointers and references with
