@@ -118,14 +118,15 @@ html[lang='pt-BR'] .hero h1 { font-size: clamp(2.8rem, 5.2vw, 4.8rem) !important
 	.hero { padding-block: 3rem !important; }
 	body::before {
 		background-position:
-			left 0.5rem top 15%,
-			right 0.5rem top 6%,
-			right 0.5rem top 68%,
-			left 0.5rem top 82%,
-			center bottom 0.5rem,
-			right 0.5rem top 38%;
-		background-size: 14rem auto, 11rem auto, 14rem auto, 15rem auto, 13rem auto, 15rem auto;
-		opacity: 0.055;
+			left 0.75rem top 4%,
+			right 0.75rem top 21%,
+			left 0.75rem top 39%,
+			right 0.75rem top 57%,
+			left 0.75rem top 75%,
+			right 0.75rem bottom 1rem;
+		background-size: 12rem auto, 10rem auto, 12rem auto, 13rem auto, 12rem auto, 13rem auto;
+		opacity: 0.05;
+		position: absolute;
 	}
 	.hero h1 { font-size: clamp(2.6rem, 9vw, 4rem) !important; line-height: 1.06 !important; }
 	html[lang='pt-BR'] .hero h1 { font-size: clamp(2.35rem, 8vw, 3.6rem) !important; }
