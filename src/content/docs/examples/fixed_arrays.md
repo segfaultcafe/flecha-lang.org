@@ -1,6 +1,6 @@
 ---
-title: "Fixed Arrays"
-description: A Flecha source example from the compiler repository.
+title: "Fixed Arrays example"
+description: "Learn fixed arrays in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/fixed_arrays.fl
 ---
 

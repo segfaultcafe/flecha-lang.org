@@ -1,5 +1,6 @@
 ---
 title: "Array ranges and counted loops"
+description: "Implemented with fixed arrays. for, loop, and range are reserved keywords."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/iteration.md
 ---
 Implemented with fixed arrays. `for`, `loop`, and `range` are reserved keywords.

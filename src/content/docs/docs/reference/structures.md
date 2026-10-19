@@ -1,5 +1,6 @@
 ---
 title: "Structures and lifecycle methods"
+description: "Structures are nominal inline value types. This milestone implements fields, privacy, out-of-line methods, construction, automatic destruction, and…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/structures.md
 ---
 Structures are nominal inline value types. This milestone implements fields,

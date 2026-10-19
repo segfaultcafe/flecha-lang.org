@@ -1,5 +1,6 @@
 ---
 title: "Flecha Language Specification"
+description: "Status: evolving specification; implemented and proposed behavior is identified File extension: .fl Compiler command: flecha"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/SPEC.md
 ---
 Status: evolving specification; implemented and proposed behavior is identified

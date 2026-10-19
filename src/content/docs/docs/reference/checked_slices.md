@@ -1,5 +1,6 @@
 ---
 title: "Checked slices"
+description: "A slice borrows contiguous initialized storage. Its runtime representation is an address and a usize length, with no capacity, allocation, ownership, or…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/checked_slices.md
 ---
 A slice borrows contiguous initialized storage. Its runtime representation is an

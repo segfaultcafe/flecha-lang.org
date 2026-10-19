@@ -1,5 +1,6 @@
 ---
 title: "Docker sandbox"
+description: "The development sandbox provides a disposable Linux environment with the current checkout of Flecha installed. It includes:"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/sandbox.md
 ---
 The development sandbox provides a disposable Linux environment with the

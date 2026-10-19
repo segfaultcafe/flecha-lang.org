@@ -1,5 +1,6 @@
 ---
 title: "Flecha runtime ABI"
+description: "Generated native objects call a versioned C ABI implemented by the Flecha runtime archive. The current ABI version is 1, and every exported symbol is prefixed…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/runtime_abi.md
 ---
 Generated native objects call a versioned C ABI implemented by the Flecha

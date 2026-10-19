@@ -1,6 +1,6 @@
 ---
-title: "Loop Control"
-description: A Flecha source example from the compiler repository.
+title: "Loop Control example"
+description: "Learn loop control in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/loop_control.fl
 ---
 

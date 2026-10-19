@@ -1,6 +1,6 @@
 ---
-title: "Diagnostics · Unsafe Pointers"
-description: A Flecha source example from the compiler repository.
+title: "Unsafe Pointers diagnostics"
+description: "See the Flecha compiler diagnostics produced by invalid unsafe pointers programs."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/diagnostics/unsafe_pointers.fl
 ---
 

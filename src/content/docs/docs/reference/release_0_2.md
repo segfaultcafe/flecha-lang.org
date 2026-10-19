@@ -1,5 +1,6 @@
 ---
 title: "Flecha 0.2.0 milestone"
+description: "Flecha 0.2.0 is the callable-values and closures milestone. This document separates implemented foundations from the remaining staged work."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/release_0_2.md
 ---
 Flecha 0.2.0 is the callable-values and closures milestone. This document

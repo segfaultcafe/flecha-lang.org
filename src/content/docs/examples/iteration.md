@@ -1,6 +1,6 @@
 ---
-title: "Iteration"
-description: A Flecha source example from the compiler repository.
+title: "Iteration example"
+description: "Learn iteration in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/iteration.fl
 ---
 

@@ -1,6 +1,6 @@
 ---
-title: "Structures"
-description: A Flecha source example from the compiler repository.
+title: "Structures example"
+description: "Learn structures in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/structures.fl
 ---
 

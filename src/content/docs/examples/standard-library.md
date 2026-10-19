@@ -1,6 +1,6 @@
 ---
-title: "Modules · Src · Main"
-description: A Flecha source example from the compiler repository.
+title: "Standard library modules"
+description: "Import and use Flecha standard-library algorithms with modules, generic functions, fixed arrays, and slices."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/modules/src/main.fl
 ---
 

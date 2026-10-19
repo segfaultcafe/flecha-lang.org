@@ -1,6 +1,6 @@
 ---
-title: "While Also"
-description: A Flecha source example from the compiler repository.
+title: "While Also example"
+description: "Learn while also in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/while_also.fl
 ---
 

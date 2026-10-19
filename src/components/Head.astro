@@ -1,0 +1,68 @@
+---
+const route = Astro.locals.starlightRoute;
+const translatedRoutes = new Set(['', 'install', 'learn', 'docs', 'examples', 'releases']);
+const isPortuguese = route.locale === 'pt-br';
+const routeWithoutLocale = route.id.replace(/^pt-br\/?/, '');
+const hasPortugueseTranslation = translatedRoutes.has(routeWithoutLocale);
+
+const canonicalEnglish = new URL(
+	`/${route.entry.id ? `${route.entry.id.replace(/^index$/, '')}/` : ''}`.replace('//', '/'),
+	Astro.site,
+).href;
+
+const head = route.head
+	.filter(({ tag, attrs }) => {
+		if (route.isFallback && tag === 'link' && attrs?.rel === 'alternate') return false;
+		if (
+			!isPortuguese &&
+			!hasPortugueseTranslation &&
+			tag === 'link' &&
+			attrs?.rel === 'alternate' &&
+			attrs?.hreflang === 'pt-BR'
+		) return false;
+		return true;
+	})
+	.map((entry) => {
+		if (route.isFallback && entry.tag === 'link' && entry.attrs?.rel === 'canonical') {
+			return { ...entry, attrs: { ...entry.attrs, href: canonicalEnglish } };
+		}
+		if (routeWithoutLocale === '' && entry.tag === 'meta' && entry.attrs?.property === 'og:type') {
+			return { ...entry, attrs: { ...entry.attrs, content: 'website' } };
+		}
+		return entry;
+	});
+
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'WebSite',
+			'@id': 'https://flecha-lang.org/#website',
+			name: 'Flecha programming language',
+			alternateName: 'Flecha',
+			url: 'https://flecha-lang.org/',
+			inLanguage: ['en', 'pt-BR'],
+		},
+		{
+			'@type': 'SoftwareApplication',
+			'@id': 'https://flecha-lang.org/#compiler',
+			name: 'Flecha compiler',
+			applicationCategory: 'DeveloperApplication',
+			operatingSystem: 'Linux, macOS, Windows',
+			softwareVersion: '0.1.2',
+			url: 'https://flecha-lang.org/',
+			downloadUrl: 'https://github.com/segfaultcafe/flecha/releases',
+			codeRepository: 'https://github.com/segfaultcafe/flecha',
+			offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+		},
+	],
+};
+---
+
+{head.map(({ tag: Tag, attrs, content }) => <Tag {...attrs} set:html={content} />)}
+{route.isFallback && <meta name="robots" content="noindex,follow" />}
+{
+	routeWithoutLocale === '' && (
+		<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+	)
+}

@@ -1,5 +1,6 @@
 ---
 title: "Checked stack references"
+description: "Checked references are implemented for initialized scalar, structure, fixed-array, and raw-pointer storage. They borrow storage without allocating, owning, or…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/checked_references.md
 ---
 Checked references are implemented for initialized scalar, structure, fixed-array, and raw-pointer

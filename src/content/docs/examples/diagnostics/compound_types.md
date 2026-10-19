@@ -1,6 +1,6 @@
 ---
-title: "Diagnostics · Compound Types"
-description: A Flecha source example from the compiler repository.
+title: "Compound Types diagnostics"
+description: "See the Flecha compiler diagnostics produced by invalid compound types programs."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/diagnostics/compound_types.fl
 ---
 

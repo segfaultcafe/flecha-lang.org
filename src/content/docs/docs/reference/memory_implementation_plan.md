@@ -1,5 +1,6 @@
 ---
 title: "Memory feature implementation history and remaining work"
+description: "Status: const types, unsafe pointers, checked references, fixed arrays, and iteration, checked slices, deferred calls, and tuples/destructuring are merged…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/memory_implementation_plan.md
 ---
 Status: const types, unsafe pointers, checked references, fixed arrays, and

@@ -1,5 +1,6 @@
 ---
 title: "Flecha 0.1 release contract"
+description: "Flecha 0.1.0 is the first installable experimental release. Self-hosting is not part of this milestone. The release is complete only when the same source…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/release_0_1.md
 ---
 Flecha 0.1.0 is the first installable experimental release. Self-hosting is

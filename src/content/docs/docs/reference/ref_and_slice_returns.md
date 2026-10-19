@@ -1,5 +1,6 @@
 ---
 title: "Reference and slice returns"
+description: "Status: implemented on feat/ref-and-slice-returns for the next Flecha language version."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/ref_and_slice_returns.md
 ---
 Status: implemented on `feat/ref-and-slice-returns` for the next Flecha

@@ -1,5 +1,6 @@
 ---
 title: "Memory model and remaining proposals"
+description: "Status: implemented behavior is identified below; broader ownership sections remain design proposals."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/memory_model.md
 ---
 Status: implemented behavior is identified below; broader ownership sections

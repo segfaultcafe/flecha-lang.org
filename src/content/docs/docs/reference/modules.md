@@ -1,5 +1,6 @@
 ---
 title: "Modules and imports"
+description: "A module is one .fl file. Its declaration comes first and matches the filename:"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/modules.md
 ---
 A module is one `.fl` file. Its declaration comes first and matches the filename:
@@ -119,4 +120,4 @@ ownership errors stop before object emission. An executable's entry module needs
 
 Neovim highlights `@imports` in light blue, and recognizes `module` and `export`.
 See [Longbow](/docs/reference/longbow/) for project creation and builds and
-[the module example](/examples/modules/src/main/) for a runnable project.
+[the module example](/examples/standard-library/) for a runnable project.

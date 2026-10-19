@@ -1,5 +1,6 @@
 ---
 title: "Strings"
+description: "The initial string model is byte-oriented. Lengths and indices count bytes, and char is a u8. Unicode decoding and code-point iteration belong in a later text…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/string.md
 ---
 Flecha has two complementary text types:

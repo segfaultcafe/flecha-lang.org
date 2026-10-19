@@ -1,6 +1,6 @@
 ---
-title: "Diagnostics · Iteration"
-description: A Flecha source example from the compiler repository.
+title: "Iteration diagnostics"
+description: "See the Flecha compiler diagnostics produced by invalid iteration programs."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/diagnostics/iteration.fl
 ---
 

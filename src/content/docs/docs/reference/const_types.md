@@ -1,5 +1,6 @@
 ---
 title: "Const declarations and compound types"
+description: "The first milestone implemented const value declarations and the recursive type foundation for pointers and references. Raw pointers are now executable as…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/const_types.md
 ---
 The first milestone implemented const value declarations and the recursive type

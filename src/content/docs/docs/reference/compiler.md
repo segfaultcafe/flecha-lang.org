@@ -1,5 +1,6 @@
 ---
 title: "Flecha compiler"
+description: "Flecha is the language compiler shipped in Flecha release archives. It loads a .fl entry module and its imports, performs semantic and ownership checks…"
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/compiler.md
 ---
 `flecha` is the language compiler shipped in Flecha release archives. It

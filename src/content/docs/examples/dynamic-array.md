@@ -1,6 +1,6 @@
 ---
-title: "Dynamic Array · Src · Main"
-description: A Flecha source example from the compiler repository.
+title: "Generic dynamic array"
+description: "Build and query a generic dynamic array using Flecha’s standard-library Array container."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/dynamic_array/src/main.fl
 ---
 

@@ -1,6 +1,6 @@
 ---
-title: "Diagnostics · Const Declarations"
-description: A Flecha source example from the compiler repository.
+title: "Const Declarations diagnostics"
+description: "See the Flecha compiler diagnostics produced by invalid const declarations programs."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/diagnostics/const_declarations.fl
 ---
 

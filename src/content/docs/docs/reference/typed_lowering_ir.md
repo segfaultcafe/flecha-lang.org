@@ -1,5 +1,6 @@
 ---
 title: "Typed lowering IR"
+description: "The lowering layer is the internal boundary between semantic analysis and code generation. It does not define or change Flecha source syntax."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/typed_lowering_ir.md
 ---
 The lowering layer is the internal boundary between semantic analysis and code

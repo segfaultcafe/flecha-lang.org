@@ -31,6 +31,78 @@ const titleFromName = (name) =>
 		.replaceAll('_', ' ')
 		.replace(/\b\w/g, (letter) => letter.toUpperCase());
 
+const exampleOverrides = new Map([
+	[
+		'modules/src/main.fl',
+		{
+			slug: 'standard-library',
+			title: 'Standard library modules',
+			description:
+				'Import and use Flecha standard-library algorithms with modules, generic functions, fixed arrays, and slices.',
+		},
+	],
+	[
+		'dynamic_array/src/main.fl',
+		{
+			slug: 'dynamic-array',
+			title: 'Generic dynamic array',
+			description:
+				'Build and query a generic dynamic array using Flecha’s standard-library Array container.',
+		},
+	],
+]);
+
+function truncateDescription(text, limit = 158) {
+	if (text.length <= limit) return text;
+	const shortened = text.slice(0, limit + 1);
+	const breakAt = shortened.lastIndexOf(' ');
+	return `${shortened.slice(0, breakAt > 100 ? breakAt : limit).replace(/[,:;.-]+$/, '')}…`;
+}
+
+function descriptionFromMarkdown(markdown, fallback) {
+	const prose = markdown
+		.replace(/```[\s\S]*?```/g, '')
+		.split(/\r?\n\s*\r?\n/)
+		.map((paragraph) => paragraph.trim())
+		.find(
+			(paragraph) =>
+				paragraph.length > 40 &&
+				!paragraph.startsWith('#') &&
+				!paragraph.startsWith(':::') &&
+				!paragraph.startsWith('|') &&
+				!paragraph.startsWith('- ') &&
+				!paragraph.startsWith('* ') &&
+				!paragraph.startsWith('<'),
+		);
+	if (!prose) return fallback;
+	const plain = prose
+		.replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+		.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+		.replace(/`([^`]+)`/g, '$1')
+		.replace(/[*_~]/g, '')
+		.replace(/<[^>]+>/g, '')
+		.replace(/\s+/g, ' ')
+		.trim();
+	const sentence = plain ? `${plain[0].toUpperCase()}${plain.slice(1)}` : fallback;
+	return truncateDescription(sentence);
+}
+
+function exampleMetadata(sourcePath) {
+	const override = exampleOverrides.get(sourcePath);
+	if (override) return override;
+
+	const diagnostic = sourcePath.startsWith('diagnostics/');
+	const basenameWithoutExtension = basename(sourcePath, '.fl');
+	const subject = titleFromName(basenameWithoutExtension);
+	return {
+		slug: sourcePath.slice(0, -3),
+		title: diagnostic ? `${subject} diagnostics` : `${subject} example`,
+		description: diagnostic
+			? `See the Flecha compiler diagnostics produced by invalid ${subject.toLowerCase()} programs.`
+			: `Learn ${subject.toLowerCase()} in Flecha with a complete source example you can inspect and run.`,
+	};
+}
+
 function splitTitle(markdown, fallback) {
 	const match = markdown.match(/^#\s+(.+)\r?\n+/);
 	return {
@@ -41,6 +113,14 @@ function splitTitle(markdown, fallback) {
 
 function rewriteLinks(markdown) {
 	return markdown
+		.replaceAll(
+			/\]\(\.\.\/examples\/modules\/src\/main\.fl(#[^)]+)?\)/gi,
+			'](/examples/standard-library/$1)',
+		)
+		.replaceAll(
+			/\]\(\.\.\/examples\/dynamic_array\/src\/main\.fl(#[^)]+)?\)/gi,
+			'](/examples/dynamic-array/$1)',
+		)
 		.replaceAll(/\]\(\.\.\/examples\/([a-z0-9_/-]+)\.fl(#[^)]+)?\)/gi, '](/examples/$1/$2)')
 		.replaceAll(/\]\(docs\/([a-z0-9_/-]+)\.md(#[^)]+)?\)/gi, '](/docs/reference/$1/$2)')
 		.replaceAll(/\]\((?:\.\/)?([a-z0-9_/-]+)\.md(#[^)]+)?\)/gi, '](/docs/reference/$1/$2)')
@@ -73,9 +153,14 @@ function listFiles(root, suffix) {
 function writeMarkdownPage(sourceFile, targetFile, sourcePath) {
 	const raw = readFileSync(sourceFile, 'utf8');
 	const { title, body } = splitTitle(raw, titleFromName(basename(sourceFile)));
+	const description = descriptionFromMarkdown(
+		body,
+		`Reference documentation for ${title} in the Flecha programming language.`,
+	);
 	const frontmatter = [
 		'---',
 		`title: ${JSON.stringify(title)}`,
+		`description: ${JSON.stringify(description)}`,
 		`editUrl: https://github.com/segfaultcafe/flecha/edit/master/${sourcePath}`,
 		'---',
 		'',
@@ -101,10 +186,9 @@ writeMarkdownPage(
 
 const examples = listFiles(examplesSource, '.fl');
 for (const sourcePath of examples) {
-	const slug = sourcePath.slice(0, -3);
-	const title = sourcePath.split('/').map(titleFromName).join(' · ');
+	const { slug, title, description } = exampleMetadata(sourcePath);
 	const code = readFileSync(join(examplesSource, sourcePath), 'utf8').trimEnd();
-	const page = `---\ntitle: ${JSON.stringify(title)}\ndescription: A Flecha source example from the compiler repository.\neditUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/${sourcePath}\n---\n\n[View source on GitHub](https://github.com/segfaultcafe/flecha/blob/master/examples/${sourcePath})\n\n\`\`\`flecha title="${sourcePath}"\n${code}\n\`\`\`\n`;
+	const page = `---\ntitle: ${JSON.stringify(title)}\ndescription: ${JSON.stringify(description)}\neditUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/${sourcePath}\n---\n\n[View source on GitHub](https://github.com/segfaultcafe/flecha/blob/master/examples/${sourcePath})\n\n\`\`\`flecha title="${sourcePath}"\n${code}\n\`\`\`\n`;
 	const target = join(examplesTarget, `${slug}.md`);
 	mkdirSync(dirname(target), { recursive: true });
 	writeFileSync(target, page, 'utf8');

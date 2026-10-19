@@ -1,6 +1,6 @@
 ---
-title: "Unsafe Pointers"
-description: A Flecha source example from the compiler repository.
+title: "Unsafe Pointers example"
+description: "Learn unsafe pointers in Flecha with a complete source example you can inspect and run."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/unsafe_pointers.fl
 ---
 
