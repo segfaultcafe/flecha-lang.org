@@ -81,6 +81,7 @@ const exampleCatalog = [
 			'error_values',
 			'defer',
 			'callables',
+			'once',
 		],
 	},
 	{
@@ -97,7 +98,7 @@ const exampleCatalog = [
 	},
 	{
 		category: 'library',
-		slugs: ['standard-library', 'dynamic-array', 'llvm_poc'],
+		slugs: ['callback_algorithms', 'standard-library', 'dynamic-array', 'llvm_poc'],
 	},
 	{
 		category: 'diagnostics',
@@ -342,7 +343,7 @@ writeMarkdownBodyPage(join(docsTarget, 'changelog.md'), {
 	sourcePath: 'CHANGELOG.md',
 	description: 'Current Flecha development changes and the complete tagged release history.',
 });
-for (const version of ['0.1.2', '0.1.3']) {
+for (const version of ['0.1.2', '0.1.3', '0.2.0']) {
 	writeMarkdownBodyPage(join(docsTarget, `release_${version.replaceAll('.', '_')}.md`), {
 		title: `Flecha ${version}`,
 		body: releaseBody(changelog, version),

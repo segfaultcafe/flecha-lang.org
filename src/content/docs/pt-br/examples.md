@@ -3,7 +3,7 @@ title: Exemplos
 description: Catálogo completo de programas Flecha sincronizados do repositório do compilador.
 ---
 
-Estes 34 exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com/segfaultcafe/flecha/tree/master/examples). O código e os identificadores permanecem iguais ao original; as páginas individuais estão em inglês.
+Estes 36 exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com/segfaultcafe/flecha/tree/master/examples). O código e os identificadores permanecem iguais ao original; as páginas individuais estão em inglês.
 
 ## Linguagem e fluxo de controle
 
@@ -23,6 +23,7 @@ Estes 34 exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com
 - [Error Values](/examples/error_values/)
 - [Defer](/examples/defer/)
 - [Callables](/examples/callables/)
+- [Once](/examples/once/)
 
 ## Memória e propriedade
 
@@ -36,6 +37,7 @@ Estes 34 exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com
 
 ## Biblioteca padrão e compilação
 
+- [Callback Algorithms](/examples/callback_algorithms/)
 - [Standard library modules](/examples/standard-library/)
 - [Generic dynamic array](/examples/dynamic-array/)
 - [LLVM IR proof of concept](/examples/llvm_poc/)

@@ -1,9 +1,9 @@
 {
   "repository": "segfaultcafe/flecha",
-  "commit": "510691f5e0d51b496fb714b760c3f0cef9ef6b55",
-  "syncedAt": "2026-10-20T00:44:35.675Z",
+  "commit": "36f6fe69f5701376f40a02b4293554cb607daba8",
+  "syncedAt": "2026-10-20T14:33:35.914Z",
   "docs": 43,
-  "examples": 34,
+  "examples": 36,
   "examplePages": [
     {
       "slug": "factorial",
@@ -86,6 +86,11 @@
       "category": "language"
     },
     {
+      "slug": "once",
+      "title": "Once example",
+      "category": "language"
+    },
+    {
       "slug": "checked_references",
       "title": "Checked References example",
       "category": "memory"
@@ -119,6 +124,11 @@
       "slug": "memory_tracking",
       "title": "Memory Tracking example",
       "category": "memory"
+    },
+    {
+      "slug": "callback_algorithms",
+      "title": "Callback Algorithms example",
+      "category": "library"
     },
     {
       "slug": "standard-library",

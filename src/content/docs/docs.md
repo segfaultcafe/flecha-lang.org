@@ -47,7 +47,7 @@ Implementation references cover [semantic analysis](/docs/reference/semantic_ana
 ## Project history
 
 - [Changelog and current development](/docs/reference/changelog/)
-- [Flecha 0.2.0 milestone](/docs/reference/release_0_2/)
+- [Flecha 0.2.0 release notes](/docs/reference/release_0_2_0/) and [implementation milestone](/docs/reference/release_0_2/)
 - [Flecha 0.1.3](/docs/reference/release_0_1_3/) and [Flecha 0.1.2](/docs/reference/release_0_1_2/)
 - [Flecha 0.1.1 stabilization milestone](/docs/reference/release_0_1_1/)
 - [Flecha 0.1 release contract](/docs/reference/release_0_1/)
