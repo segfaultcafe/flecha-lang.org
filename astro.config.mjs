@@ -7,6 +7,31 @@ import starlight from '@astrojs/starlight';
 const flechaGrammar = JSON.parse(
 	readFileSync(new URL('./src/data/flecha.tmLanguage.json', import.meta.url), 'utf8'),
 );
+const flechaSource = JSON.parse(
+	readFileSync(new URL('./src/data/flecha-source.json', import.meta.url), 'utf8'),
+);
+const exampleCategories = [
+	['language', 'Language and control flow', 'Linguagem e fluxo de controle'],
+	['memory', 'Memory and ownership', 'Memória e propriedade'],
+	['library', 'Standard library and compilation', 'Biblioteca padrão e compilação'],
+	['diagnostics', 'Compiler diagnostics', 'Diagnósticos do compilador'],
+	['other', 'Other examples', 'Outros exemplos'],
+];
+const examplePages = Array.isArray(flechaSource.examplePages) ? flechaSource.examplePages : [];
+const exampleSidebarItems = exampleCategories.flatMap(([category, label, translation]) => {
+	const pages = examplePages.filter((page) => page.category === category);
+	if (!pages.length) return [];
+	return [
+		{
+			label,
+			translations: { 'pt-br': translation },
+			items: pages.map(({ slug, title }) => ({
+				label: title.replace(/ example$| diagnostics$/, ''),
+				slug: `examples/${slug}`,
+			})),
+		},
+	];
+});
 
 export default defineConfig({
 	site: 'https://flecha-lang.org',
@@ -151,9 +176,12 @@ export default defineConfig({
 							label: 'Project history',
 							translations: { 'pt-br': 'Histórico do projeto' },
 							items: [
-								{ label: 'Flecha 0.1 release contract', slug: 'docs/reference/release_0_1' },
-								{ label: 'Flecha 0.1.1 stabilization milestone', slug: 'docs/reference/release_0_1_1' },
+								{ label: 'Changelog and current development', slug: 'docs/reference/changelog' },
 								{ label: 'Flecha 0.2.0 milestone', slug: 'docs/reference/release_0_2' },
+								{ label: 'Flecha 0.1.3', slug: 'docs/reference/release_0_1_3' },
+								{ label: 'Flecha 0.1.2', slug: 'docs/reference/release_0_1_2' },
+								{ label: 'Flecha 0.1.1 stabilization milestone', slug: 'docs/reference/release_0_1_1' },
+								{ label: 'Flecha 0.1 release contract', slug: 'docs/reference/release_0_1' },
 							],
 						},
 					],
@@ -163,7 +191,9 @@ export default defineConfig({
 					translations: { 'pt-br': 'Exemplos' },
 					items: [
 						{ label: 'Examples overview', translations: { 'pt-br': 'Visão geral' }, slug: 'examples' },
-						{ autogenerate: { directory: 'examples' } },
+						...(exampleSidebarItems.length
+							? exampleSidebarItems
+							: [{ autogenerate: { directory: 'examples' } }]),
 					],
 				},
 				{ label: 'Releases', translations: { 'pt-br': 'Versões' }, slug: 'releases' },

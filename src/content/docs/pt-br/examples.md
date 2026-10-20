@@ -1,23 +1,55 @@
 ---
 title: Exemplos
-description: Programas Flecha executáveis sincronizados do repositório do compilador.
+description: Catálogo completo de programas Flecha sincronizados do repositório do compilador.
 ---
 
-Os exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com/segfaultcafe/flecha/tree/master/examples). O código e os identificadores permanecem iguais ao original; as páginas individuais ainda estão em inglês.
+Estes 34 exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com/segfaultcafe/flecha/tree/master/examples). O código e os identificadores permanecem iguais ao original; as páginas individuais estão em inglês.
 
-## Ordem sugerida
+## Linguagem e fluxo de controle
 
-1. [Factorial](/examples/factorial/)
-2. [Structures](/examples/structures/)
-3. [Iteration](/examples/iteration/)
-4. [Fixed arrays](/examples/fixed_arrays/)
-5. [Error values](/examples/error_values/)
-6. [Checked references](/examples/checked_references/)
-7. [Callable values and closures](/examples/callables/)
-8. [Standard-library modules and callback algorithms](/examples/standard-library/)
-9. [Generic dynamic arrays](/examples/dynamic-array/)
-10. [Ownership contracts](/examples/ownership_contracts/)
-11. [Raw allocation](/examples/raw_allocation/)
+- [Factorial](/examples/factorial/)
+- [Stdout](/examples/stdout/)
+- [Native Functions](/examples/native_functions/)
+- [Numeric Casts](/examples/numeric_casts/)
+- [Structures](/examples/structures/)
+- [Tuples](/examples/tuples/)
+- [Const Declarations](/examples/const_declarations/)
+- [If Also](/examples/if_also/)
+- [While Also](/examples/while_also/)
+- [Iteration](/examples/iteration/)
+- [Loop Control](/examples/loop_control/)
+- [Fixed Arrays](/examples/fixed_arrays/)
+- [String View](/examples/string_view/)
+- [Error Values](/examples/error_values/)
+- [Defer](/examples/defer/)
+- [Callables](/examples/callables/)
+
+## Memória e propriedade
+
+- [Checked References](/examples/checked_references/)
+- [Checked Slices](/examples/checked_slices/)
+- [Ref And Slice Returns](/examples/ref_and_slice_returns/)
+- [Ownership Contracts](/examples/ownership_contracts/)
+- [Raw Allocation](/examples/raw_allocation/)
+- [Unsafe Pointers](/examples/unsafe_pointers/)
+- [Memory Tracking](/examples/memory_tracking/)
+
+## Biblioteca padrão e compilação
+
+- [Standard library modules](/examples/standard-library/)
+- [Generic dynamic array](/examples/dynamic-array/)
+- [LLVM IR proof of concept](/examples/llvm_poc/)
+
+## Diagnósticos do compilador
+
+- [Invalids](/examples/invalids/)
+- [Checked References](/examples/diagnostics/checked_references/)
+- [Checked Slices](/examples/diagnostics/checked_slices/)
+- [Compound Types](/examples/diagnostics/compound_types/)
+- [Const Declarations](/examples/diagnostics/const_declarations/)
+- [Fixed Arrays](/examples/diagnostics/fixed_arrays/)
+- [Iteration](/examples/diagnostics/iteration/)
+- [Unsafe Pointers](/examples/diagnostics/unsafe_pointers/)
 
 ## Executar um exemplo
 

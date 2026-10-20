@@ -1,6 +1,6 @@
 ---
-title: "Llvm Poc example"
-description: "Learn llvm poc in Flecha with a complete source example you can inspect and run."
+title: "LLVM IR proof of concept"
+description: "Inspect a small Flecha program used to exercise LLVM IR generation and execution."
 editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/llvm_poc.fl
 ---
 
