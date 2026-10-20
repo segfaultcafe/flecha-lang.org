@@ -17,11 +17,12 @@ const sourceRoot = resolve(
 );
 const docsSource = join(sourceRoot, 'docs');
 const examplesSource = join(sourceRoot, 'examples');
+const changelogSource = join(sourceRoot, 'CHANGELOG.md');
 const docsTarget = join(siteRoot, 'src/content/docs/docs/reference');
 const examplesTarget = join(siteRoot, 'src/content/docs/examples');
 const metadataTarget = join(siteRoot, 'src/data/flecha-source.json');
 
-for (const required of [join(sourceRoot, 'SPEC.md'), docsSource, examplesSource]) {
+for (const required of [join(sourceRoot, 'SPEC.md'), changelogSource, docsSource, examplesSource]) {
 	if (!existsSync(required)) throw new Error(`Missing Flecha source content: ${required}`);
 }
 
@@ -50,7 +51,77 @@ const exampleOverrides = new Map([
 				'Build and query a generic dynamic array using Flecha’s standard-library Array container.',
 		},
 	],
+	[
+		'llvm_poc.fl',
+		{
+			slug: 'llvm_poc',
+			title: 'LLVM IR proof of concept',
+			description: 'Inspect a small Flecha program used to exercise LLVM IR generation and execution.',
+		},
+	],
 ]);
+
+const exampleCatalog = [
+	{
+		category: 'language',
+		slugs: [
+			'factorial',
+			'stdout',
+			'native_functions',
+			'numeric_casts',
+			'structures',
+			'tuples',
+			'const_declarations',
+			'if_also',
+			'while_also',
+			'iteration',
+			'loop_control',
+			'fixed_arrays',
+			'string_view',
+			'error_values',
+			'defer',
+			'callables',
+		],
+	},
+	{
+		category: 'memory',
+		slugs: [
+			'checked_references',
+			'checked_slices',
+			'ref_and_slice_returns',
+			'ownership_contracts',
+			'raw_allocation',
+			'unsafe_pointers',
+			'memory_tracking',
+		],
+	},
+	{
+		category: 'library',
+		slugs: ['standard-library', 'dynamic-array', 'llvm_poc'],
+	},
+	{
+		category: 'diagnostics',
+		slugs: [
+			'invalids',
+			'diagnostics/checked_references',
+			'diagnostics/checked_slices',
+			'diagnostics/compound_types',
+			'diagnostics/const_declarations',
+			'diagnostics/fixed_arrays',
+			'diagnostics/iteration',
+			'diagnostics/unsafe_pointers',
+		],
+	},
+];
+
+const categoryForExample = new Map(
+	exampleCatalog.flatMap(({ category, slugs }) => slugs.map((slug) => [slug, category])),
+);
+const orderForExample = new Map(
+	exampleCatalog
+		.flatMap(({ slugs }) => slugs)
+		.map((slug, index) => [slug, index]),
+);
 
 function truncateDescription(text, limit = 158) {
 	if (text.length <= limit) return text;
@@ -150,22 +221,102 @@ function listFiles(root, suffix) {
 	return result.sort();
 }
 
-function writeMarkdownPage(sourceFile, targetFile, sourcePath) {
-	const raw = readFileSync(sourceFile, 'utf8');
-	const { title, body } = splitTitle(raw, titleFromName(basename(sourceFile)));
-	const description = descriptionFromMarkdown(
-		body,
-		`Reference documentation for ${title} in the Flecha programming language.`,
-	);
+function writeMarkdownBodyPage(targetFile, { title, body, sourcePath, description }) {
+	const pageDescription =
+		description ??
+		descriptionFromMarkdown(
+			body,
+			`Reference documentation for ${title} in the Flecha programming language.`,
+		);
 	const frontmatter = [
 		'---',
 		`title: ${JSON.stringify(title)}`,
-		`description: ${JSON.stringify(description)}`,
+		`description: ${JSON.stringify(pageDescription)}`,
 		`editUrl: https://github.com/segfaultcafe/flecha/edit/master/${sourcePath}`,
 		'---',
 		'',
 	].join('\n');
-	writeFileSync(targetFile, frontmatter + rewriteLinks(body), 'utf8');
+	writeFileSync(targetFile, `${frontmatter}${rewriteLinks(body).trimEnd()}\n`, 'utf8');
+}
+
+function writeMarkdownPage(sourceFile, targetFile, sourcePath) {
+	const raw = readFileSync(sourceFile, 'utf8');
+	const { title, body } = splitTitle(raw, titleFromName(basename(sourceFile)));
+	writeMarkdownBodyPage(targetFile, { title, body, sourcePath });
+}
+
+function releaseBody(changelog, version) {
+	const heading = `## ${version}`;
+	const start = changelog.indexOf(heading);
+	if (start < 0) throw new Error(`Missing ${heading} in CHANGELOG.md`);
+	const bodyStart = changelog.indexOf('\n', start) + 1;
+	const nextHeading = changelog.indexOf('\n## ', bodyStart);
+	return changelog.slice(bodyStart, nextHeading < 0 ? undefined : nextHeading).trim();
+}
+
+function exampleLink({ slug, title }) {
+	return `- [${title.replace(/ example$| diagnostics$/, '')}](/examples/${slug}/)`;
+}
+
+function writeExamplesOverview(examplePages, locale = 'en') {
+	const pagesBySlug = new Map(examplePages.map((page) => [page.slug, page]));
+	const used = new Set();
+	const groupLabels =
+		locale === 'pt-br'
+			? {
+					language: 'Linguagem e fluxo de controle',
+					memory: 'Memória e propriedade',
+					library: 'Biblioteca padrão e compilação',
+					diagnostics: 'Diagnósticos do compilador',
+					other: 'Outros exemplos',
+				}
+			: {
+					language: 'Language and control flow',
+					memory: 'Memory and ownership',
+					library: 'Standard library and compilation',
+					diagnostics: 'Compiler diagnostics',
+					other: 'Other examples',
+				};
+	const groups = exampleCatalog.map(({ category, slugs }) => ({
+		category,
+		pages: slugs.flatMap((slug) => {
+			const page = pagesBySlug.get(slug);
+			if (!page) return [];
+			used.add(slug);
+			return [page];
+		}),
+	}));
+	const uncategorized = examplePages.filter(({ slug }) => !used.has(slug));
+	if (uncategorized.length) groups.push({ category: 'other', pages: uncategorized });
+
+	const catalog = groups
+		.filter(({ pages }) => pages.length)
+		.map(
+			({ category, pages }) =>
+				`## ${groupLabels[category]}\n\n${pages.map(exampleLink).join('\n')}`,
+		)
+		.join('\n\n');
+	const count = examplePages.length;
+	const translated = locale === 'pt-br';
+	const page = `---
+title: ${translated ? 'Exemplos' : 'Examples'}
+description: ${translated ? 'Catálogo completo de programas Flecha sincronizados do repositório do compilador.' : 'Complete catalog of runnable Flecha programs synced from the compiler repository.'}
+---
+
+${translated ? `Estes ${count} exemplos vêm diretamente de` : `These ${count} examples come directly from`} [\`segfaultcafe/flecha\`](https://github.com/segfaultcafe/flecha/tree/master/examples). ${translated ? 'O código e os identificadores permanecem iguais ao original; as páginas individuais estão em inglês.' : 'They cover the current language, runtime, standard library, and compiler diagnostics.'}
+
+${catalog}
+
+## ${translated ? 'Executar um exemplo' : 'Run an example'}
+
+\`\`\`sh
+build/flecha check examples/factorial.fl
+build/flecha build examples/factorial.fl -o build/factorial
+./build/factorial
+\`\`\`
+`;
+	const target = join(siteRoot, `src/content/docs/${translated ? 'pt-br/' : ''}examples.md`);
+	writeFileSync(target, page, 'utf8');
 }
 
 rmSync(docsTarget, { recursive: true, force: true });
@@ -184,15 +335,45 @@ writeMarkdownPage(
 	'SPEC.md',
 );
 
+const changelog = readFileSync(changelogSource, 'utf8');
+writeMarkdownBodyPage(join(docsTarget, 'changelog.md'), {
+	title: 'Changelog and release history',
+	body: splitTitle(changelog, 'Changelog').body,
+	sourcePath: 'CHANGELOG.md',
+	description: 'Current Flecha development changes and the complete tagged release history.',
+});
+for (const version of ['0.1.2', '0.1.3']) {
+	writeMarkdownBodyPage(join(docsTarget, `release_${version.replaceAll('.', '_')}.md`), {
+		title: `Flecha ${version}`,
+		body: releaseBody(changelog, version),
+		sourcePath: 'CHANGELOG.md',
+	});
+}
+
 const examples = listFiles(examplesSource, '.fl');
-for (const sourcePath of examples) {
-	const { slug, title, description } = exampleMetadata(sourcePath);
+const examplePages = examples.map((sourcePath) => {
+	const metadata = exampleMetadata(sourcePath);
+	return {
+		...metadata,
+		sourcePath,
+		category: categoryForExample.get(metadata.slug) ?? 'other',
+	};
+}).sort(
+	(left, right) =>
+		(orderForExample.get(left.slug) ?? Number.MAX_SAFE_INTEGER) -
+			(orderForExample.get(right.slug) ?? Number.MAX_SAFE_INTEGER) ||
+		left.slug.localeCompare(right.slug),
+);
+for (const { sourcePath, slug, title, description } of examplePages) {
 	const code = readFileSync(join(examplesSource, sourcePath), 'utf8').trimEnd();
 	const page = `---\ntitle: ${JSON.stringify(title)}\ndescription: ${JSON.stringify(description)}\neditUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/${sourcePath}\n---\n\n[View source on GitHub](https://github.com/segfaultcafe/flecha/blob/master/examples/${sourcePath})\n\n\`\`\`flecha title="${sourcePath}"\n${code}\n\`\`\`\n`;
 	const target = join(examplesTarget, `${slug}.md`);
 	mkdirSync(dirname(target), { recursive: true });
 	writeFileSync(target, page, 'utf8');
 }
+
+writeExamplesOverview(examplePages);
+writeExamplesOverview(examplePages, 'pt-br');
 
 let commit = process.env.FLECHA_SOURCE_COMMIT;
 if (!commit) {
@@ -209,7 +390,14 @@ mkdirSync(resolve(metadataTarget, '..'), { recursive: true });
 writeFileSync(
 	metadataTarget,
 	JSON.stringify(
-		{ repository: 'segfaultcafe/flecha', commit, syncedAt, docs: docs.length + 1, examples: examples.length },
+		{
+			repository: 'segfaultcafe/flecha',
+			commit,
+			syncedAt,
+			docs: docs.length + 4,
+			examples: examples.length,
+			examplePages: examplePages.map(({ slug, title, category }) => ({ slug, title, category })),
+		},
 		null,
 		2,
 	) + '\n',
@@ -221,4 +409,4 @@ cpSync(
 	join(siteRoot, 'src/data/flecha.tmLanguage.json'),
 );
 
-console.log(`Synced ${docs.length + 1} docs and ${examples.length} examples from ${commit.slice(0, 12)}.`);
+console.log(`Synced ${docs.length + 4} docs and ${examples.length} examples from ${commit.slice(0, 12)}.`);

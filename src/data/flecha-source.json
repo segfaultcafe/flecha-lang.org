@@ -1,7 +1,179 @@
 {
   "repository": "segfaultcafe/flecha",
-  "commit": "510691fe1291d0eba019603b0728f15fdb93b1b5",
-  "syncedAt": "2026-10-19T23:45:37.327Z",
-  "docs": 40,
-  "examples": 34
+  "commit": "510691f5e0d51b496fb714b760c3f0cef9ef6b55",
+  "syncedAt": "2026-10-20T00:44:35.675Z",
+  "docs": 43,
+  "examples": 34,
+  "examplePages": [
+    {
+      "slug": "factorial",
+      "title": "Factorial example",
+      "category": "language"
+    },
+    {
+      "slug": "stdout",
+      "title": "Stdout example",
+      "category": "language"
+    },
+    {
+      "slug": "native_functions",
+      "title": "Native Functions example",
+      "category": "language"
+    },
+    {
+      "slug": "numeric_casts",
+      "title": "Numeric Casts example",
+      "category": "language"
+    },
+    {
+      "slug": "structures",
+      "title": "Structures example",
+      "category": "language"
+    },
+    {
+      "slug": "tuples",
+      "title": "Tuples example",
+      "category": "language"
+    },
+    {
+      "slug": "const_declarations",
+      "title": "Const Declarations example",
+      "category": "language"
+    },
+    {
+      "slug": "if_also",
+      "title": "If Also example",
+      "category": "language"
+    },
+    {
+      "slug": "while_also",
+      "title": "While Also example",
+      "category": "language"
+    },
+    {
+      "slug": "iteration",
+      "title": "Iteration example",
+      "category": "language"
+    },
+    {
+      "slug": "loop_control",
+      "title": "Loop Control example",
+      "category": "language"
+    },
+    {
+      "slug": "fixed_arrays",
+      "title": "Fixed Arrays example",
+      "category": "language"
+    },
+    {
+      "slug": "string_view",
+      "title": "String View example",
+      "category": "language"
+    },
+    {
+      "slug": "error_values",
+      "title": "Error Values example",
+      "category": "language"
+    },
+    {
+      "slug": "defer",
+      "title": "Defer example",
+      "category": "language"
+    },
+    {
+      "slug": "callables",
+      "title": "Callables example",
+      "category": "language"
+    },
+    {
+      "slug": "checked_references",
+      "title": "Checked References example",
+      "category": "memory"
+    },
+    {
+      "slug": "checked_slices",
+      "title": "Checked Slices example",
+      "category": "memory"
+    },
+    {
+      "slug": "ref_and_slice_returns",
+      "title": "Ref And Slice Returns example",
+      "category": "memory"
+    },
+    {
+      "slug": "ownership_contracts",
+      "title": "Ownership Contracts example",
+      "category": "memory"
+    },
+    {
+      "slug": "raw_allocation",
+      "title": "Raw Allocation example",
+      "category": "memory"
+    },
+    {
+      "slug": "unsafe_pointers",
+      "title": "Unsafe Pointers example",
+      "category": "memory"
+    },
+    {
+      "slug": "memory_tracking",
+      "title": "Memory Tracking example",
+      "category": "memory"
+    },
+    {
+      "slug": "standard-library",
+      "title": "Standard library modules",
+      "category": "library"
+    },
+    {
+      "slug": "dynamic-array",
+      "title": "Generic dynamic array",
+      "category": "library"
+    },
+    {
+      "slug": "llvm_poc",
+      "title": "LLVM IR proof of concept",
+      "category": "library"
+    },
+    {
+      "slug": "invalids",
+      "title": "Invalids example",
+      "category": "diagnostics"
+    },
+    {
+      "slug": "diagnostics/checked_references",
+      "title": "Checked References diagnostics",
+      "category": "diagnostics"
+    },
+    {
+      "slug": "diagnostics/checked_slices",
+      "title": "Checked Slices diagnostics",
+      "category": "diagnostics"
+    },
+    {
+      "slug": "diagnostics/compound_types",
+      "title": "Compound Types diagnostics",
+      "category": "diagnostics"
+    },
+    {
+      "slug": "diagnostics/const_declarations",
+      "title": "Const Declarations diagnostics",
+      "category": "diagnostics"
+    },
+    {
+      "slug": "diagnostics/fixed_arrays",
+      "title": "Fixed Arrays diagnostics",
+      "category": "diagnostics"
+    },
+    {
+      "slug": "diagnostics/iteration",
+      "title": "Iteration diagnostics",
+      "category": "diagnostics"
+    },
+    {
+      "slug": "diagnostics/unsafe_pointers",
+      "title": "Unsafe Pointers diagnostics",
+      "category": "diagnostics"
+    }
+  ]
 }

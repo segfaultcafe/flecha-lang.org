@@ -24,4 +24,12 @@ Flecha está em desenvolvimento ativo. Guias focados descrevem o comportamento a
 - [Visibilidade de módulos, quivers e módulos privados — inglês](/docs/reference/modules/#visibility)
 - [Comandos de teste da Flecha e do Longbow — inglês](/docs/reference/release_0_2/#language-tests-implemented-before-020)
 
+## Histórico do projeto
+
+- [Changelog e desenvolvimento atual — inglês](/docs/reference/changelog/)
+- [Marco da Flecha 0.2.0 — inglês](/docs/reference/release_0_2/)
+- [Flecha 0.1.3 — inglês](/docs/reference/release_0_1_3/) e [Flecha 0.1.2 — inglês](/docs/reference/release_0_1_2/)
+- [Marco de estabilização da Flecha 0.1.1 — inglês](/docs/reference/release_0_1_1/)
+- [Contrato de lançamento da Flecha 0.1 — inglês](/docs/reference/release_0_1/)
+
 Use o seletor de idioma no cabeçalho para voltar à versão original em inglês de qualquer página traduzida.
