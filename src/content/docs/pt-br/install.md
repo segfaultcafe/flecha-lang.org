@@ -5,7 +5,7 @@ description: Compile o compilador Flecha e a ferramenta de projetos Longbow a pa
 
 Flecha é um software em estágio inicial. Atualmente, a instalação mais confiável é a compilação a partir do código-fonte; versões marcadas também publicam arquivos por plataforma e pacotes para editores.
 
-[Baixe a Flecha v0.2.0 para Linux, Windows ou macOS](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.0). Cada versão inclui checksums, o compilador, Longbow, runtime e biblioteca padrão, suporte ao Neovim e uma extensão para VS Code.
+[Baixe a Flecha v0.2.1 para Linux, Windows ou macOS](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.1). Cada versão inclui checksums, o compilador, Longbow, runtime e biblioteca padrão, suporte ao Neovim e uma extensão para VS Code.
 
 :::caution[Antes de começar]
 A linguagem, a CLI do compilador e a ABI podem mudar entre versões. Use uma versão marcada quando precisar de um toolchain reproduzível.
