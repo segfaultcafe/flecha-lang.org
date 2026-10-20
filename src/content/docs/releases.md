@@ -3,6 +3,16 @@ title: Releases
 description: Current Flecha releases and project status.
 ---
 
+## 0.2.1
+
+Released October 20, 2026. Flecha 0.2.1 corrects the module model introduced in 0.2.0: modules are now logical scopes assembled from declarations across any number of source files, and filenames no longer define module identity.
+
+Imports select declared modules instead of files. Each source unit keeps its own imports while sharing declarations with every other file in the same logical module. Distinct imported modules with the same name can overlap; unique members resolve normally, ambiguous members produce a use-site error, and aliases isolate either module. Test pairing now follows declared `<name>_test` modules, so multiple arbitrarily named files can contribute to one test module.
+
+Legacy `private module` remains accepted with a deprecation warning. New code should use `quiver` for same-namespace visibility. `export` now always means public declaration visibility, even inside a legacy private module, while the private module's import gate still limits who can import it.
+
+[View release v0.2.1 on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.1), read the [complete module correction](/docs/reference/release_0_2_1/), or use the current [modules and imports guide](/docs/reference/modules/).
+
 ## 0.2.0
 
 Released October 20, 2026. Flecha 0.2.0 adds first-class callable values and closures, explicit capture ownership, generic and single-use `once` callables, callable-aware `defer`, scoped module visibility, first-class language tests, callback algorithms, expanded arrays, and richer filesystem and file-stream APIs.
@@ -39,6 +49,6 @@ Flecha has not reached a stable language or ABI. Read each release's notes and p
 
 ## Current development
 
-The `master` branch now tracks work after v0.2.0. Features on that branch remain development behavior until they appear in another tagged release.
+The `master` branch now tracks work after v0.2.1. Features on that branch remain development behavior until they appear in another tagged release.
 
-Read the [v0.2.0 implementation milestone](/docs/reference/release_0_2/) or see the [complete changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Read the [v0.2.1 module correction](/docs/reference/release_0_2_1/) or see the [complete changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).

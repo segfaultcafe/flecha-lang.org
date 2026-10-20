@@ -25,6 +25,7 @@ Flecha is under active development. Focused feature guides describe current comp
 - [Iteration](/docs/reference/iteration/), [match](/docs/reference/match/), and [defer](/docs/reference/defer/)
 - [Generics](/docs/reference/generics/), [callable values and closures](/docs/reference/release_0_2/), and [extern declarations](/docs/reference/extern/)
 - [Module, quiver, and private-module visibility](/docs/reference/modules/)
+- [Logical modules across multiple source files](/docs/reference/module_composition/)
 
 ## Memory and ownership
 
@@ -47,6 +48,7 @@ Implementation references cover [semantic analysis](/docs/reference/semantic_ana
 ## Project history
 
 - [Changelog and current development](/docs/reference/changelog/)
+- [Flecha 0.2.1 module correction](/docs/reference/release_0_2_1/)
 - [Flecha 0.2.0 release notes](/docs/reference/release_0_2_0/) and [implementation milestone](/docs/reference/release_0_2/)
 - [Flecha 0.1.3](/docs/reference/release_0_1_3/) and [Flecha 0.1.2](/docs/reference/release_0_1_2/)
 - [Flecha 0.1.1 stabilization milestone](/docs/reference/release_0_1_1/)

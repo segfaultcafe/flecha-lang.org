@@ -17,8 +17,9 @@ Flecha está em desenvolvimento ativo. Guias focados descrevem o comportamento a
 - [Módulos — inglês](/docs/reference/modules/)
 - [Longbow — inglês](/docs/reference/longbow/)
 
-## Recursos da v0.2.0
+## Recursos atuais
 
+- [Módulos lógicos em vários arquivos-fonte — inglês](/docs/reference/module_composition/)
 - [Valores chamáveis, closures e capturas explícitas — inglês](/docs/reference/release_0_2/)
 - [Assinaturas chamáveis genéricas — inglês](/docs/reference/generics/#callable-signatures)
 - [Visibilidade de módulos, quivers e módulos privados — inglês](/docs/reference/modules/#visibility)
@@ -27,6 +28,7 @@ Flecha está em desenvolvimento ativo. Guias focados descrevem o comportamento a
 ## Histórico do projeto
 
 - [Changelog e desenvolvimento atual — inglês](/docs/reference/changelog/)
+- [Correção do modelo de módulos da Flecha 0.2.1 — inglês](/docs/reference/release_0_2_1/)
 - [Notas da Flecha 0.2.0 — inglês](/docs/reference/release_0_2_0/) e [marco de implementação — inglês](/docs/reference/release_0_2/)
 - [Flecha 0.1.3 — inglês](/docs/reference/release_0_1_3/) e [Flecha 0.1.2 — inglês](/docs/reference/release_0_1_2/)
 - [Marco de estabilização da Flecha 0.1.1 — inglês](/docs/reference/release_0_1_1/)
