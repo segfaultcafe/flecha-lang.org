@@ -156,6 +156,24 @@ i32 main() {
 }
 ```
 
+Callable signatures may be generic. Type arguments are explicit when the alias
+is used, and specialization substitutes parameters and results before ordinary
+structural compatibility, safety, ownership, and borrow-contract checking:
+
+```flecha
+func Predicate<T>(&const T value) => (bool);
+func Transform<T, U>(T value) => (U);
+
+Transform<i32, i64> widen = (value) => {
+    return value.cast<i64>;
+};
+```
+
+A specialized alias is an ordinary callable type. It can be used in parameters,
+results, fields, containers, and other generic declarations, and it supplies the
+complete expected signature for contextual anonymous-function inference.
+Generic callable declarations do not infer omitted type arguments.
+
 Callable aliases are structural rather than nominal: two complete signatures
 with identical parameter, result, safety, ownership, and borrow contracts are
 compatible regardless of their declaration names. Callable values are
@@ -201,8 +219,38 @@ not affect the captured value. Captured state belongs to the closure and may be
 mutated independently when its source binding was writable.
 
 Copy captures reject borrowed handles, callable values, and other noncopyable
-values. A raw pointer may be copied only by an `unsafe` anonymous function;
-owning and lending raw-resource contracts remain future capture modes.
+values. A raw pointer may be copied only by an `unsafe` anonymous function.
+Tracked raw allocations require an explicit resource capture instead:
+
+```flecha
+unsafe Reader inspect(lend *const i32 pointer) {
+    return unsafe [lend pointer]() => { return *pointer; }; // rejected: escape
+}
+
+unsafe Reader retain(own *i32 pointer) {
+    return unsafe [own pointer]() => { return *pointer; };
+}
+```
+
+`lend name` keeps a tracked raw allocation with its current owner and prevents
+freeing or transferring that allocation while the closure is live. A lending
+closure cannot leave the lexical scope in which it was created. It requires an
+`unsafe` anonymous function and a raw pointer or runtime-sized buffer.
+
+`own name` moves a value into the closure environment. For a raw pointer or
+runtime-sized buffer, it transfers cleanup responsibility and requires an
+`unsafe` anonymous function. It also accepts movable, noncopyable safe values,
+including callable values and aggregates containing callables or safe custom
+teardown. These captures do not make the anonymous function unsafe. Copyable
+values use `copy` instead, and values with unsafe teardown are immovable and
+rejected. The source binding becomes unavailable, borrow origins follow the
+moved value, and the environment destroy thunk recursively tears it down
+exactly once.
+
+All `own` captured bindings are read-only. Because ordinary callables are
+reusable, their bodies may access an owned capture but cannot transfer or
+otherwise consume it. Consuming a capture from the body remains reserved for a
+future `once func` design.
 
 `&name` creates an exclusive checked borrow of writable storage. `&const name`
 creates a shared, read-only borrow. The loan lasts until the closure's last use,
@@ -841,9 +889,18 @@ The compiler should eventually be self-hosted in Flecha, but self-hosting is not
 Modules declare `module name;`, matching their filename. Import blocks use
 `@imports :: root::path::module :: lib::library::module as alias;`, with a
 multiline form preferred. `root` and `lib` are reserved in import paths.
-Top-level declarations require `export` for access through imports. Exported
-structures and enums bundle non-private member functions; existing field
-privacy and compiler-only tear rules remain unchanged. Directory imports use
+`private module name;` restricts importing the module to its quiver. In a
+private module, `export` has quiver visibility rather than global visibility;
+unmarked declarations remain module-only.
+Top-level declarations use `export` for access from every importing module,
+`quiver` for access from modules in the same immediate directory and the same
+source-root or library identity, and no modifier for module-only access.
+Wildcard imports do not bypass these boundaries. Exported and quiver
+structures and enums bundle non-private member functions; member functions do
+not take declaration-visibility modifiers, and private members remain limited
+to methods of the exact owning type. Exported APIs may expose only exported
+nominal types. Quiver APIs may also expose quiver types from the same quiver,
+but never module-private types. Directory imports use
 `root::path::*`
 for immediate module files or `root::path::{first, second}` for selected modules.
 Each imported module retains its namespace. See [modules](/docs/reference/modules/).
@@ -908,10 +965,13 @@ i32 main() {
 
 ## Generics
 
-Generic functions and structures use explicit type parameters and arguments:
+Generic functions, structures, and callable signatures use explicit type
+parameters and arguments:
 `T identity<T>(T value)`, `structure Box<T> { T value; };`, and
-`identity<i32>(42)`. Methods inherit owner parameters through `Box<T>::method`.
-Specializations have distinct nominal identities and are checked on use.
+`func Mapper<T>(T) => (T);`. Methods inherit owner parameters through
+`Box<T>::method`. Structure specializations have distinct nominal identities;
+callable specializations remain structural. All specializations are checked on
+use.
 References remain valid function parameters and cannot be stored in structure
 fields. Existing ownership, const, visibility, and lifecycle rules apply.
 See [generics](/docs/reference/generics/) for the implemented rules and limits.

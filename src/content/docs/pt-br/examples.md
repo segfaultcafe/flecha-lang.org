@@ -13,8 +13,11 @@ Os exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com/segfa
 4. [Fixed arrays](/examples/fixed_arrays/)
 5. [Error values](/examples/error_values/)
 6. [Checked references](/examples/checked_references/)
-7. [Ownership contracts](/examples/ownership_contracts/)
-8. [Raw allocation](/examples/raw_allocation/)
+7. [Callable values and closures](/examples/callables/)
+8. [Standard-library modules and callback algorithms](/examples/standard-library/)
+9. [Generic dynamic arrays](/examples/dynamic-array/)
+10. [Ownership contracts](/examples/ownership_contracts/)
+11. [Raw allocation](/examples/raw_allocation/)
 
 ## Executar um exemplo
 
