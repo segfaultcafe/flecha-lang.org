@@ -177,6 +177,8 @@ export default defineConfig({
 							translations: { 'pt-br': 'Histórico do projeto' },
 							items: [
 								{ label: 'Changelog and current development', slug: 'docs/reference/changelog' },
+								{ label: 'Flecha 0.2.1 module correction', slug: 'docs/reference/release_0_2_1' },
+								{ label: 'Logical module composition', slug: 'docs/reference/module_composition' },
 								{ label: 'Flecha 0.2.0', slug: 'docs/reference/release_0_2_0' },
 								{ label: 'Flecha 0.2.0 implementation milestone', slug: 'docs/reference/release_0_2' },
 								{ label: 'Flecha 0.1.3', slug: 'docs/reference/release_0_1_3' },

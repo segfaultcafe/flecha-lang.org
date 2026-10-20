@@ -3,6 +3,16 @@ title: Versões
 description: Versões atuais da Flecha e status do projeto.
 ---
 
+## 0.2.1
+
+Lançada em 20 de outubro de 2026. A Flecha 0.2.1 corrige o modelo de módulos introduzido na v0.2.0: módulos agora são escopos lógicos formados por declarações em qualquer quantidade de arquivos-fonte, e o nome do arquivo não define mais a identidade do módulo.
+
+Imports selecionam módulos declarados, não arquivos. Cada unidade-fonte mantém seus próprios imports e compartilha declarações com os demais arquivos do mesmo módulo lógico. Módulos distintos importados com o mesmo nome podem se sobrepor: membros exclusivos são resolvidos normalmente, membros ambíguos geram erro no ponto de uso e aliases isolam cada módulo. Testes agora são associados por módulos `<name>_test` declarados, permitindo que vários arquivos com nomes livres contribuam para um único módulo de teste.
+
+O legado `private module` continua aceito com aviso de depreciação. Código novo deve usar `quiver` para visibilidade no mesmo namespace. `export` passa a significar sempre visibilidade pública da declaração, inclusive dentro de um módulo privado legado; a restrição de importação do módulo ainda controla quem pode importá-lo.
+
+[Ver v0.2.1 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.1), ler a [correção completa do modelo de módulos — em inglês](/docs/reference/release_0_2_1/) ou consultar o [guia atual de módulos e imports — em inglês](/docs/reference/modules/).
+
 ## 0.2.0
 
 Lançada em 20 de outubro de 2026. A Flecha 0.2.0 adiciona valores chamáveis e closures de primeira classe, propriedade explícita de capturas, callables genéricos e de uso único com `once`, `defer` para callables, visibilidade por quiver, testes nativos da linguagem, algoritmos com callbacks, arrays ampliados e APIs mais completas para sistema de arquivos e streams.
@@ -39,6 +49,6 @@ Flecha ainda não possui uma linguagem ou ABI estável. Leia as notas de cada ve
 
 ## Desenvolvimento atual
 
-O branch `master` agora acompanha o trabalho posterior à v0.2.0. Recursos nesse branch permanecem em desenvolvimento até aparecerem em outra versão marcada.
+O branch `master` agora acompanha o trabalho posterior à v0.2.1. Recursos nesse branch permanecem em desenvolvimento até aparecerem em outra versão marcada.
 
-Consulte o [marco de implementação da v0.2.0 — em inglês](/docs/reference/release_0_2/) ou veja o [changelog completo no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Consulte a [correção do modelo de módulos da v0.2.1 — em inglês](/docs/reference/release_0_2_1/) ou veja o [changelog completo no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
