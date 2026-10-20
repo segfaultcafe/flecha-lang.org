@@ -17,4 +17,11 @@ Flecha está em desenvolvimento ativo. Guias focados descrevem o comportamento a
 - [Módulos — inglês](/docs/reference/modules/)
 - [Longbow — inglês](/docs/reference/longbow/)
 
+## Recursos recentes em `master`
+
+- [Valores chamáveis, closures e capturas explícitas — inglês](/docs/reference/release_0_2/)
+- [Assinaturas chamáveis genéricas — inglês](/docs/reference/generics/#callable-signatures)
+- [Visibilidade de módulos, quivers e módulos privados — inglês](/docs/reference/modules/#visibility)
+- [Comandos de teste da Flecha e do Longbow — inglês](/docs/reference/release_0_2/#language-tests-implemented-before-020)
+
 Use o seletor de idioma no cabeçalho para voltar à versão original em inglês de qualquer página traduzida.

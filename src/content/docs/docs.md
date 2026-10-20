@@ -23,7 +23,8 @@ Flecha is under active development. Focused feature guides describe current comp
 - [Fixed arrays](/docs/reference/fixed_arrays/) and [dynamic arrays](/docs/reference/dynamic_arrays/)
 - [Strings](/docs/reference/string/) and [error values](/docs/reference/error_values/)
 - [Iteration](/docs/reference/iteration/), [match](/docs/reference/match/), and [defer](/docs/reference/defer/)
-- [Generics](/docs/reference/generics/) and [extern declarations](/docs/reference/extern/)
+- [Generics](/docs/reference/generics/), [callable values and closures](/docs/reference/release_0_2/), and [extern declarations](/docs/reference/extern/)
+- [Module, quiver, and private-module visibility](/docs/reference/modules/)
 
 ## Memory and ownership
 
@@ -32,6 +33,12 @@ Flecha is under active development. Focused feature guides describe current comp
 - [Definite assignment](/docs/reference/definite_assignment/)
 - [Raw allocation](/docs/reference/raw_allocation/) and [unsafe pointers](/docs/reference/unsafe_pointers/)
 - [Memory model and remaining proposals](/docs/reference/memory_model/)
+
+## Tooling and standard library
+
+- [Flecha and Longbow test commands](/docs/reference/release_0_2/#language-tests-implemented-before-020)
+- [Standard-library development](/docs/reference/std_development/)
+- [Generic callback algorithms example](/examples/standard-library/)
 
 ## Compiler internals
 

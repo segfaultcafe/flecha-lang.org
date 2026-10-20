@@ -50,6 +50,70 @@ ownership does not guarantee non-nullness. Visible factory return paths preserve
 allocation-error/null relationships, including `new<T>` failure paths. An arbitrary
 error result does not imply that an accompanying owning pointer is null.
 
+## Anonymous-function captures
+
+Raw allocations use explicit capture contracts, parallel to parameter
+contracts but tied to the closure environment:
+
+```flecha
+unsafe func Reader() => (i32);
+
+unsafe i32 use() {
+    borrowed, borrowError := new<i32>(20);
+    if borrowError != none { return 1; }
+    i32 result = 0;
+    {
+        Reader reader = unsafe [lend borrowed]() => { return *borrowed; };
+        result = reader();
+    }
+    free(borrowed);
+
+    retained, retainError := new<i32>(22);
+    if retainError != none { return 2; }
+    Reader owner = unsafe [own retained]() => { return *retained; };
+    return result + owner();
+}
+```
+
+`lend` requires an `unsafe` anonymous function and a raw pointer or
+runtime-sized buffer. Raw-resource `own` has the same safety requirement. A
+tracked allocation cannot use `copy`, because copying the address does not say
+which value owns cleanup. Captured bindings are read-only; mutation through a
+mutable pointer remains possible.
+
+`lend name` copies the raw handle without transferring its cleanup obligation.
+The closure keeps that allocation lent until the callable leaves its creation
+scope, so the owner cannot be freed or passed to an `own` consumer in the
+meantime. A lending closure cannot be returned or stored into a longer-lived
+binding or container.
+
+`own name` consumes the source owner's cleanup obligation when the closure is
+created. Moving the callable moves that obligation. Its destroy thunk releases
+the captured allocation in reverse capture order, then frees the environment.
+Null remains valid and needs no cleanup. The callable may be invoked repeatedly,
+so its body cannot free the capture or pass it to an `own` parameter; otherwise
+the next invocation could use released storage. Such consuming bodies require a
+future single-use callable design.
+
+The same `own name` syntax moves noncopyable safe values into an environment:
+
+```flecha
+func Mapper(i32) => (i32);
+
+Mapper decorate(Mapper inner) <- inner {
+    return [own inner](value) => { return inner(value) + 1; };
+}
+```
+
+Callable values, mutable checked handles, and movable aggregates such as tuples,
+fixed arrays, structures, and safe containers are accepted. Copyable values use
+`copy` instead. A structure with unsafe teardown is immovable and rejected. Safe
+owning captures do not require an unsafe literal, even when an aggregate hides
+raw storage behind safe teardown. The move invalidates the source binding,
+retains any checked-reference origins, and recursively destroys the value in
+reverse capture order. A reusable closure may call or inspect this state but may
+not move it out or pass it to a consuming parameter.
+
 ## Owning fields and tear
 
 ```flecha
