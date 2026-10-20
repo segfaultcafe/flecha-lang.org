@@ -3,7 +3,7 @@ title: Examples
 description: Complete catalog of runnable Flecha programs synced from the compiler repository.
 ---
 
-These 34 examples come directly from [`segfaultcafe/flecha`](https://github.com/segfaultcafe/flecha/tree/master/examples). They cover the current language, runtime, standard library, and compiler diagnostics.
+These 36 examples come directly from [`segfaultcafe/flecha`](https://github.com/segfaultcafe/flecha/tree/master/examples). They cover the current language, runtime, standard library, and compiler diagnostics.
 
 ## Language and control flow
 
@@ -23,6 +23,7 @@ These 34 examples come directly from [`segfaultcafe/flecha`](https://github.com/
 - [Error Values](/examples/error_values/)
 - [Defer](/examples/defer/)
 - [Callables](/examples/callables/)
+- [Once](/examples/once/)
 
 ## Memory and ownership
 
@@ -36,6 +37,7 @@ These 34 examples come directly from [`segfaultcafe/flecha`](https://github.com/
 
 ## Standard library and compilation
 
+- [Callback Algorithms](/examples/callback_algorithms/)
 - [Standard library modules](/examples/standard-library/)
 - [Generic dynamic array](/examples/dynamic-array/)
 - [LLVM IR proof of concept](/examples/llvm_poc/)

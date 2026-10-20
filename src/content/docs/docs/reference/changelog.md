@@ -5,8 +5,22 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/CHANGELOG.md
 ---
 ## Unreleased
 
+## 0.2.0 - 2026-10-20
+
+Flecha 0.2.0 introduces callable values and closures with explicit ownership,
+generic and single-use callable signatures, first-class language tests, scoped
+module visibility, and broader standard-library containers and I/O support.
+
 ### Language
 
+- Added single-use `once func` callable types and `once` anonymous functions.
+  Invocation consumes the callable, reusable callables can move into a
+  compatible once slot, and once bodies may consume owned captures without
+  double destruction.
+- `defer` now accepts callable values and structure methods in addition to
+  direct functions. Indirect callees are moved into the deferred record, method
+  receivers remain safely borrowed through scope exit, and all forms preserve
+  registration-time evaluation, LIFO execution, and exactly-once teardown.
 - Modules may now be declared with `private module name;`, restricting imports
   to the same quiver. Within a private module, `export` exposes a declaration to
   that quiver rather than globally; wildcard imports and separate source or
@@ -56,13 +70,29 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/CHANGELOG.md
 
 ### Tooling
 
+- Added first-class `flecha test` and `longbow test` commands, paired
+  `_test.fl` modules, strict `test` declaration validation, production-module
+  private access, verbose reporting, and standard testing/assertion modules.
 - Sanitizer validation now keeps leak detection enabled for compiler and native
   callable tests, and release packages execute a cross-module callable ABI
-  smoke test on every supported platform.
-- A runnable callable example and editor documentation cover `func`,
-  captureless literals, inferred signatures, and `copy` captures.
+  smoke covering reusable and single-use closures plus deferred callable and
+  member invocation on every supported platform.
+- Runnable callable, callback-algorithm, deferred-call, and single-use callable
+  examples cover named functions, inferred signatures, every capture mode,
+  generic algorithms, and consuming closures.
 - Development builds of Flecha and Longbow now include the commit distance,
   abbreviated Git revision, and dirty-worktree state in `--version` output.
+
+### Standard library
+
+- Added generic slice algorithms including `for_each`, `find_if`, `fold`,
+  `any_of`, `all_of`, `count_if`, `sort_by`, `reverse`, `fill`, `index_of`, and
+  `contains`, together with matching safe-array methods.
+- Expanded safe and raw arrays with construction, append, removal, cloning,
+  capacity management, views, mutation algorithms, and lifecycle coverage.
+- Added file streams, exact and partial reads, string and byte writes, seeking,
+  file metadata, and expanded filesystem path operations with structured I/O
+  errors.
 
 ## 0.1.3 - 2026-10-19
 

@@ -138,13 +138,25 @@ scope constraints as references. Slice range sources receive shared reborrows.
 `FLECHA-S0037` reports statically invalid slice bounds; dynamic bounds trap in
 native code. See [checked_slices.md](/docs/reference/checked_slices/).
 
+### Single-use callables
+
+`once func` is structurally distinct from `func`. A compatible reusable
+callable is assignable to a once destination, but the reverse conversion is
+not. Every indirect call through a once signature records a move of the callee,
+so definite assignment reports a second invocation or later use with
+`FLECHA-S0027`. Inside a once anonymous function, an `own` capture may be moved,
+returned through an owning contract, passed to an owning parameter, or freed;
+the same operations remain invalid in reusable closures.
+
 ### Deferred calls
 
-`defer` requires a statically resolved direct call (`FLECHA-S0038` otherwise).
-Argument typing, definite assignment, and unsafe permission apply at
-registration. Synthetic capture symbols keep reference/slice loans live until
-their enclosing scope exits, including across backward jumps and control-flow
-joins. See [defer.md](/docs/reference/defer/) for capture and cleanup rules.
+`defer` accepts direct functions, callable values, and resolved structure or
+enum methods (`FLECHA-S0038` otherwise). Callee, receiver, and argument typing,
+definite assignment, moves, and unsafe permission apply at registration.
+Synthetic capture symbols keep callable borrow origins and receiver,
+reference, or slice loans live until their enclosing scope exits, including
+across backward jumps and control-flow joins. See [defer.md](/docs/reference/defer/) for
+capture and cleanup rules.
 
 ### Tuples and destructuring
 

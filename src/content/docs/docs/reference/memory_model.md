@@ -508,9 +508,10 @@ The special pointer-operation syntax and naming remain to be finalized.
 
 ### 8.1 Deferred cleanup
 
-The direct-call implementation is documented in [defer.md](/docs/reference/defer/). Deferred
-`free`, bounded static allocation-effect checks, and `own` / `lend` contracts
-are implemented. External ownership contracts remain future work.
+The function, callable-value, and member-call implementation is documented in
+[defer.md](/docs/reference/defer/). Deferred `free`, bounded static allocation-effect checks,
+and `own` / `lend` contracts are implemented. External ownership contracts
+remain future work.
 
 A deferred call registers when execution reaches it and executes when its
 current enclosing scope exits. It is not hoisted to scope entry. Register
@@ -621,9 +622,10 @@ implementation milestone, const declarations and compound type representation,
 is documented in [const declarations and types](/docs/reference/const_types/). Unsafe pointer operations are documented in [unsafe pointers](/docs/reference/unsafe_pointers/).
 Checked scalar and pointer-slot references are documented in
 [checked references](/docs/reference/checked_references/). Checked slices, system allocation,
-direct deferred calls, explicit cross-function ownership contracts, and
-single-origin borrowed-result contracts are also implemented. More general
-inferred resource effects remain future work. Named and generic
+direct, indirect, and member deferred calls, explicit cross-function ownership
+contracts, general whole-value moves, and single-origin borrowed-result
+contracts are also implemented. More general inferred resource effects remain
+future work. Named and generic
 [error values](/docs/reference/error_values/) are implemented.
 [Tuples and destructuring](/docs/reference/tuples/) are implemented.
 
