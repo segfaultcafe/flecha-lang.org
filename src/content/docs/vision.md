@@ -16,6 +16,27 @@ Individual release milestones define concrete commitments; this vision does
 not assign every idea to a version in advance.
 :::
 
+## The design promise
+
+Flecha aims to remain substantially simpler than C++ and Rust while preserving
+the safety and control expected from a native systems language. Simplicity does
+not mean removing access to the machine. It means using a small set of
+orthogonal mechanisms that continue to compose as programs become larger:
+
+- explicit ownership and moves;
+- checked references and slices;
+- deterministic cleanup without a garbage collector;
+- errors as ordinary values;
+- explicit closure captures and ownership contracts; and
+- raw pointers and unverifiable native operations behind narrow `unsafe`
+  boundaries.
+
+The safe path should be the normal path, low-level escape hatches should remain
+available, and abstractions should compile away when they carry no necessary
+runtime work. Flecha must prove this promise through real implementations—not
+only through syntax examples—including parsers, servers, native APIs,
+graphics, and eventually its own compiler.
+
 ## Why the foundations matter
 
 The current work on ownership, bytes, strings, containers, encoding, streams,

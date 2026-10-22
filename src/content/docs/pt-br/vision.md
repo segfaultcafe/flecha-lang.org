@@ -17,6 +17,29 @@ define seus compromissos concretos; esta visão não atribui antecipadamente
 cada ideia a uma versão.
 :::
 
+## A promessa de projeto
+
+A Flecha busca permanecer muito mais simples que C++ e Rust, preservando a
+segurança e o controle esperados de uma linguagem de sistemas nativa.
+Simplicidade não significa remover o acesso à máquina. Significa usar um
+conjunto pequeno de mecanismos independentes que continuam se compondo
+conforme os programas crescem:
+
+- ownership e movimentos explícitos;
+- referências e slices verificados;
+- destruição determinística sem garbage collector;
+- erros como valores comuns;
+- capturas de closures e contratos de ownership explícitos; e
+- ponteiros brutos e operações nativas não verificáveis atrás de fronteiras
+  `unsafe` estreitas.
+
+O caminho seguro deve ser o caminho normal, os escapes de baixo nível devem
+continuar disponíveis, e abstrações devem desaparecer durante a compilação
+quando não carregam trabalho necessário em runtime. A Flecha precisa provar
+essa promessa com implementações reais — não apenas com exemplos de sintaxe —
+incluindo parsers, servidores, APIs nativas, gráficos e, futuramente, o próprio
+compilador.
+
 ## Por que as fundações importam
 
 O trabalho atual em ownership, bytes, strings, containers, codificação,

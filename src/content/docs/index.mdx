@@ -4,7 +4,7 @@ description: Flecha is a statically typed systems programming language with expl
 template: splash
 hero:
   title: Build close to the metal. Keep intent in view.
-  tagline: Flecha is an early-stage, statically typed systems language for predictable execution, explicit memory operations, and direct access to native targets.
+  tagline: Flecha is an early-stage systems language pursuing memory safety, native performance, and direct machine access through a language substantially simpler than C++ or Rust.
   image:
     file: ../../assets/flecha-logo.png
     alt: Flecha logo
@@ -41,7 +41,8 @@ test index_of_finds_the_first_match(&testing::UnitTest t) {
 
 <div class="splash-copy">
 	<div class="status-band">
-		<div><strong>v0.2.3</strong><span>Latest tagged release</span></div>
+		<div><strong>v0.2.3</strong><span>Latest released version</span></div>
+		<div><strong>v0.3.0</strong><span>Development milestone · unreleased</span></div>
 		<div><strong>Native targets</strong><span>LLVM-backed compilation</span></div>
 		<div><strong>Early stage</strong><span>APIs and syntax can still evolve</span></div>
 	</div>
@@ -59,8 +60,9 @@ test index_of_finds_the_first_match(&testing::UnitTest t) {
 	</section>
 
 	<div class="section-heading">
-		<div class="eyebrow">Built for clarity</div>
-		<h2>Direct control, backed by compiler checks.</h2>
+		<div class="eyebrow">The design promise</div>
+		<h2>Simple language. Safe systems. Native performance.</h2>
+		<p>Flecha aims to remain substantially simpler than C++ and Rust without giving up memory safety or low-level control. A small set of mechanisms—explicit ownership, checked references and slices, deterministic cleanup, error values, and narrow <code>unsafe</code> boundaries—should compose into powerful libraries instead of requiring a new language feature for every domain.</p>
 	</div>
 	<div class="feature-grid">
 		<div class="feature-card"><div class="feature-icon">&amp;T</div><b>Explicit memory</b><p>Checked references, slices, move-only callable values, explicit closure captures, raw allocation in unsafe code, and ownership contracts.</p></div>
