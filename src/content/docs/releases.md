@@ -3,6 +3,20 @@ title: Releases
 description: Current Flecha releases and project status.
 ---
 
+## 0.2.3
+
+Released October 22, 2026. Flecha 0.2.3 fixes nested receiver reborrowing in method-call arguments. Mutable receiver borrows now activate after argument evaluation, allowing temporary shared reborrows that produce ordinary values, such as `self->read(self->remaining())`.
+
+Overlapping mutation, moves, and arguments that retain a borrow into the mutable call remain rejected.
+
+[View release v0.2.3 on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.3)
+
+## 0.2.2
+
+Released October 21, 2026. Flecha 0.2.2 fixes zero-state classification for structures containing move-only runtime-array owners. Null `*[]T` owners now count as trivially zeroable, so equivalent structures can use `none` directly, including inside tuple results, without weakening move-only ownership semantics.
+
+[View release v0.2.2 on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.2)
+
 ## 0.2.1
 
 Released October 20, 2026. Flecha 0.2.1 corrects the module model introduced in 0.2.0: modules are now logical scopes assembled from declarations across any number of source files, and filenames no longer define module identity.
@@ -49,6 +63,6 @@ Flecha has not reached a stable language or ABI. Read each release's notes and p
 
 ## Current development
 
-The `master` branch now tracks work after v0.2.1. Features on that branch remain development behavior until they appear in another tagged release.
+The `master` branch now tracks work after v0.2.3. Features on that branch remain development behavior until they appear in another tagged release.
 
-Read the [v0.2.1 module correction](/docs/reference/release_0_2_1/) or see the [complete changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Read the [v0.2.3 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.3), the [v0.2.1 module correction](/docs/reference/release_0_2_1/), or the [complete changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
