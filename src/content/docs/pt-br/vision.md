@@ -177,4 +177,4 @@ aprender construindo e usando a série v1.x — não por transformar os palpites
 hoje na linguagem de amanhã.
 
 Para a versão detalhada desta direção, leia o
-[documento de visão no repositório da Flecha](https://github.com/segfaultcafe/flecha/blob/master/docs/vision.md).
+[proposta de visão no repositório da Flecha](https://github.com/segfaultcafe/flecha/pull/94).

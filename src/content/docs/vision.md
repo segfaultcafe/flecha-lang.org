@@ -170,4 +170,4 @@ learns while building and using v1.x—not by locking today's guesses into
 tomorrow's language.
 
 For the detailed project version of this direction, read the
-[vision document in the Flecha repository](https://github.com/segfaultcafe/flecha/blob/master/docs/vision.md).
+[vision proposal in the Flecha repository](https://github.com/segfaultcafe/flecha/pull/94).
