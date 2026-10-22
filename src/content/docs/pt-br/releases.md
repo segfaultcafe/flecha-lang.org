@@ -3,6 +3,20 @@ title: Versões
 description: Versões atuais da Flecha e status do projeto.
 ---
 
+## 0.2.3
+
+Lançada em 22 de outubro de 2026. A Flecha 0.2.3 corrige reempréstimos aninhados do receptor nos argumentos de chamadas de métodos. O empréstimo mutável do receptor passa a ser ativado após a avaliação dos argumentos, permitindo reempréstimos compartilhados temporários que produzem valores comuns, como `self->read(self->remaining())`.
+
+Mutações sobrepostas, movimentos e argumentos que mantêm um empréstimo durante a chamada mutável continuam rejeitados.
+
+[Ver v0.2.3 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.3)
+
+## 0.2.2
+
+Lançada em 21 de outubro de 2026. A Flecha 0.2.2 corrige a classificação de estado zero para estruturas que contêm proprietários move-only de arrays com tamanho em tempo de execução. Proprietários `*[]T` nulos passam a ser trivialmente zeráveis, permitindo que estruturas equivalentes usem `none` diretamente, inclusive dentro de resultados em tupla, sem enfraquecer a semântica de propriedade move-only.
+
+[Ver v0.2.2 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.2)
+
 ## 0.2.1
 
 Lançada em 20 de outubro de 2026. A Flecha 0.2.1 corrige o modelo de módulos introduzido na v0.2.0: módulos agora são escopos lógicos formados por declarações em qualquer quantidade de arquivos-fonte, e o nome do arquivo não define mais a identidade do módulo.
@@ -49,6 +63,6 @@ Flecha ainda não possui uma linguagem ou ABI estável. Leia as notas de cada ve
 
 ## Desenvolvimento atual
 
-O branch `master` agora acompanha o trabalho posterior à v0.2.1. Recursos nesse branch permanecem em desenvolvimento até aparecerem em outra versão marcada.
+O branch `master` agora acompanha o trabalho posterior à v0.2.3. Recursos nesse branch permanecem em desenvolvimento até aparecerem em outra versão marcada.
 
-Consulte a [correção do modelo de módulos da v0.2.1 — em inglês](/docs/reference/release_0_2_1/) ou veja o [changelog completo no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Consulte a [versão v0.2.3 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.3), a [correção do modelo de módulos da v0.2.1 — em inglês](/docs/reference/release_0_2_1/) ou o [changelog completo no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
