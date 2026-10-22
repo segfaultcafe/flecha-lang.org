@@ -1,6 +1,6 @@
 ---
 const route = Astro.locals.starlightRoute;
-const translatedRoutes = new Set(['', 'install', 'learn', 'docs', 'examples', 'releases']);
+const translatedRoutes = new Set(['', 'install', 'learn', 'docs', 'examples', 'vision', 'releases']);
 const isPortuguese = route.locale === 'pt-br';
 const routeWithoutLocale = route.id.replace(/^pt-br\/?/, '');
 const hasPortugueseTranslation = translatedRoutes.has(routeWithoutLocale);
