@@ -50,6 +50,7 @@ export default defineConfig({
 					'/pt-br/learn/',
 					'/pt-br/docs/',
 					'/pt-br/examples/',
+					'/pt-br/vision/',
 					'/pt-br/releases/',
 				]).has(pathname);
 			},
@@ -199,6 +200,7 @@ export default defineConfig({
 							: [{ autogenerate: { directory: 'examples' } }]),
 					],
 				},
+				{ label: 'Vision (and beyond)', translations: { 'pt-br': 'Visão (e além)' }, slug: 'vision' },
 				{ label: 'Releases', translations: { 'pt-br': 'Versões' }, slug: 'releases' },
 			],
 			expressiveCode: {

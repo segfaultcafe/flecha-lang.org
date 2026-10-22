@@ -11,8 +11,8 @@ const shouldRenderSearch =
 const portuguese = Astro.url.pathname === '/pt-br/' || Astro.url.pathname.startsWith('/pt-br/');
 const prefix = portuguese ? '/pt-br' : '';
 const nav = portuguese
-	? [['Instalar', 'install'], ['Aprender', 'learn'], ['Documentação', 'docs'], ['Exemplos', 'examples'], ['Versões', 'releases']]
-	: [['Install', 'install'], ['Learn', 'learn'], ['Docs', 'docs'], ['Examples', 'examples'], ['Releases', 'releases']];
+	? [['Instalar', 'install'], ['Aprender', 'learn'], ['Documentação', 'docs'], ['Exemplos', 'examples'], ['Visão', 'vision'], ['Versões', 'releases']]
+	: [['Install', 'install'], ['Learn', 'learn'], ['Docs', 'docs'], ['Examples', 'examples'], ['Vision', 'vision'], ['Releases', 'releases']];
 ---
 
 <div class="header">
