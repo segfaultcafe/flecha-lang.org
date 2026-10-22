@@ -4,7 +4,7 @@ description: Flecha é uma linguagem de programação de sistemas estaticamente 
 template: splash
 hero:
   title: Programe perto do metal. Mantenha a intenção visível.
-  tagline: Flecha é uma linguagem de sistemas, estaticamente tipada e em estágio inicial, voltada à execução previsível, operações explícitas de memória e alvos nativos.
+  tagline: Flecha é uma linguagem de sistemas em estágio inicial que busca segurança de memória, performance nativa e acesso direto à máquina com uma linguagem muito mais simples que C++ ou Rust.
   image:
     file: ../../../assets/flecha-logo.png
     alt: Logotipo da Flecha
@@ -41,7 +41,8 @@ test index_of_finds_the_first_match(&testing::UnitTest t) {
 
 <div class="splash-copy">
 	<div class="status-band">
-		<div><strong>v0.2.3</strong><span>Versão marcada mais recente</span></div>
+		<div><strong>v0.2.3</strong><span>Versão lançada mais recente</span></div>
+		<div><strong>v0.3.0</strong><span>Marco em desenvolvimento · não lançado</span></div>
 		<div><strong>Alvos nativos</strong><span>Compilação baseada em LLVM</span></div>
 		<div><strong>Estágio inicial</strong><span>APIs e sintaxe ainda podem evoluir</span></div>
 	</div>
@@ -59,8 +60,9 @@ test index_of_finds_the_first_match(&testing::UnitTest t) {
 	</section>
 
 	<div class="section-heading">
-		<div class="eyebrow">Construída para clareza</div>
-		<h2>Controle direto, apoiado pelas verificações do compilador.</h2>
+		<div class="eyebrow">A promessa de projeto</div>
+		<h2>Linguagem simples. Sistemas seguros. Performance nativa.</h2>
+		<p>A Flecha busca permanecer muito mais simples que C++ e Rust sem abrir mão de segurança de memória ou controle de baixo nível. Um conjunto pequeno de mecanismos — ownership explícito, referências e slices verificados, destruição determinística, erros como valores e fronteiras <code>unsafe</code> estreitas — deve se combinar em bibliotecas poderosas, sem exigir um novo recurso da linguagem para cada domínio.</p>
 	</div>
 	<div class="feature-grid">
 		<div class="feature-card"><div class="feature-icon">&amp;T</div><b>Memória explícita</b><p>Referências, fatias, valores chamáveis move-only, capturas explícitas em closures, alocação bruta em código inseguro e contratos de propriedade.</p></div>

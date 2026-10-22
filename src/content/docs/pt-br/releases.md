@@ -63,6 +63,9 @@ Flecha ainda não possui uma linguagem ou ABI estável. Leia as notas de cada ve
 
 ## Desenvolvimento atual
 
-O branch `master` agora acompanha o trabalho posterior à v0.2.3. Recursos nesse branch permanecem em desenvolvimento até aparecerem em outra versão marcada.
+A Flecha v0.3.0 é o marco atual de desenvolvimento e ainda não foi lançada. A
+versão lançada mais recente continua sendo a v0.2.3. O branch `master`
+acompanha o trabalho rumo à v0.3.0, e seus recursos permanecem em desenvolvimento
+até aparecerem em uma versão marcada.
 
-Consulte a [versão v0.2.3 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.3), a [correção do modelo de módulos da v0.2.1 — em inglês](/docs/reference/release_0_2_1/) ou o [changelog completo no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Consulte a [versão v0.2.3 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.3), o [marco da biblioteca padrão v0.3.0 — em inglês](/docs/reference/release_0_3/) ou o [changelog completo no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
