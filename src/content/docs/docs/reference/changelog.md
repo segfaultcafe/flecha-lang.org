@@ -5,6 +5,20 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/CHANGELOG.md
 ---
 ## Unreleased
 
+## 0.2.4 - 2026-10-25
+
+Flecha 0.2.4 corrects test selection for logical modules composed from
+multiple source files.
+
+### Fixed
+
+- `flecha test <file>` now executes only tests declared in the requested source
+  file while still loading the complete logical test module for shared
+  declarations, imports, and semantic analysis.
+- `longbow test` now runs every source file that declares a test module, so
+  project-wide test execution retains complete coverage under file-local test
+  selection.
+
 ## 0.2.3 - 2026-10-22
 
 Flecha 0.2.3 fixes nested receiver reborrowing in method-call arguments.
@@ -27,8 +41,8 @@ move-only runtime-array owners.
 - Null `*[]T` owning buffers now count as trivially zeroable when classifying
   structure `zero()` implementations and generated initializers.
 - Structures with an equivalent trivial zero state can use `none` directly,
-  including when nested in tuple results, without weakening move-only ownership
-  semantics.
+  including when nested in tuple results, without weakening move-only
+  ownership.
 
 ## 0.2.1 - 2026-10-20
 

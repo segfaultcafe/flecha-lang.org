@@ -3,6 +3,14 @@ title: Versões
 description: Versões atuais da Flecha e status do projeto.
 ---
 
+## 0.2.4
+
+Lançada em 25 de outubro de 2026. A Flecha 0.2.4 corrige a seleção de testes em módulos lógicos compostos por vários arquivos-fonte.
+
+`flecha test <arquivo>` agora executa somente os testes declarados no arquivo solicitado, mas continua carregando o módulo lógico de testes completo para declarações compartilhadas, imports e análise semântica. `longbow test` agora executa todo arquivo-fonte que declara um módulo de testes, preservando a cobertura completa do projeto.
+
+[Ver v0.2.4 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.4)
+
 ## 0.2.3
 
 Lançada em 22 de outubro de 2026. A Flecha 0.2.3 corrige reempréstimos aninhados do receptor nos argumentos de chamadas de métodos. O empréstimo mutável do receptor passa a ser ativado após a avaliação dos argumentos, permitindo reempréstimos compartilhados temporários que produzem valores comuns, como `self->read(self->remaining())`.
@@ -64,8 +72,8 @@ Flecha ainda não possui uma linguagem ou ABI estável. Leia as notas de cada ve
 ## Desenvolvimento atual
 
 A Flecha v0.3.0 é o marco atual de desenvolvimento e ainda não foi lançada. A
-versão lançada mais recente continua sendo a v0.2.3. O branch `master`
+versão lançada mais recente é a v0.2.4. O branch `master`
 acompanha o trabalho rumo à v0.3.0, e seus recursos permanecem em desenvolvimento
 até aparecerem em uma versão marcada.
 
-Consulte a [versão v0.2.3 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.3), o [marco da biblioteca padrão v0.3.0 — em inglês](/docs/reference/release_0_3/) ou o [changelog completo no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Consulte a [versão v0.2.4 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.4), o [marco da biblioteca padrão v0.3.0 — em inglês](/docs/reference/release_0_3/) ou o [changelog completo no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).

@@ -3,6 +3,14 @@ title: Releases
 description: Current Flecha releases and project status.
 ---
 
+## 0.2.4
+
+Released October 25, 2026. Flecha 0.2.4 corrects test selection for logical modules composed from multiple source files.
+
+`flecha test <file>` now executes only tests declared in the requested source file while still loading the complete logical test module for shared declarations, imports, and semantic analysis. `longbow test` now runs every source file that declares a test module, preserving complete project-wide coverage.
+
+[View release v0.2.4 on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.4)
+
 ## 0.2.3
 
 Released October 22, 2026. Flecha 0.2.3 fixes nested receiver reborrowing in method-call arguments. Mutable receiver borrows now activate after argument evaluation, allowing temporary shared reborrows that produce ordinary values, such as `self->read(self->remaining())`.
@@ -64,8 +72,8 @@ Flecha has not reached a stable language or ABI. Read each release's notes and p
 ## Current development
 
 Flecha v0.3.0 is the current development milestone; it has not been released.
-The latest released version remains v0.2.3. The `master` branch tracks work
+The latest released version is v0.2.4. The `master` branch tracks work
 toward v0.3.0, and features there remain development behavior until they appear
 in a tagged release.
 
-Read the [v0.2.3 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.3), the [v0.3.0 standard-library milestone](/docs/reference/release_0_3/), or the [complete changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Read the [v0.2.4 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.4), the [v0.3.0 standard-library milestone](/docs/reference/release_0_3/), or the [complete changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
