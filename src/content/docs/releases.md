@@ -3,6 +3,14 @@ title: Releases
 description: Current Flecha releases and project status.
 ---
 
+## 0.2.5
+
+Released October 27, 2026. Flecha 0.2.5 lets Longbow create and operate on projects whose names are not Flecha identifiers, including names with spaces and hyphens.
+
+`longbow check`, `build`, `run`, `test`, and `clean` now accept an optional project directory. Library project names are normalized into valid Flecha module identifiers.
+
+[View release v0.2.5 on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.5)
+
 ## 0.2.4
 
 Released October 25, 2026. Flecha 0.2.4 corrects test selection for logical modules composed from multiple source files.
@@ -72,8 +80,8 @@ Flecha has not reached a stable language or ABI. Read each release's notes and p
 ## Current development
 
 Flecha v0.3.0 is the current development milestone; it has not been released.
-The latest released version is v0.2.4. The `master` branch tracks work
+The latest released version is v0.2.5. The `master` branch tracks work
 toward v0.3.0, and features there remain development behavior until they appear
 in a tagged release.
 
-Read the [v0.2.4 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.4), the [v0.3.0 standard-library milestone](/docs/reference/release_0_3/), or the [complete changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Read the [v0.2.5 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.5), the [v0.3.0 standard-library milestone](/docs/reference/release_0_3/), or the [complete changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).

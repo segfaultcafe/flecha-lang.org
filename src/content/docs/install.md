@@ -5,7 +5,7 @@ description: Build the Flecha compiler and Longbow project tool from source.
 
 Flecha is early-stage software. The most dependable installation path is currently a source build; tagged releases also publish platform archives and editor packages.
 
-[Download Flecha v0.2.4 for Linux, Windows, or macOS](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.4). Every release includes checksums, the compiler, Longbow, the runtime and standard library, Neovim support, and a VS Code extension.
+[Download Flecha v0.2.5 for Linux, Windows, or macOS](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.5). Every release includes checksums, the compiler, Longbow, the runtime and standard library, Neovim support, and a VS Code extension.
 
 :::caution[Before you begin]
 The language, compiler CLI, and ABI may change between releases. Use a tagged release when you need a repeatable toolchain.
