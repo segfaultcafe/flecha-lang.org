@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "flecha-registry",
+  "main": "src/index.ts",
+  "tsconfig": "./tsconfig.json",
+  "compatibility_date": "2026-10-28",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "registry.flecha-lang.org",
+      "custom_domain": true
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "REGISTRY_DB",
+      "database_name": "flecha-registry",
+      "database_id": "ec3f33ce-d0bb-4f5d-a8af-41910df6dd75",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PACKAGE_ARCHIVES",
+      "bucket_name": "flecha-registry-archives"
+    }
+  ],
+  "vars": {
+    "MAX_ARCHIVE_BYTES": "16777216"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
