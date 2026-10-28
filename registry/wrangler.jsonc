@@ -9,6 +9,10 @@
     {
       "pattern": "registry.flecha-lang.org",
       "custom_domain": true
+    },
+    {
+      "pattern": "packages.flecha-lang.org",
+      "custom_domain": true
     }
   ],
   "d1_databases": [
@@ -26,7 +30,8 @@
     }
   ],
   "vars": {
-    "MAX_ARCHIVE_BYTES": "16777216"
+    "MAX_ARCHIVE_BYTES": "16777216",
+    "PACKAGES_ORIGIN": "https://packages.flecha-lang.org"
   },
   "observability": {
     "enabled": true

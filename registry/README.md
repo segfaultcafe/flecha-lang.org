@@ -11,8 +11,18 @@ GET  /v1/packages/OWNER/PACKAGE/index
 GET  /v1/packages/OWNER/PACKAGE/VERSION/archive
 PUT  /v1/packages/OWNER/PACKAGE/VERSION/archive
 POST /v1/packages/OWNER/PACKAGE/VERSION/yank
+POST /v1/auth/device
+POST /v1/auth/device/token
+GET  /v1/auth/whoami
+POST /v1/auth/revoke
 GET  /healthz
 ```
+
+`packages.flecha-lang.org` is served by the same Worker. It provides GitHub and
+Google sign-in, first-login registration, device approval, account management,
+and owner claiming. Provider credentials authenticate the browser only; the
+CLI receives a separate opaque Flecha token, and only its SHA-256 hash is
+stored.
 
 Published versions cannot be replaced. Yanking only changes index state, so an
 existing Longbow lock can continue downloading the immutable archive.
@@ -61,16 +71,56 @@ npx wrangler d1 migrations apply flecha-registry --remote
 npm run deploy
 ```
 
-The `custom_domain` route makes the Worker the origin for
-`registry.flecha-lang.org`; Cloudflare creates the DNS record and certificate.
-No separate CNAME should exist for that hostname.
+Before deploying authentication, create a GitHub OAuth App and a Google OAuth
+2.0 Web application with these callback URLs:
+
+```text
+https://packages.flecha-lang.org/auth/github/callback
+https://packages.flecha-lang.org/auth/google/callback
+```
+
+Provision their credentials as Worker secrets. They must never be committed:
+
+```sh
+npx wrangler secret put GITHUB_CLIENT_ID
+npx wrangler secret put GITHUB_CLIENT_SECRET
+npx wrangler secret put GOOGLE_CLIENT_ID
+npx wrangler secret put GOOGLE_CLIENT_SECRET
+```
+
+GitHub requires the `read:user user:email` scopes. Google requires
+`openid email profile`. Both flows use authorization-code PKCE; Google ID
+tokens are additionally verified against its current JWKS and checked for
+issuer, audience, expiry, nonce, and subject.
+
+The `custom_domain` routes make the Worker the origin for
+`registry.flecha-lang.org` and `packages.flecha-lang.org`; Cloudflare creates
+their DNS records and certificates. No separate CNAME should exist for either
+hostname.
 
 Verify the deployment:
 
 ```sh
 curl --fail --show-error https://registry.flecha-lang.org/healthz
 curl --fail --show-error https://registry.flecha-lang.org/v1
+curl --fail --show-error https://packages.flecha-lang.org/login
 ```
+
+## Developer login and registration
+
+```sh
+longbow login
+longbow whoami
+longbow logout
+```
+
+Longbow requests a ten-minute device code and directs the developer to the
+packages site. A first GitHub or Google login creates the registry user. The
+account page lets the user claim an available, non-reserved owner name. Owner
+membership is checked live on every publish or yank; CLI tokens do not embed a
+stale copy of those roles. Device codes are single-use, tokens are revocable,
+browser sessions use secure HttpOnly SameSite cookies, and state, nonce, PKCE,
+CSRF, expiry, and polling interval checks are enforced.
 
 ## Publishing tokens
 

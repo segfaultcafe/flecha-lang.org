@@ -1,6 +1,20 @@
 import { authorize } from "./auth";
 import { errorResponse, HttpError, methodNotAllowed } from "./errors";
 import {
+  accountPage,
+  approveDevice,
+  claimOwner,
+  createDeviceAuthorization,
+  devicePage,
+  exchangeDeviceAuthorization,
+  finishOAuth,
+  loginPage,
+  logoutBrowser,
+  revokeCurrentToken,
+  startOAuth,
+  whoAmI,
+} from "./identity";
+import {
   DEFAULT_MAX_ARCHIVE_BYTES,
   PACKAGE_CONTENT_TYPE,
   semanticVersionKey,
@@ -15,6 +29,11 @@ export interface Env {
   REGISTRY_DB: D1Database;
   PACKAGE_ARCHIVES: R2Bucket;
   MAX_ARCHIVE_BYTES?: string;
+  GITHUB_CLIENT_ID?: string;
+  GITHUB_CLIENT_SECRET?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  PACKAGES_ORIGIN?: string;
 }
 
 interface ReleaseRow {
@@ -296,6 +315,23 @@ async function yankRelease(
 
 async function route(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
+  if (url.pathname === "/" && url.hostname === "packages.flecha-lang.org") {
+    return Response.redirect(`${env.PACKAGES_ORIGIN || "https://packages.flecha-lang.org"}/account`, 302);
+  }
+  if (url.pathname === "/login") return loginPage(request);
+  if (url.pathname === "/device") return devicePage(request, env);
+  if (url.pathname === "/device/approve") return approveDevice(request, env);
+  if (url.pathname === "/account") return accountPage(request, env);
+  if (url.pathname === "/account/owners") return claimOwner(request, env);
+  if (url.pathname === "/auth/github/start") return startOAuth(request, env, "github");
+  if (url.pathname === "/auth/github/callback") return finishOAuth(request, env, "github");
+  if (url.pathname === "/auth/google/start") return startOAuth(request, env, "google");
+  if (url.pathname === "/auth/google/callback") return finishOAuth(request, env, "google");
+  if (url.pathname === "/auth/logout") return logoutBrowser(request, env);
+  if (url.pathname === "/v1/auth/device") return createDeviceAuthorization(request, env);
+  if (url.pathname === "/v1/auth/device/token") return exchangeDeviceAuthorization(request, env);
+  if (url.pathname === "/v1/auth/whoami") return whoAmI(request, env);
+  if (url.pathname === "/v1/auth/revoke") return revokeCurrentToken(request, env);
   if (url.pathname === "/healthz") {
     if (request.method !== "GET") throw methodNotAllowed("GET");
     return Response.json(
