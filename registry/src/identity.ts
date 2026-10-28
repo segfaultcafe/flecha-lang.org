@@ -200,7 +200,12 @@ async function createSession(database: D1Database, userId: string): Promise<{ co
 
 function requireSameOrigin(request: Request, env: IdentityEnv): void {
   const origin = request.headers.get("Origin");
-  if (origin && origin !== packagesOrigin(env)) throw new HttpError(403, "invalid request origin");
+  if (!origin || origin === packagesOrigin(env)) return;
+  // Some embedded browsers serialize a same-origin form submission as an
+  // opaque origin. Fetch Metadata is a forbidden request header in browsers,
+  // so it still distinguishes that case from a cross-site form submission.
+  if (origin === "null" && request.headers.get("Sec-Fetch-Site") === "same-origin") return;
+  throw new HttpError(403, "invalid request origin");
 }
 
 async function findDeviceByUserCode(database: D1Database, code: string): Promise<DeviceRow | null> {

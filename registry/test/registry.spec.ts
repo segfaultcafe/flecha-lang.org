@@ -291,6 +291,79 @@ describe("Flecha registry identity", () => {
     expect(duplicate.status).toBe(409);
   });
 
+  it("accepts an opaque origin for a browser-verified same-origin logout", async () => {
+    const session = "opaque-origin-session";
+    const sessionHash = (await sha256(encoder.encode(session))).slice("sha256:".length);
+    await env.REGISTRY_DB.batch([
+      env.REGISTRY_DB.prepare("INSERT INTO registry_users(id, handle) VALUES ('usr_logout', 'logout-user')"),
+      env.REGISTRY_DB
+        .prepare(
+          `INSERT INTO registry_browser_sessions(session_sha256, user_id, csrf_token, expires_at)
+           VALUES (?1, 'usr_logout', 'csrf-logout', unixepoch() + 60)`,
+        )
+        .bind(sessionHash),
+    ]);
+
+    const loggedOut = await worker.fetch(
+      new Request("https://packages.flecha-lang.org/auth/logout", {
+        method: "POST",
+        headers: {
+          Cookie: `flecha_session=${session}`,
+          Origin: "null",
+          "Sec-Fetch-Site": "same-origin",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ csrf: "csrf-logout" }),
+      }),
+      env,
+    );
+
+    expect(loggedOut.status).toBe(303);
+    expect(loggedOut.headers.get("Set-Cookie")).toContain("Max-Age=0");
+    expect(
+      await env.REGISTRY_DB
+        .prepare("SELECT user_id FROM registry_browser_sessions WHERE session_sha256 = ?1")
+        .bind(sessionHash)
+        .first(),
+    ).toBeNull();
+  });
+
+  it("rejects an opaque origin when Fetch Metadata reports a cross-site request", async () => {
+    const session = "cross-site-session";
+    const sessionHash = (await sha256(encoder.encode(session))).slice("sha256:".length);
+    await env.REGISTRY_DB.batch([
+      env.REGISTRY_DB.prepare("INSERT INTO registry_users(id, handle) VALUES ('usr_cross_site', 'cross-site-user')"),
+      env.REGISTRY_DB
+        .prepare(
+          `INSERT INTO registry_browser_sessions(session_sha256, user_id, csrf_token, expires_at)
+           VALUES (?1, 'usr_cross_site', 'csrf-cross-site', unixepoch() + 60)`,
+        )
+        .bind(sessionHash),
+    ]);
+
+    const rejected = await worker.fetch(
+      new Request("https://packages.flecha-lang.org/auth/logout", {
+        method: "POST",
+        headers: {
+          Cookie: `flecha_session=${session}`,
+          Origin: "null",
+          "Sec-Fetch-Site": "cross-site",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ csrf: "csrf-cross-site" }),
+      }),
+      env,
+    );
+
+    expect(rejected.status).toBe(403);
+    expect(
+      await env.REGISTRY_DB
+        .prepare("SELECT user_id FROM registry_browser_sessions WHERE session_sha256 = ?1")
+        .bind(sessionHash)
+        .first<{ user_id: string }>(),
+    ).toEqual({ user_id: "usr_cross_site" });
+  });
+
   it("issues a one-time CLI token after device approval", async () => {
     const started = await worker.fetch(
       new Request(`${BASE}/v1/auth/device`, {
