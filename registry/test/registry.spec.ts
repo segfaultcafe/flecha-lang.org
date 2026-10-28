@@ -245,6 +245,20 @@ describe("Flecha registry protocol", () => {
 });
 
 describe("Flecha registry identity", () => {
+  it("exposes GitHub as the only browser login provider for v0.3.0", async () => {
+    const login = await worker.fetch(new Request("https://packages.flecha-lang.org/login"), env);
+    expect(login.status).toBe(200);
+    const html = await login.text();
+    expect(html).toContain("Continue with GitHub");
+    expect(html).not.toContain("Google");
+
+    const removedProvider = await worker.fetch(
+      new Request("https://packages.flecha-lang.org/auth/google/start"),
+      env,
+    );
+    expect(removedProvider.status).toBe(404);
+  });
+
   it("lets a signed-in user claim an available owner", async () => {
     const session = "browser-session-secret";
     const sessionHash = (await sha256(encoder.encode(session))).slice("sha256:".length);

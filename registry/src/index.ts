@@ -31,8 +31,6 @@ export interface Env {
   MAX_ARCHIVE_BYTES?: string;
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
-  GOOGLE_CLIENT_ID?: string;
-  GOOGLE_CLIENT_SECRET?: string;
   PACKAGES_ORIGIN?: string;
 }
 
@@ -325,8 +323,6 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (url.pathname === "/account/owners") return claimOwner(request, env);
   if (url.pathname === "/auth/github/start") return startOAuth(request, env, "github");
   if (url.pathname === "/auth/github/callback") return finishOAuth(request, env, "github");
-  if (url.pathname === "/auth/google/start") return startOAuth(request, env, "google");
-  if (url.pathname === "/auth/google/callback") return finishOAuth(request, env, "google");
   if (url.pathname === "/auth/logout") return logoutBrowser(request, env);
   if (url.pathname === "/v1/auth/device") return createDeviceAuthorization(request, env);
   if (url.pathname === "/v1/auth/device/token") return exchangeDeviceAuthorization(request, env);
