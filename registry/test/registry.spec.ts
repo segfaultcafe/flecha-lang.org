@@ -120,6 +120,13 @@ async function clearStorage(): Promise<void> {
     env.REGISTRY_DB.prepare("DELETE FROM registry_packages"),
     env.REGISTRY_DB.prepare("DELETE FROM registry_token_scopes"),
     env.REGISTRY_DB.prepare("DELETE FROM registry_tokens"),
+    env.REGISTRY_DB.prepare("DELETE FROM registry_oauth_requests"),
+    env.REGISTRY_DB.prepare("DELETE FROM registry_device_authorizations"),
+    env.REGISTRY_DB.prepare("DELETE FROM registry_browser_sessions"),
+    env.REGISTRY_DB.prepare("DELETE FROM registry_owner_memberships"),
+    env.REGISTRY_DB.prepare("DELETE FROM registry_owners"),
+    env.REGISTRY_DB.prepare("DELETE FROM registry_oauth_identities"),
+    env.REGISTRY_DB.prepare("DELETE FROM registry_users"),
   ]);
   let cursor: string | undefined;
   do {
@@ -234,5 +241,150 @@ describe("Flecha registry protocol", () => {
       env,
     );
     expect(archive.status).toBe(404);
+  });
+});
+
+describe("Flecha registry identity", () => {
+  it("lets a signed-in user claim an available owner", async () => {
+    const session = "browser-session-secret";
+    const sessionHash = (await sha256(encoder.encode(session))).slice("sha256:".length);
+    await env.REGISTRY_DB.batch([
+      env.REGISTRY_DB.prepare("INSERT INTO registry_users(id, handle) VALUES ('usr_browser', 'browser-user')"),
+      env.REGISTRY_DB
+        .prepare(
+          `INSERT INTO registry_browser_sessions(session_sha256, user_id, csrf_token, expires_at)
+           VALUES (?1, 'usr_browser', 'csrf-test', unixepoch() + 60)`,
+        )
+        .bind(sessionHash),
+    ]);
+    const claimed = await worker.fetch(
+      new Request("https://packages.flecha-lang.org/account/owners", {
+        method: "POST",
+        headers: {
+          Cookie: `flecha_session=${session}`,
+          Origin: "https://packages.flecha-lang.org",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ owner: "browser-user", csrf: "csrf-test" }),
+      }),
+      env,
+    );
+    expect(claimed.status).toBe(303);
+    expect(
+      await env.REGISTRY_DB
+        .prepare("SELECT role FROM registry_owner_memberships WHERE owner = 'browser-user' AND user_id = 'usr_browser'")
+        .first<{ role: string }>(),
+    ).toEqual({ role: "owner" });
+
+    const duplicate = await worker.fetch(
+      new Request("https://packages.flecha-lang.org/account/owners", {
+        method: "POST",
+        headers: {
+          Cookie: `flecha_session=${session}`,
+          Origin: "https://packages.flecha-lang.org",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ owner: "browser-user", csrf: "csrf-test" }),
+      }),
+      env,
+    );
+    expect(duplicate.status).toBe(409);
+  });
+
+  it("issues a one-time CLI token after device approval", async () => {
+    const started = await worker.fetch(
+      new Request(`${BASE}/v1/auth/device`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_id: "longbow-cli" }),
+      }),
+      env,
+    );
+    expect(started.status).toBe(200);
+    const authorization = (await started.json()) as {
+      device_code: string;
+      user_code: string;
+      verification_uri: string;
+    };
+    expect(authorization.user_code).toMatch(/^[A-Z2-9]{4}-[A-Z2-9]{4}$/);
+    expect(authorization.verification_uri).toBe("https://packages.flecha-lang.org/device");
+
+    const pending = await worker.fetch(
+      new Request(`${BASE}/v1/auth/device/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_id: "longbow-cli", device_code: authorization.device_code }),
+      }),
+      env,
+    );
+    expect(pending.status).toBe(400);
+    expect(await pending.json()).toMatchObject({ error: "authorization_pending" });
+
+    const deviceHash = (await sha256(encoder.encode(authorization.device_code))).slice("sha256:".length);
+    await env.REGISTRY_DB.batch([
+      env.REGISTRY_DB
+        .prepare(
+          `INSERT INTO registry_users(id, handle, display_name, email, email_verified)
+           VALUES ('usr_test', 'alice', 'Alice', 'alice@example.com', 1)`,
+        ),
+      env.REGISTRY_DB
+        .prepare(
+          "UPDATE registry_device_authorizations SET status = 'approved', user_id = 'usr_test', last_polled_at = NULL WHERE device_code_sha256 = ?1",
+        )
+        .bind(deviceHash),
+    ]);
+
+    const exchanged = await worker.fetch(
+      new Request(`${BASE}/v1/auth/device/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_id: "longbow-cli", device_code: authorization.device_code }),
+      }),
+      env,
+    );
+    expect(exchanged.status).toBe(200);
+    const credentials = (await exchanged.json()) as { access_token: string };
+    expect(credentials.access_token).toMatch(/^flp_/);
+
+    const reused = await worker.fetch(
+      new Request(`${BASE}/v1/auth/device/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_id: "longbow-cli", device_code: authorization.device_code }),
+      }),
+      env,
+    );
+    expect(reused.status).toBe(400);
+
+    const whoami = await worker.fetch(
+      new Request(`${BASE}/v1/auth/whoami`, {
+        headers: { Authorization: `Bearer ${credentials.access_token}` },
+      }),
+      env,
+    );
+    expect(whoami.status).toBe(200);
+    expect(await whoami.json()).toMatchObject({
+      handle: "alice",
+      email: "alice@example.com",
+      email_verified: true,
+      owners: [],
+    });
+  });
+
+  it("derives CLI publishing authority from current owner membership", async () => {
+    const token = "flp_member-token";
+    const tokenHash = (await sha256(encoder.encode(token))).slice("sha256:".length);
+    await env.REGISTRY_DB.batch([
+      env.REGISTRY_DB.prepare("INSERT INTO registry_users(id, handle) VALUES ('usr_owner', 'owner')"),
+      env.REGISTRY_DB
+        .prepare("INSERT INTO registry_owners(slug, display_name, created_by) VALUES ('alice', 'alice', 'usr_owner')"),
+      env.REGISTRY_DB
+        .prepare("INSERT INTO registry_owner_memberships(owner, user_id, role) VALUES ('alice', 'usr_owner', 'owner')"),
+      env.REGISTRY_DB
+        .prepare("INSERT INTO registry_tokens(token_sha256, subject, user_id) VALUES (?1, 'owner', 'usr_owner')")
+        .bind(tokenHash),
+    ]);
+    const archive = packageArchive("alice/example");
+    expect((await publish(archive, { owner: "alice", token })).status).toBe(201);
   });
 });

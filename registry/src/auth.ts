@@ -5,6 +5,7 @@ export type RegistryPermission = "publish" | "yank";
 
 interface TokenRow {
   subject: string;
+  user_id: string | null;
   expires_at: number | null;
   revoked_at: number | null;
 }
@@ -14,13 +15,20 @@ interface ScopeRow {
   can_yank: number;
 }
 
-export async function authorize(
+interface MembershipRow {
+  role: "owner" | "admin" | "publisher";
+}
+
+export interface AuthenticatedToken {
+  hash: string;
+  subject: string;
+  userId: string | null;
+}
+
+export async function authenticateToken(
   request: Request,
   database: D1Database,
-  owner: string,
-  packageName: string,
-  permission: RegistryPermission,
-): Promise<string> {
+): Promise<AuthenticatedToken> {
   const authorization = request.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ") || authorization.length <= "Bearer ".length) {
     throw new HttpError(401, "a bearer token is required", {
@@ -37,7 +45,7 @@ export async function authorize(
   const tokenHash = await sha256Hex(token);
   const tokenRow = await database
     .prepare(
-      `SELECT subject, expires_at, revoked_at
+      `SELECT subject, user_id, expires_at, revoked_at
          FROM registry_tokens
         WHERE token_sha256 = ?1`,
     )
@@ -48,6 +56,36 @@ export async function authorize(
     throw new HttpError(401, "invalid or expired bearer token", {
       "WWW-Authenticate": 'Bearer realm="flecha-registry", error="invalid_token"',
     });
+  }
+  await database
+    .prepare("UPDATE registry_tokens SET last_used_at = ?2 WHERE token_sha256 = ?1")
+    .bind(tokenHash, now)
+    .run();
+  return { hash: tokenHash, subject: tokenRow.subject, userId: tokenRow.user_id };
+}
+
+export async function authorize(
+  request: Request,
+  database: D1Database,
+  owner: string,
+  packageName: string,
+  permission: RegistryPermission,
+): Promise<string> {
+  const token = await authenticateToken(request, database);
+  if (token.userId) {
+    const membership = await database
+      .prepare(
+        `SELECT role
+           FROM registry_owner_memberships
+          WHERE owner = ?1 AND user_id = ?2`,
+      )
+      .bind(owner, token.userId)
+      .first<MembershipRow>();
+    const permitted =
+      membership &&
+      (permission === "publish" || membership.role === "owner" || membership.role === "admin");
+    if (!permitted) throw new HttpError(403, `token cannot ${permission} ${owner}/${packageName}`);
+    return token.subject;
   }
 
   const scope = await database
@@ -60,10 +98,10 @@ export async function authorize(
         ORDER BY CASE WHEN package = ?3 THEN 0 ELSE 1 END
         LIMIT 1`,
     )
-    .bind(tokenHash, owner, packageName)
+    .bind(token.hash, owner, packageName)
     .first<ScopeRow>();
   if (!scope || (permission === "publish" ? scope.can_publish !== 1 : scope.can_yank !== 1)) {
     throw new HttpError(403, `token cannot ${permission} ${owner}/${packageName}`);
   }
-  return tokenRow.subject;
+  return token.subject;
 }
