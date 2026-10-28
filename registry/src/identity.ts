@@ -6,12 +6,10 @@ export interface IdentityEnv {
   REGISTRY_DB: D1Database;
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
-  GOOGLE_CLIENT_ID?: string;
-  GOOGLE_CLIENT_SECRET?: string;
   PACKAGES_ORIGIN?: string;
 }
 
-type Provider = "github" | "google";
+type Provider = "github";
 
 interface DeviceRow {
   device_code_sha256: string;
@@ -320,8 +318,8 @@ export async function exchangeDeviceAuthorization(request: Request, env: Identit
 }
 
 function providerCredentials(env: IdentityEnv, provider: Provider): { id: string; secret: string } {
-  const id = provider === "github" ? env.GITHUB_CLIENT_ID : env.GOOGLE_CLIENT_ID;
-  const secret = provider === "github" ? env.GITHUB_CLIENT_SECRET : env.GOOGLE_CLIENT_SECRET;
+  const id = env.GITHUB_CLIENT_ID;
+  const secret = env.GITHUB_CLIENT_SECRET;
   if (!id || !secret) throw new HttpError(503, `${provider} login is not configured`);
   return { id, secret };
 }
@@ -342,34 +340,25 @@ export async function startOAuth(request: Request, env: IdentityEnv, provider: P
 
   const state = randomToken();
   const verifier = randomToken(48);
-  const nonce = provider === "google" ? randomToken() : null;
   await env.REGISTRY_DB
     .prepare(
       `INSERT INTO registry_oauth_requests(
          state_sha256, provider, code_verifier, nonce, device_code_sha256, expires_at
        ) VALUES (?1, ?2, ?3, ?4, ?5, ?6)`,
     )
-    .bind(await sha256Hex(state), provider, verifier, nonce, deviceHash, now() + OAUTH_TTL_SECONDS)
+    .bind(await sha256Hex(state), provider, verifier, null, deviceHash, now() + OAUTH_TTL_SECONDS)
     .run();
 
   const callback = `${packagesOrigin(env)}/auth/${provider}/callback`;
   const challenge = await pkceChallenge(verifier);
-  const authorization =
-    provider === "github"
-      ? new URL("https://github.com/login/oauth/authorize")
-      : new URL("https://accounts.google.com/o/oauth2/v2/auth");
+  const authorization = new URL("https://github.com/login/oauth/authorize");
   authorization.searchParams.set("client_id", credentials.id);
   authorization.searchParams.set("redirect_uri", callback);
   authorization.searchParams.set("response_type", "code");
   authorization.searchParams.set("state", state);
   authorization.searchParams.set("code_challenge", challenge);
   authorization.searchParams.set("code_challenge_method", "S256");
-  if (provider === "github") {
-    authorization.searchParams.set("scope", "read:user user:email");
-  } else {
-    authorization.searchParams.set("scope", "openid email profile");
-    authorization.searchParams.set("nonce", nonce!);
-  }
+  authorization.searchParams.set("scope", "read:user user:email");
   return Response.redirect(authorization.toString(), 302);
 }
 
@@ -380,8 +369,6 @@ async function tokenExchange(
   env: IdentityEnv,
 ): Promise<Record<string, unknown>> {
   const credentials = providerCredentials(env, provider);
-  const endpoint =
-    provider === "github" ? "https://github.com/login/oauth/access_token" : "https://oauth2.googleapis.com/token";
   const body = new URLSearchParams({
     client_id: credentials.id,
     client_secret: credentials.secret,
@@ -390,7 +377,7 @@ async function tokenExchange(
     code_verifier: verifier,
     grant_type: "authorization_code",
   });
-  const response = await fetch(endpoint, {
+  const response = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
     headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
     body,
@@ -430,61 +417,6 @@ async function githubIdentity(accessToken: string): Promise<ProviderIdentity> {
     displayName: typeof user.name === "string" ? user.name : null,
     email,
     emailVerified,
-  };
-}
-
-function decodeJwtPart(part: string): Record<string, unknown> {
-  const base64 = part.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(part.length / 4) * 4, "=");
-  return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(base64), (value) => value.charCodeAt(0))));
-}
-
-async function googleIdentity(idToken: string, env: IdentityEnv, nonce: string): Promise<ProviderIdentity> {
-  const parts = idToken.split(".");
-  if (parts.length !== 3) throw new HttpError(502, "Google returned an invalid identity token");
-  const header = decodeJwtPart(parts[0]);
-  const claims = decodeJwtPart(parts[1]);
-  if (header.alg !== "RS256" || typeof header.kid !== "string") throw new HttpError(502, "Google returned an unsupported identity token");
-  const keysResponse = await fetch("https://www.googleapis.com/oauth2/v3/certs");
-  if (!keysResponse.ok) throw new HttpError(502, "could not verify the Google identity");
-  const keys = (await keysResponse.json()) as { keys?: Array<JsonWebKey & { kid?: string }> };
-  const jwk = keys.keys?.find((key) => key.kid === header.kid);
-  if (!jwk) throw new HttpError(502, "Google identity signing key is unavailable");
-  const key = await crypto.subtle.importKey(
-    "jwk",
-    jwk,
-    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-    false,
-    ["verify"],
-  );
-  const signature = Uint8Array.from(
-    atob(parts[2].replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(parts[2].length / 4) * 4, "=")),
-    (value) => value.charCodeAt(0),
-  );
-  const verified = await crypto.subtle.verify(
-    "RSASSA-PKCS1-v1_5",
-    key,
-    signature,
-    new TextEncoder().encode(`${parts[0]}.${parts[1]}`),
-  );
-  const issuer = claims.iss === "https://accounts.google.com" || claims.iss === "accounts.google.com";
-  if (
-    !verified ||
-    !issuer ||
-    claims.aud !== env.GOOGLE_CLIENT_ID ||
-    typeof claims.exp !== "number" ||
-    claims.exp <= now() ||
-    claims.nonce !== nonce ||
-    typeof claims.sub !== "string"
-  ) {
-    throw new HttpError(502, "Google identity token validation failed");
-  }
-  const email = typeof claims.email === "string" ? claims.email : null;
-  return {
-    subject: claims.sub,
-    handle: email?.split("@", 1)[0] || `google-${claims.sub.slice(0, 8)}`,
-    displayName: typeof claims.name === "string" ? claims.name : null,
-    email,
-    emailVerified: claims.email_verified === true,
   };
 }
 
@@ -571,14 +503,8 @@ export async function finishOAuth(request: Request, env: IdentityEnv, provider: 
   }
   await env.REGISTRY_DB.prepare("DELETE FROM registry_oauth_requests WHERE state_sha256 = ?1").bind(stateHash).run();
   const tokens = await tokenExchange(provider, code, transaction.code_verifier, env);
-  let identity: ProviderIdentity;
-  if (provider === "github") {
-    if (typeof tokens.access_token !== "string") throw new HttpError(502, "GitHub did not return an access token");
-    identity = await githubIdentity(tokens.access_token);
-  } else {
-    if (typeof tokens.id_token !== "string" || !transaction.nonce) throw new HttpError(502, "Google did not return an identity token");
-    identity = await googleIdentity(tokens.id_token, env, transaction.nonce);
-  }
+  if (typeof tokens.access_token !== "string") throw new HttpError(502, "GitHub did not return an access token");
+  const identity = await githubIdentity(tokens.access_token);
   const user = await upsertIdentity(env.REGISTRY_DB, provider, identity);
   if (transaction.device_code_sha256) {
     await env.REGISTRY_DB
@@ -622,8 +548,7 @@ export async function devicePage(request: Request, env: IdentityEnv): Promise<Re
   }
   const encoded = encodeURIComponent(code);
   return page("Sign in", `<h1>Sign in to Flecha Packages</h1><p>Approve device <span class="code">${escapeHtml(code)}</span> by signing in.</p>
-    <a href="/auth/github/start?user_code=${encoded}">Continue with GitHub</a>
-    <a class="secondary" href="/auth/google/start?user_code=${encoded}">Continue with Google</a>`);
+    <a href="/auth/github/start?user_code=${encoded}">Continue with GitHub</a>`);
 }
 
 export async function approveDevice(request: Request, env: IdentityEnv): Promise<Response> {
@@ -649,8 +574,7 @@ export async function approveDevice(request: Request, env: IdentityEnv): Promise
 export async function loginPage(request: Request): Promise<Response> {
   if (request.method !== "GET") throw methodNotAllowed("GET");
   return page("Sign in", `<h1>Flecha Packages</h1><p>Sign in or create your registry account.</p>
-    <a href="/auth/github/start">Continue with GitHub</a>
-    <a class="secondary" href="/auth/google/start">Continue with Google</a>`);
+    <a href="/auth/github/start">Continue with GitHub</a>`);
 }
 
 export async function accountPage(request: Request, env: IdentityEnv): Promise<Response> {

@@ -18,9 +18,9 @@ POST /v1/auth/revoke
 GET  /healthz
 ```
 
-`packages.flecha-lang.org` is served by the same Worker. It provides GitHub and
-Google sign-in, first-login registration, device approval, account management,
-and owner claiming. Provider credentials authenticate the browser only; the
+`packages.flecha-lang.org` is served by the same Worker. For v0.3.0 it provides
+GitHub sign-in, first-login registration, device approval, account management,
+and owner claiming. GitHub credentials authenticate the browser only; the
 CLI receives a separate opaque Flecha token, and only its SHA-256 hash is
 stored.
 
@@ -71,12 +71,10 @@ npx wrangler d1 migrations apply flecha-registry --remote
 npm run deploy
 ```
 
-Before deploying authentication, create a GitHub OAuth App and a Google OAuth
-2.0 Web application with these callback URLs:
+Before deploying authentication, create a GitHub OAuth App with this callback URL:
 
 ```text
 https://packages.flecha-lang.org/auth/github/callback
-https://packages.flecha-lang.org/auth/google/callback
 ```
 
 Provision their credentials as Worker secrets. They must never be committed:
@@ -84,14 +82,10 @@ Provision their credentials as Worker secrets. They must never be committed:
 ```sh
 npx wrangler secret put GITHUB_CLIENT_ID
 npx wrangler secret put GITHUB_CLIENT_SECRET
-npx wrangler secret put GOOGLE_CLIENT_ID
-npx wrangler secret put GOOGLE_CLIENT_SECRET
 ```
 
-GitHub requires the `read:user user:email` scopes. Google requires
-`openid email profile`. Both flows use authorization-code PKCE; Google ID
-tokens are additionally verified against its current JWKS and checked for
-issuer, audience, expiry, nonce, and subject.
+GitHub requires the `read:user user:email` scopes and the flow uses
+authorization-code PKCE.
 
 The `custom_domain` routes make the Worker the origin for
 `registry.flecha-lang.org` and `packages.flecha-lang.org`; Cloudflare creates
@@ -115,7 +109,7 @@ longbow logout
 ```
 
 Longbow requests a ten-minute device code and directs the developer to the
-packages site. A first GitHub or Google login creates the registry user. The
+packages site. A first GitHub login creates the registry user. The
 account page lets the user claim an available, non-reserved owner name. Owner
 membership is checked live on every publish or yank; CLI tokens do not embed a
 stale copy of those roles. Device codes are single-use, tokens are revocable,
