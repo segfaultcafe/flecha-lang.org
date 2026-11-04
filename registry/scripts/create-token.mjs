@@ -16,6 +16,7 @@ const packageName = values.get('package') ?? '*';
 const subject = values.get('subject');
 const permissions = new Set((values.get('permissions') ?? 'publish,yank').split(','));
 const sqlFile = values.get('sql');
+const tokenFile = values.get('token-file');
 const expiresAt = values.get('expires-at');
 
 if (!owner || !/^[a-z][a-z0-9_-]*$/.test(owner)) {
@@ -56,5 +57,11 @@ if (sqlFile) {
   console.log('\nHash-only provisioning SQL:\n');
   console.log(sql);
 }
-console.log('\nLongbow token (shown once; store it securely):\n');
-console.log(token);
+if (tokenFile) {
+  writeFileSync(tokenFile, `${token}\n`, { encoding: 'utf8', mode: 0o600, flag: 'wx' });
+  chmodSync(tokenFile, 0o600);
+  console.log(`Wrote the one-time Longbow token to ${tokenFile}`);
+} else {
+  console.log('\nLongbow token (shown once; store it securely):\n');
+  console.log(token);
+}
