@@ -184,6 +184,33 @@ describe("Flecha registry protocol", () => {
       env,
     );
     expect(lockedDownload.status).toBe(200);
+    expect(
+      await env.REGISTRY_DB
+        .prepare(
+          `SELECT action, actor, owner, package, version
+             FROM registry_audit_events
+            WHERE owner = 'flecha' AND package = 'example'
+            ORDER BY id`,
+        )
+        .all(),
+    ).toMatchObject({
+      results: [
+        {
+          action: "package.publish",
+          actor: "registry-test",
+          owner: "flecha",
+          package: "example",
+          version: "1.2.3",
+        },
+        {
+          action: "package.yank",
+          actor: "registry-test",
+          owner: "flecha",
+          package: "example",
+          version: "1.2.3",
+        },
+      ],
+    });
   });
 
   it("never replaces a published owner, package, and version", async () => {
@@ -303,6 +330,11 @@ describe("Flecha registry identity", () => {
       env,
     );
     expect(duplicate.status).toBe(409);
+    expect(
+      await env.REGISTRY_DB
+        .prepare("SELECT action, actor, owner FROM registry_audit_events WHERE action = 'owner.claim' ORDER BY id DESC LIMIT 1")
+        .first(),
+    ).toEqual({ action: "owner.claim", actor: "browser-user", owner: "browser-user" });
   });
 
   it("accepts an opaque origin for a browser-verified same-origin logout", async () => {
@@ -456,6 +488,22 @@ describe("Flecha registry identity", () => {
       email_verified: true,
       owners: [],
     });
+    expect(
+      await env.REGISTRY_DB
+        .prepare("SELECT action, actor FROM registry_audit_events WHERE action = 'token.issue' ORDER BY id DESC LIMIT 1")
+        .first(),
+    ).toEqual({ action: "token.issue", actor: "alice" });
+  });
+
+  it("keeps audit events append-only", async () => {
+    await seedToken();
+    expect((await publish()).status).toBe(201);
+    await expect(
+      env.REGISTRY_DB.prepare("DELETE FROM registry_audit_events").run(),
+    ).rejects.toThrow("registry audit events are append-only");
+    await expect(
+      env.REGISTRY_DB.prepare("UPDATE registry_audit_events SET actor = 'changed'").run(),
+    ).rejects.toThrow("registry audit events are append-only");
   });
 
   it("derives CLI publishing authority from current owner membership", async () => {

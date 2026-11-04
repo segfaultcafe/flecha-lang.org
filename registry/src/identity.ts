@@ -1,4 +1,5 @@
 import { authenticateToken } from "./auth";
+import { insertAuditEvent } from "./audit";
 import { HttpError, methodNotAllowed } from "./errors";
 import { sha256Hex, validIdentity } from "./validation";
 
@@ -303,13 +304,19 @@ export async function exchangeDeviceAuthorization(request: Request, env: Identit
   if (!consumed) throw new HttpError(400, "invalid_grant");
   const rawToken = `flp_${randomToken(32)}`;
   const tokenHash = await sha256Hex(rawToken);
-  await env.REGISTRY_DB
-    .prepare(
-      `INSERT INTO registry_tokens(token_sha256, subject, user_id, label)
-       VALUES (?1, ?2, ?3, 'Longbow CLI')`,
-    )
-    .bind(tokenHash, user.handle, user.id)
-    .run();
+  await env.REGISTRY_DB.batch([
+    env.REGISTRY_DB
+      .prepare(
+        `INSERT INTO registry_tokens(token_sha256, subject, user_id, label)
+         VALUES (?1, ?2, ?3, 'Longbow CLI')`,
+      )
+      .bind(tokenHash, user.handle, user.id),
+    insertAuditEvent(env.REGISTRY_DB, {
+      action: "token.issue",
+      actor: user.handle,
+      details: { label: "Longbow CLI" },
+    }),
+  ]);
   return json({
     access_token: rawToken,
     token_type: "Bearer",
@@ -636,6 +643,12 @@ export async function claimOwner(request: Request, env: IdentityEnv): Promise<Re
       env.REGISTRY_DB
         .prepare("INSERT INTO registry_owner_memberships(owner, user_id, role) VALUES (?1, ?2, 'owner')")
         .bind(owner, session.id),
+      insertAuditEvent(env.REGISTRY_DB, {
+        action: "owner.claim",
+        actor: session.handle,
+        owner,
+        details: { user_id: session.id, role: "owner" },
+      }),
     ]);
   } catch (error) {
     if (error instanceof Error && error.message.includes("UNIQUE")) throw new HttpError(409, "that owner name is already claimed");
@@ -669,9 +682,14 @@ export async function whoAmI(request: Request, env: IdentityEnv): Promise<Respon
 export async function revokeCurrentToken(request: Request, env: IdentityEnv): Promise<Response> {
   if (request.method !== "POST") throw methodNotAllowed("POST");
   const token = await authenticateToken(request, env.REGISTRY_DB);
-  await env.REGISTRY_DB
-    .prepare("UPDATE registry_tokens SET revoked_at = unixepoch() WHERE token_sha256 = ?1")
-    .bind(token.hash)
-    .run();
+  await env.REGISTRY_DB.batch([
+    env.REGISTRY_DB
+      .prepare("UPDATE registry_tokens SET revoked_at = unixepoch() WHERE token_sha256 = ?1")
+      .bind(token.hash),
+    insertAuditEvent(env.REGISTRY_DB, {
+      action: "token.revoke",
+      actor: token.subject,
+    }),
+  ]);
   return new Response(null, { status: 204, headers: { "Cache-Control": "no-store" } });
 }

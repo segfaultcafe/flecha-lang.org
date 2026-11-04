@@ -33,7 +33,71 @@
     "MAX_ARCHIVE_BYTES": "16777216",
     "PACKAGES_ORIGIN": "https://packages.flecha-lang.org"
   },
+  "ratelimits": [
+    {
+      "name": "AUTH_RATE_LIMITER",
+      "namespace_id": "146001",
+      "simple": {
+        "limit": 30,
+        "period": 60
+      }
+    },
+    {
+      "name": "MUTATION_RATE_LIMITER",
+      "namespace_id": "146002",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    }
+  ],
   "observability": {
     "enabled": true
+  },
+  "env": {
+    "staging": {
+      "name": "flecha-registry-staging",
+      "workers_dev": true,
+      "routes": [],
+      "d1_databases": [
+        {
+          "binding": "REGISTRY_DB",
+          "database_name": "flecha-registry-staging",
+          "database_id": "34f7af3b-5693-46a7-a48a-378e8c82435a",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "PACKAGE_ARCHIVES",
+          "bucket_name": "flecha-registry-staging-archives"
+        }
+      ],
+      "vars": {
+        "MAX_ARCHIVE_BYTES": "16777216",
+        "PACKAGES_ORIGIN": "https://flecha-registry-staging.j-a-c-buschinelli.workers.dev"
+      },
+      "ratelimits": [
+        {
+          "name": "AUTH_RATE_LIMITER",
+          "namespace_id": "146101",
+          "simple": {
+            "limit": 30,
+            "period": 60
+          }
+        },
+        {
+          "name": "MUTATION_RATE_LIMITER",
+          "namespace_id": "146102",
+          "simple": {
+            "limit": 60,
+            "period": 60
+          }
+        }
+      ],
+      "observability": {
+        "enabled": true
+      }
+    }
   }
 }

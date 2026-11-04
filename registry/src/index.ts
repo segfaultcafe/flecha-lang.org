@@ -1,4 +1,5 @@
 import { authorize } from "./auth";
+import { insertAuditEvent } from "./audit";
 import { errorResponse, HttpError, methodNotAllowed } from "./errors";
 import {
   accountPage,
@@ -32,6 +33,8 @@ export interface Env {
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
   PACKAGES_ORIGIN?: string;
+  AUTH_RATE_LIMITER: RateLimit;
+  MUTATION_RATE_LIMITER: RateLimit;
 }
 
 interface ReleaseRow {
@@ -64,6 +67,23 @@ function registryHeaders(extra: HeadersInit = {}): Headers {
   const headers = new Headers(extra);
   headers.set("X-Content-Type-Options", "nosniff");
   return headers;
+}
+
+async function rateLimitKey(request: Request, prefix: string): Promise<string> {
+  const credential =
+    request.headers.get("Authorization") ||
+    request.headers.get("Cookie") ||
+    request.headers.get("CF-Connecting-IP") ||
+    "anonymous";
+  return `${prefix}:${await sha256Hex(credential)}`;
+}
+
+async function enforceRateLimit(request: Request, limiter: RateLimit, prefix: string): Promise<void> {
+  const result = await limiter.limit({ key: await rateLimitKey(request, prefix) });
+  if (!result.success) {
+    console.warn("registry request rate limited", { prefix });
+    throw new HttpError(429, "too many requests", { "Retry-After": "60" });
+  }
 }
 
 function requirePackage(owner: string, packageName: string): void {
@@ -265,6 +285,14 @@ async function publishArchive(
           archiveKey,
           subject,
         ),
+      insertAuditEvent(env.REGISTRY_DB, {
+        action: "package.publish",
+        actor: subject,
+        owner,
+        packageName,
+        version,
+        details: { checksum: actualChecksum, archive_key: archiveKey },
+      }),
     ]);
   } catch (error) {
     if (error instanceof Error && error.message.includes("UNIQUE constraint failed")) {
@@ -296,15 +324,32 @@ async function yankRelease(
   requirePackage(owner, packageName);
   requireVersion(version);
   const subject = await authorize(request, env.REGISTRY_DB, owner, packageName, "yank");
-  const result = await env.REGISTRY_DB
+  const existing = await env.REGISTRY_DB
     .prepare(
-      `UPDATE registry_releases
-          SET state = 'yanked', yanked_at = unixepoch(), yanked_by = ?4
+      `SELECT 1
+         FROM registry_releases
         WHERE owner = ?1 AND package = ?2 AND version = ?3`,
     )
-    .bind(owner, packageName, version, subject)
-    .run();
-  if (result.meta.changes === 0) throw new HttpError(404, "package version not found");
+    .bind(owner, packageName, version)
+    .first();
+  if (!existing) throw new HttpError(404, "package version not found");
+  const [result] = await env.REGISTRY_DB.batch([
+    env.REGISTRY_DB
+      .prepare(
+        `UPDATE registry_releases
+            SET state = 'yanked', yanked_at = unixepoch(), yanked_by = ?4
+          WHERE owner = ?1 AND package = ?2 AND version = ?3`,
+      )
+      .bind(owner, packageName, version, subject),
+    insertAuditEvent(env.REGISTRY_DB, {
+      action: "package.yank",
+      actor: subject,
+      owner,
+      packageName,
+      version,
+    }),
+  ]);
+  if (result.meta.changes === 0) throw new HttpError(503, "could not record package yank");
   return new Response(null, {
     status: 204,
     headers: registryHeaders({ "Cache-Control": "no-store" }),
@@ -313,6 +358,20 @@ async function yankRelease(
 
 async function route(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
+  if (
+    url.pathname === "/v1/auth/device" ||
+    url.pathname === "/v1/auth/device/token" ||
+    url.pathname === "/auth/github/start"
+  ) {
+    await enforceRateLimit(request, env.AUTH_RATE_LIMITER, url.pathname);
+  }
+  if (
+    url.pathname === "/account/owners" ||
+    (request.method === "PUT" && url.pathname.endsWith("/archive")) ||
+    (request.method === "POST" && url.pathname.endsWith("/yank"))
+  ) {
+    await enforceRateLimit(request, env.MUTATION_RATE_LIMITER, url.pathname);
+  }
   if (url.pathname === "/" && url.hostname === "packages.flecha-lang.org") {
     return Response.redirect(`${env.PACKAGES_ORIGIN || "https://packages.flecha-lang.org"}/account`, 302);
   }

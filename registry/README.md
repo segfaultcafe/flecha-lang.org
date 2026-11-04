@@ -27,6 +27,10 @@ stored.
 Published versions cannot be replaced. Yanking only changes index state, so an
 existing Longbow lock can continue downloading the immutable archive.
 
+Production limits, audit review, monitoring, backup, recovery, deployment, and
+staging/production qualification procedures are defined in
+[`OPERATIONS.md`](OPERATIONS.md).
+
 ## Local development
 
 ```sh
@@ -34,6 +38,7 @@ cd registry
 npm ci
 npm run check
 npm test
+npm run deploy:dry-run
 npm run dev
 ```
 
@@ -128,11 +133,14 @@ npm run token:create -- \
   --package '*' \
   --subject release-automation \
   --permissions publish,yank \
-  --sql /tmp/flecha-registry-token.sql
+  --sql /tmp/flecha-registry-token.sql \
+  --token-file /tmp/flecha-registry-token
 ```
 
-The command prints the raw token once. Store it in a password manager or CI
-secret as `LONGBOW_TOKEN`, then load only its hash into D1:
+Without `--token-file`, the command prints the raw token once. With it, the
+token is written to a new mode-0600 file without entering terminal logs. Store
+the token in a password manager or CI secret as `LONGBOW_TOKEN`, then load only
+its hash into D1:
 
 ```sh
 npx wrangler d1 execute flecha-registry \
@@ -140,7 +148,8 @@ npx wrangler d1 execute flecha-registry \
   --file /tmp/flecha-registry-token.sql
 ```
 
-Delete the temporary SQL file after applying it. Revoke a token by setting
+Delete both temporary files after applying and securely storing the token.
+Revoke a token by setting
 `revoked_at = unixepoch()` for its hash in `registry_tokens`.
 
 Use `--package package-name` for a package-specific token and
@@ -159,5 +168,8 @@ Use `--package package-name` for a package-specific token and
 - Mutation authorization is denied by default and uses package-scoped token
   rows. Raw tokens are never stored.
 
-Cloudflare rate limiting and alerting should be enabled before announcing the
-public service. Worker observability is enabled in `wrangler.jsonc`.
+Cloudflare Worker rate-limit bindings protect authentication and mutation
+routes, append-only D1 audit events record security-sensitive changes, and
+Worker observability is enabled in `wrangler.jsonc`. See `OPERATIONS.md` for
+alert thresholds, D1 Time Travel and export procedures, R2 integrity checks,
+and the lifecycle smoke command.

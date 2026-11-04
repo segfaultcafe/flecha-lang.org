@@ -1,0 +1,44 @@
+name: Registry production smoke
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      base:
+        description: Registry origin to qualify
+        required: true
+        default: https://registry.flecha-lang.org
+      lifecycle:
+        description: Publish and yank a dedicated smoke release
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: registry
+    env:
+      REGISTRY_TOKEN: ${{ secrets.REGISTRY_SMOKE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: registry/package-lock.json
+      - run: npm ci
+      - name: Read-only protocol smoke
+        if: ${{ github.event_name == 'schedule' || !inputs.lifecycle }}
+        run: npm run smoke -- --base "${{ inputs.base || 'https://registry.flecha-lang.org' }}"
+      - name: Publish and yank lifecycle smoke
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.lifecycle }}
+        run: |
+          test -n "$REGISTRY_TOKEN"
+          npm run smoke -- --base "${{ inputs.base }}" --lifecycle --identity flecha-smoke/registry-contract
