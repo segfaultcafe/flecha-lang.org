@@ -5,6 +5,15 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/CHANGELOG.md
 ---
 ## Unreleased
 
+## 0.3.0 - 2026-11-05
+
+Flecha 0.3.0 makes the toolchain application-capable with a substantially
+larger standard library, deterministic source-package management, portable
+installed-package qualification, and hard release gates for correctness,
+stability, and performance. See the
+[0.3.0 release and upgrade notes](/docs/reference/release_0_3_0/) for the supported
+platforms, migration guidance, and known limitations.
+
 ### Added
 
 - Added allocation-free constant-time equality for byte slices and `stringv`
