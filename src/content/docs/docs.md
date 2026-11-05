@@ -1,12 +1,14 @@
 ---
 title: Documentation
-description: Language, compiler, tooling, implementation, and design documentation for Flecha.
+description: Current Flecha v0.3 language, standard-library, package, compiler, and tooling documentation.
 ---
 
 Flecha's documentation is synced from the compiler repository so the guides here track the implementation while this website remains independently deployable.
 
-:::note[Project status]
-Flecha is under active development. Focused feature guides describe current compiler behavior; broader design documents and parts of the specification may describe intended or experimental behavior.
+:::note[Version boundary]
+These pages track the developing v0.3 contract on `master`. Historical release
+and implementation documents are retained for archaeology, but they are not the
+current API. Pin a tagged toolchain when you need a frozen contract.
 :::
 
 ## Start here
@@ -16,6 +18,14 @@ Flecha is under active development. Focused feature guides describe current comp
 - [Supported toolchains](/docs/reference/toolchains/)
 - [Modules](/docs/reference/modules/)
 - [Longbow](/docs/reference/longbow/)
+- [Package ecosystem](/docs/reference/package_ecosystem/)
+- [Complete v0.3 standard-library API inventory](/docs/reference/standard_library/)
+
+## Tutorials
+
+- [Your first Longbow project](/tutorials/first-project/)
+- [Build a command-line application](/tutorials/command-line-app/)
+- [Create and ship a package](/tutorials/publish-package/)
 
 ## Language features
 
@@ -23,7 +33,7 @@ Flecha is under active development. Focused feature guides describe current comp
 - [Fixed arrays](/docs/reference/fixed_arrays/) and [dynamic arrays](/docs/reference/dynamic_arrays/)
 - [Strings](/docs/reference/string/) and [error values](/docs/reference/error_values/)
 - [Iteration](/docs/reference/iteration/), [match](/docs/reference/match/), and [defer](/docs/reference/defer/)
-- [Generics](/docs/reference/generics/), [callable values and closures](/docs/reference/release_0_2/), and [extern declarations](/docs/reference/extern/)
+- [Generics and callable signatures](/docs/reference/generics/), [callable examples](/examples/callables/), and [extern declarations](/docs/reference/extern/)
 - [Module, quiver, and private-module visibility](/docs/reference/modules/)
 - [Logical modules across multiple source files](/docs/reference/module_composition/)
 
@@ -37,19 +47,18 @@ Flecha is under active development. Focused feature guides describe current comp
 
 ## Tooling and standard library
 
-- [Flecha and Longbow test commands](/docs/reference/release_0_2/#language-tests-implemented-before-020)
-- [Standard-library development](/docs/reference/std_development/)
-- [Generic callback algorithms example](/examples/standard-library/)
+- [Bytes](/docs/reference/bytes/), [collections](/docs/reference/collections/), [text](/docs/reference/text/), and [formatting](/docs/reference/formatting/)
+- [Filesystem and buffered I/O](/docs/reference/filesystem/), [paths](/docs/reference/path/), [networking](/docs/reference/network/), [OS APIs](/docs/reference/os/), and [child processes](/docs/reference/process/)
+- [Encoding](/docs/reference/encoding/), [hashing](/docs/reference/hashing/), [cryptography](/docs/reference/cryptography/), and [randomness](/docs/reference/random/)
+- [Math](/docs/reference/math/), [time](/docs/reference/time/), [memory helpers](/docs/reference/memory/), and [testing](/docs/reference/testing/)
+- [Every exported module and top-level declaration](/docs/reference/standard_library/)
 
 ## Compiler internals
 
 Implementation references cover [semantic analysis](/docs/reference/semantic_analysis/), [typed lowering IR](/docs/reference/typed_lowering_ir/), [LLVM code generation](/docs/reference/llvm_codegen/), [native code generation](/docs/reference/native_codegen/), and the [runtime ABI](/docs/reference/runtime_abi/).
 
-## Project history
+## Current milestone and history
 
+- [Flecha v0.3 release contract](/docs/reference/release_0_3/)
 - [Changelog and current development](/docs/reference/changelog/)
-- [Flecha 0.2.1 module correction](/docs/reference/release_0_2_1/)
-- [Flecha 0.2.0 release notes](/docs/reference/release_0_2_0/) and [implementation milestone](/docs/reference/release_0_2/)
-- [Flecha 0.1.3](/docs/reference/release_0_1_3/) and [Flecha 0.1.2](/docs/reference/release_0_1_2/)
-- [Flecha 0.1.1 stabilization milestone](/docs/reference/release_0_1_1/)
-- [Flecha 0.1 release contract](/docs/reference/release_0_1/)
+- [Tagged releases](/releases/)

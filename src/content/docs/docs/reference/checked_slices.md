@@ -6,7 +6,7 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/checked_slices.
 A slice borrows contiguous initialized storage. Its runtime representation is an
 address and a `usize` length, with no capacity, allocation, ownership, or cleanup.
 The source array owns the elements. See the runnable
-[example](/examples/checked_slices/).
+[example](https://github.com/segfaultcafe/flecha/blob/master/examples/checked_slices.fl).
 
 ## Types and creation
 

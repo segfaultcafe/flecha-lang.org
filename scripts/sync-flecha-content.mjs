@@ -22,7 +22,12 @@ const docsTarget = join(siteRoot, 'src/content/docs/docs/reference');
 const examplesTarget = join(siteRoot, 'src/content/docs/examples');
 const metadataTarget = join(siteRoot, 'src/data/flecha-source.json');
 
-for (const required of [join(sourceRoot, 'SPEC.md'), changelogSource, docsSource, examplesSource]) {
+for (const required of [
+	join(sourceRoot, 'SPEC.md'),
+	changelogSource,
+	docsSource,
+	examplesSource,
+]) {
 	if (!existsSync(required)) throw new Error(`Missing Flecha source content: ${required}`);
 }
 
@@ -59,6 +64,20 @@ const exampleOverrides = new Map([
 			description: 'Inspect a small Flecha program used to exercise LLVM IR generation and execution.',
 		},
 	],
+	['workspace_guard/src/main.fl', { slug: 'workspace_guard/src/main', title: 'Workspace Guard application', description: 'Inspect the command-line entry point for deterministic workspace snapshots and verified child execution.' }],
+	['workspace_guard/src/commands.fl', { slug: 'workspace_guard/src/commands', title: 'Workspace Guard commands', description: 'Implement snapshot, verify, diff, and guarded process execution as one complete Flecha application.' }],
+	['workspace_guard/src/manifest.fl', { slug: 'workspace_guard/src/manifest', title: 'Workspace Guard manifest', description: 'Read and write the deterministic, portable SHA-256 workspace manifest format.' }],
+	['workspace_guard/src/model.fl', { slug: 'workspace_guard/src/model', title: 'Workspace Guard model', description: 'Define the errors, records, and shared helpers used by the Workspace Guard application.' }],
+	['workspace_guard/src/scanner.fl', { slug: 'workspace_guard/src/scanner', title: 'Workspace Guard scanner', description: 'Recursively scan portable workspace paths and stream file content through SHA-256.' }],
+	['ledger/src/main.fl', { slug: 'ledger/src/main', title: 'Deterministic ledger application', description: 'Inspect the command-line entry point for the append-only, hash-chained ledger.' }],
+	['ledger/src/codec.fl', { slug: 'ledger/src/codec', title: 'Ledger canonical codec', description: 'Encode and decode the cross-platform binary ledger format without native padding or endianness.' }],
+	['ledger/src/codec_test.fl', { slug: 'ledger/src/codec_test', title: 'Ledger golden-vector tests', description: 'Verify the canonical ledger block and file bytes against fixed SHA-256 vectors.' }],
+	['ledger/src/commands.fl', { slug: 'ledger/src/commands', title: 'Ledger commands', description: 'Implement create, append, verify, and list operations for the deterministic ledger.' }],
+	['ledger/src/model.fl', { slug: 'ledger/src/model', title: 'Ledger model', description: 'Define ledger blocks, constants, error values, and hash-chain validation.' }],
+	['ledger/src/storage.fl', { slug: 'ledger/src/storage', title: 'Ledger storage', description: 'Load, validate, and append canonical records through Flecha file and buffered I/O.' }],
+	['standard_library/src/main.fl', { slug: 'standard_library/src/main', title: 'Standard-library qualification program', description: 'Run one installed-toolchain program across the complete public v0.3 standard-library surface.' }],
+	['standard_library/src/public_api.fl', { slug: 'standard_library/src/public_api', title: 'Standard-library public API fixture', description: 'Exercise every public standard-library module from a normal Flecha application.' }],
+	['standard_library/src/public_api_test.fl', { slug: 'standard_library/src/public_api_test', title: 'Standard-library public API tests', description: 'Compile and execute the public standard-library qualification fixture through Flecha tests.' }],
 ]);
 
 const exampleCatalog = [
@@ -98,7 +117,31 @@ const exampleCatalog = [
 	},
 	{
 		category: 'library',
-		slugs: ['callback_algorithms', 'standard-library', 'dynamic-array', 'llvm_poc'],
+		slugs: [
+			'callback_algorithms',
+			'standard-library',
+			'dynamic-array',
+			'llvm_poc',
+			'standard_library/src/main',
+			'standard_library/src/public_api',
+			'standard_library/src/public_api_test',
+		],
+	},
+	{
+		category: 'applications',
+		slugs: [
+			'workspace_guard/src/commands',
+			'workspace_guard/src/main',
+			'workspace_guard/src/manifest',
+			'workspace_guard/src/model',
+			'workspace_guard/src/scanner',
+			'ledger/src/commands',
+			'ledger/src/codec',
+			'ledger/src/codec_test',
+			'ledger/src/main',
+			'ledger/src/model',
+			'ledger/src/storage',
+		],
 	},
 	{
 		category: 'diagnostics',
@@ -186,6 +229,11 @@ function splitTitle(markdown, fallback) {
 function rewriteLinks(markdown) {
 	return markdown
 		.replaceAll(
+			/\]\(\.\.\/(std\/src|examples|cmake)\/([^\s)#]+)(#[^)]+)?\)/gi,
+			(_match, area, path, anchor = '') =>
+				`](https://github.com/segfaultcafe/flecha/blob/master/${area}/${path}${anchor})`,
+		)
+		.replaceAll(
 			/\]\(\.\.\/examples\/modules\/src\/main\.fl(#[^)]+)?\)/gi,
 			'](/examples/standard-library/$1)',
 		)
@@ -268,6 +316,7 @@ function writeExamplesOverview(examplePages, locale = 'en') {
 					language: 'Linguagem e fluxo de controle',
 					memory: 'Memória e propriedade',
 					library: 'Biblioteca padrão e compilação',
+					applications: 'Aplicativos completos',
 					diagnostics: 'Diagnósticos do compilador',
 					other: 'Outros exemplos',
 				}
@@ -275,6 +324,7 @@ function writeExamplesOverview(examplePages, locale = 'en') {
 					language: 'Language and control flow',
 					memory: 'Memory and ownership',
 					library: 'Standard library and compilation',
+					applications: 'Complete applications',
 					diagnostics: 'Compiler diagnostics',
 					other: 'Other examples',
 				};
@@ -395,7 +445,7 @@ writeFileSync(
 			repository: 'segfaultcafe/flecha',
 			commit,
 			syncedAt,
-			docs: docs.length + 4,
+			docs: docs.length + 5,
 			examples: examples.length,
 			examplePages: examplePages.map(({ slug, title, category }) => ({ slug, title, category })),
 		},
@@ -410,4 +460,4 @@ cpSync(
 	join(siteRoot, 'src/data/flecha.tmLanguage.json'),
 );
 
-console.log(`Synced ${docs.length + 4} docs and ${examples.length} examples from ${commit.slice(0, 12)}.`);
+console.log(`Synced ${docs.length + 5} docs and ${examples.length} examples from ${commit.slice(0, 12)}.`);

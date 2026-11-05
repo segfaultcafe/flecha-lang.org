@@ -5,7 +5,7 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/checked_referen
 ---
 Checked references are implemented for initialized scalar, structure, fixed-array, and raw-pointer
 storage. They borrow storage without allocating, owning, or extending its
-lifetime. See [the runnable example](/examples/checked_references/).
+lifetime. See [the runnable example](https://github.com/segfaultcafe/flecha/blob/master/examples/checked_references.fl).
 
 ```flecha
 u8 double_local() {
@@ -99,6 +99,54 @@ returned only through an explicit `<- parameter>` contract; see
 condition/value correlation to prove paths impossible. Temporary borrows may
 remain live through their entire expression. Rebinding or moving the handle
 used to address a pending indirect assignment is rejected.
+
+## Structure fields
+
+A structure may store a checked reference. The structure carries that borrow
+without owning or destroying the referent. A constructor or factory returning
+the structure must name the source through the ordinary returned-borrow
+contract:
+
+```flecha
+structure View {
+    private &i32 value;
+    private i32 tag;
+};
+
+View View::init(&i32 value, i32 tag) <- value override {
+    return build View {
+        self.value = value;
+        self.tag = tag;
+    };
+}
+```
+
+Every direct field whose type contains a checked reference must be initialized
+by a direct `self.field = value` assignment at the beginning of the build
+block. These reference-bearing assignments may appear in either order, but
+must precede validation, control flow, and assignments to other fields. This
+lets generated code construct those fields directly without first inventing an
+invalid null reference or destroying uninitialized storage. Declaration
+defaults do not replace this contract.
+
+Reference-bearing structures are never zeroable, recursively. They receive no
+generated `zero()`, cannot define a usable no-argument `zero()`, reject `none`,
+and require an initializer at every variable declaration. They also receive no
+generated no-argument `init`; construction needs an explicit constructor or
+factory with a borrow source.
+
+Movement and copying remain separate from zeroability. Moving either mutable
+or shared reference fields transfers the tracked borrow to the destination.
+An `&T` field makes its containing structure noncopyable, because copying it
+would duplicate an exclusive borrow. An `&const T` field remains copyable when
+every other field is copyable and the structure has no custom `tear`; each copy
+carries the shared borrow. A safe custom `tear` still makes the structure
+noncopyable but movable, while an unsafe `tear` still makes it immovable. These
+lifecycle rules are orthogonal to the reference field itself.
+
+`&*T` is also a valid field type. It borrows a raw-pointer slot rather than the
+pointed-to `T`; dereferencing the stored raw pointer still requires `unsafe`.
+References never take `own` or `lend` because `&T` is already a checked borrow.
 
 ## Disjoint structure fields
 

@@ -1,9 +1,9 @@
 {
   "repository": "segfaultcafe/flecha",
-  "commit": "5bb085c7d5a451c1789ee2edebae304273ba9de2",
-  "syncedAt": "2026-10-27T12:56:39.006Z",
-  "docs": 47,
-  "examples": 36,
+  "commit": "3d279c34cf7cced06fccaf158f38ce1a066efbf1",
+  "syncedAt": "2026-11-05T03:09:54.063Z",
+  "docs": 71,
+  "examples": 50,
   "examplePages": [
     {
       "slug": "factorial",
@@ -144,6 +144,76 @@
       "slug": "llvm_poc",
       "title": "LLVM IR proof of concept",
       "category": "library"
+    },
+    {
+      "slug": "standard_library/src/main",
+      "title": "Standard-library qualification program",
+      "category": "library"
+    },
+    {
+      "slug": "standard_library/src/public_api",
+      "title": "Standard-library public API fixture",
+      "category": "library"
+    },
+    {
+      "slug": "standard_library/src/public_api_test",
+      "title": "Standard-library public API tests",
+      "category": "library"
+    },
+    {
+      "slug": "workspace_guard/src/commands",
+      "title": "Workspace Guard commands",
+      "category": "applications"
+    },
+    {
+      "slug": "workspace_guard/src/main",
+      "title": "Workspace Guard application",
+      "category": "applications"
+    },
+    {
+      "slug": "workspace_guard/src/manifest",
+      "title": "Workspace Guard manifest",
+      "category": "applications"
+    },
+    {
+      "slug": "workspace_guard/src/model",
+      "title": "Workspace Guard model",
+      "category": "applications"
+    },
+    {
+      "slug": "workspace_guard/src/scanner",
+      "title": "Workspace Guard scanner",
+      "category": "applications"
+    },
+    {
+      "slug": "ledger/src/commands",
+      "title": "Ledger commands",
+      "category": "applications"
+    },
+    {
+      "slug": "ledger/src/codec",
+      "title": "Ledger canonical codec",
+      "category": "applications"
+    },
+    {
+      "slug": "ledger/src/codec_test",
+      "title": "Ledger golden-vector tests",
+      "category": "applications"
+    },
+    {
+      "slug": "ledger/src/main",
+      "title": "Deterministic ledger application",
+      "category": "applications"
+    },
+    {
+      "slug": "ledger/src/model",
+      "title": "Ledger model",
+      "category": "applications"
+    },
+    {
+      "slug": "ledger/src/storage",
+      "title": "Ledger storage",
+      "category": "applications"
     },
     {
       "slug": "invalids",

@@ -51,11 +51,11 @@ boundary.
 module main;
 
 @imports
-    :: lib::std::containers::algorithms;
+    :: lib::std::containers::collections;
 
 i32 main() {
     [5]i32 values = [10, 20, 30, 20, 40];
-    index, found := algorithms::index_of<i32>(values[:], 30);
+    index, found := collections::index_of<i32>(values[:], 30);
     if found {
         stdoutln(index);
         return 0;
@@ -80,7 +80,7 @@ own helper rather than the application's helper.
 
 The declared module name becomes the local namespace unless an alias is
 supplied with `as`. Imported functions, types, static methods, and error
-variants remain qualified, for example `algorithms::index_of<i32>(...)`,
+variants remain qualified, for example `collections::index_of<i32>(...)`,
 `containers::Box`, and `errors::IoError.NotFound`.
 
 Directory imports select declared logical module names:
@@ -211,4 +211,4 @@ FFI linkage contracts remain outside this implementation.
 
 See [Logical module composition](/docs/reference/module_composition/) for the precise 0.2.1
 contract, [Longbow](/docs/reference/longbow/) for project workflows, and
-[the module example](/examples/standard-library/) for a runnable project.
+[the module example](https://github.com/segfaultcafe/flecha/blob/master/examples/modules/src/main.fl) for a runnable project.

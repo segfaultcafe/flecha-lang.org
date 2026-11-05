@@ -7,7 +7,7 @@ Fixed arrays are implemented with inline contiguous storage. `[N]T` contains
 exactly `N` elements of type `T`; both the element type and length participate
 in type identity. Creating, copying, passing, or returning an array does not
 allocate a separate heap buffer. See the runnable
-[sorting and initialization example](/examples/fixed_arrays/).
+[sorting and initialization example](https://github.com/segfaultcafe/flecha/blob/master/examples/fixed_arrays.fl).
 
 ## Types and initialization
 

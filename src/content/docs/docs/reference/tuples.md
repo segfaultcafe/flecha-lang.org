@@ -17,7 +17,7 @@ Empty tuples and single-element tuples are not supported. A trailing comma is
 allowed after two or more elements. Elements evaluate exactly once, left to
 right. Each element's value is captured before evaluating the next element.
 
-See the runnable [example](/examples/tuples/).
+See the runnable [example](https://github.com/segfaultcafe/flecha/blob/master/examples/tuples.fl).
 
 ## Functions
 
