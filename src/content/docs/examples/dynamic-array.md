@@ -10,10 +10,10 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/dynamic_arr
 module main;
 
 @imports
-    :: lib::std::containers::array;
+    :: lib::std::containers::collections;
 
 i32 main() {
-    numbers := array::Array<i32>::init();
+    numbers := collections::Array<i32>::init();
 
     i32 i = 0;
     while i < 100 {

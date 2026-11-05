@@ -3,7 +3,7 @@ title: Exemplos
 description: Catálogo completo de programas Flecha sincronizados do repositório do compilador.
 ---
 
-Estes 36 exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com/segfaultcafe/flecha/tree/master/examples). O código e os identificadores permanecem iguais ao original; as páginas individuais estão em inglês.
+Estes 50 exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com/segfaultcafe/flecha/tree/master/examples). O código e os identificadores permanecem iguais ao original; as páginas individuais estão em inglês.
 
 ## Linguagem e fluxo de controle
 
@@ -41,6 +41,23 @@ Estes 36 exemplos vêm diretamente de [`segfaultcafe/flecha`](https://github.com
 - [Standard library modules](/examples/standard-library/)
 - [Generic dynamic array](/examples/dynamic-array/)
 - [LLVM IR proof of concept](/examples/llvm_poc/)
+- [Standard-library qualification program](/examples/standard_library/src/main/)
+- [Standard-library public API fixture](/examples/standard_library/src/public_api/)
+- [Standard-library public API tests](/examples/standard_library/src/public_api_test/)
+
+## Aplicativos completos
+
+- [Workspace Guard commands](/examples/workspace_guard/src/commands/)
+- [Workspace Guard application](/examples/workspace_guard/src/main/)
+- [Workspace Guard manifest](/examples/workspace_guard/src/manifest/)
+- [Workspace Guard model](/examples/workspace_guard/src/model/)
+- [Workspace Guard scanner](/examples/workspace_guard/src/scanner/)
+- [Ledger commands](/examples/ledger/src/commands/)
+- [Ledger canonical codec](/examples/ledger/src/codec/)
+- [Ledger golden-vector tests](/examples/ledger/src/codec_test/)
+- [Deterministic ledger application](/examples/ledger/src/main/)
+- [Ledger model](/examples/ledger/src/model/)
+- [Ledger storage](/examples/ledger/src/storage/)
 
 ## Diagnósticos do compilador
 

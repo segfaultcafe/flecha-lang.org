@@ -5,7 +5,7 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/docs/defer.md
 ---
 `defer callee(arguments);` captures a function, callable value, or structure
 method call now and executes it when the current lexical scope exits. See
-[the runnable example](/examples/defer/).
+[the runnable example](https://github.com/segfaultcafe/flecha/blob/master/examples/defer.fl).
 
 ```flecha
 void report(i32 value) { stdoutln(value); }

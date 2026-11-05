@@ -183,8 +183,11 @@ allocating in a loop. Previously freed aliases remain stale if the site repeats.
 Analysis is bounded at 128 distinct states per CFG node and 100,000 processed
 states per root function, including interpreted callees. Exceeding either budget
 is an error, not a silently successful check. Complex but valid programs may
-need simpler control flow. Declared ownership contracts support recursive calls; general inferred recursive
-summaries and owning container storage remain future work.
+need simpler control flow. Declared ownership contracts support recursive raw
+pointer calls. Recursive calls carrying only safe values are summarized with
+their declared result shape, so movable structures and owning containers can be
+returned recursively while every function body is still verified independently.
+Uncontracted recursion that exposes raw allocation handles remains rejected.
 
 This is an allocation checker, not a proof that arbitrary unsafe code is memory
 safe. Raw pointer parameters entering a root function are symbolic external
@@ -194,11 +197,13 @@ unknown external/field-derived pointers and stack-address lifetimes do not gain
 a safety guarantee. Free with unverified provenance is rejected. The analysis
 tracks allocation obligations, not byte usage or peak heap size; automatic
 strings and structure values continue to use their existing cleanup rules.
-General safe heap-owner primitives remain future work. The first concrete
-dynamic collection is [`RawArray<T>`](/docs/reference/dynamic_arrays/), implemented in
-Flecha using these raw contracts. The same document describes `Array<T>`, its
-safe public wrapper; both container values now use whole-value moves, while
-move-only element relocation remains unsupported.
+For compiler-managed runtime buffers, use `own []T` and
+`new<own []T>(count)`; they are intentionally outside this raw-allocation
+checker. The first concrete dynamic collection is
+[`RawArray<T>`](/docs/reference/dynamic_arrays/), implemented in Flecha using these raw
+contracts. The same document describes `Array<T>`, its safe public wrapper;
+both container values now use whole-value moves, while move-only element
+relocation remains unsupported.
 
 ## Diagnostics and verification
 
@@ -230,5 +235,5 @@ Anonymous functions may preserve a temporary loan with `[lend pointer]` or
 transfer cleanup into their environment with `[own pointer]`; the complete
 rules are documented in [ownership contracts](/docs/reference/ownership_contracts/).
 See [runtime_abi.md](/docs/reference/runtime_abi/) for the storage ABI and
-[../examples/raw_allocation.fl](/examples/raw_allocation/) for a runnable
+[../examples/raw_allocation.fl](https://github.com/segfaultcafe/flecha/blob/master/examples/raw_allocation.fl) for a runnable
 example returning 42.

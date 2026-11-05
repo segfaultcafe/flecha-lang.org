@@ -15,7 +15,7 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/callback_al
 module callback_algorithms;
 
 @imports
-    :: lib::std::containers::algorithms;
+    :: lib::std::containers::collections;
 
 bool is_greater_than_two(&const i32 value) {
     return *value > 2;
@@ -26,13 +26,13 @@ i32 main() {
 
     // Named function.
     index, found :=
-        algorithms::find_if<i32>(values[:], is_greater_than_two);
+        collections::find_if<i32>(values[:], is_greater_than_two);
     if !found or index != 2 {
         return 1;
     }
 
     // Captureless, contextually inferred anonymous function.
-    total := algorithms::fold<i32, i32>(
+    total := collections::fold<i32, i32>(
         values[:],
         0,
         (sum, value) => { return sum + *value; }
@@ -43,7 +43,7 @@ i32 main() {
 
     // Capturing anonymous function.
     i32 visited = 0;
-    algorithms::for_each<i32>(values[:], [&visited](value) => {
+    collections::for_each<i32>(values[:], [&visited](value) => {
         visited = visited + *value;
     });
     if visited != 10 {
@@ -51,7 +51,7 @@ i32 main() {
     }
 
     // Captureless comparator.
-    algorithms::sort_by<i32>(values[:], (left, right) => {
+    collections::sort_by<i32>(values[:], (left, right) => {
         return *left > *right;
     });
     if values[0] != 4 or values[1] != 3 or

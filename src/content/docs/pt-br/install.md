@@ -3,7 +3,9 @@ title: Instalar a Flecha
 description: Compile o compilador Flecha e a ferramenta de projetos Longbow a partir do código-fonte.
 ---
 
-Flecha é um software em estágio inicial. Atualmente, a instalação mais confiável é a compilação a partir do código-fonte; versões marcadas também publicam arquivos por plataforma e pacotes para editores.
+Flecha é um software em estágio inicial. Use um arquivo de versão marcada
+para um toolchain reproduzível ou compile `master` quando quiser explicitamente
+o contrato v0.3 em desenvolvimento documentado neste site.
 
 [Baixe a Flecha v0.2.5 para Linux, Windows ou macOS](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.5). Cada versão inclui checksums, o compilador, Longbow, runtime e biblioteca padrão, suporte ao Neovim e uma extensão para VS Code.
 
@@ -29,7 +31,8 @@ cd flecha
 make build
 ```
 
-O compilador será criado em `build/flecha`, e a ferramenta de projetos em `build/longbow`.
+O compilador será criado em `build/flecha`, e a ferramenta de projetos e
+pacotes em `build/longbow`. Mantenha os dois binários da mesma compilação.
 
 ```sh
 cmake -S . -B build -G Ninja -DBUILD_TESTING=OFF
@@ -45,4 +48,7 @@ build/flecha build examples/factorial.fl -o build/factorial
 ./build/factorial
 ```
 
-O exemplo imprime `Factorial: 120`. Continue em [Aprender Flecha](/pt-br/learn/).
+O exemplo imprime `Factorial: 120`. Adicione o diretório `build` absoluto ao
+`PATH` para seguir os tutoriais e confirme que `flecha --version` e
+`longbow --version` mostram a mesma versão. Continue em
+[Aprender Flecha](/pt-br/learn/).
