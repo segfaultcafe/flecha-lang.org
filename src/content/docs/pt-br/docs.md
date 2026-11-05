@@ -6,8 +6,9 @@ description: Documentação da linguagem, compilador, ferramentas, implementaç�
 A documentação da Flecha é sincronizada do repositório do compilador. A jornada principal está disponível em português do Brasil; a referência técnica completa permanece em inglês durante a tradução gradual.
 
 :::note[Limite de versão]
-Estas páginas acompanham o contrato v0.3 em desenvolvimento no branch `master`.
-Documentos históricos continuam disponíveis, mas não definem a API atual.
+Os tutoriais usam o toolchain v0.3.0 marcado. A referência sincronizada também
+mostra o desenvolvimento atual de `master`; use as notas de versão e o
+toolchain marcado quando precisar do contrato v0.3.0 congelado.
 :::
 
 ## Comece aqui
@@ -20,11 +21,14 @@ Documentos históricos continuam disponíveis, mas não definem a API atual.
 - [Ecossistema de pacotes — inglês](/docs/reference/package_ecosystem/)
 - [API completa da biblioteca padrão v0.3 — inglês](/docs/reference/standard_library/)
 
-## Tutoriais atuais
+## Trilhas de aprendizado
 
-- [Primeiro projeto Longbow — inglês](/tutorials/first-project/)
-- [Aplicativo de linha de comando — inglês](/tutorials/command-line-app/)
-- [Criar e publicar um pacote — inglês](/tutorials/publish-package/)
+- [Caminho de cinco níveis](/pt-br/learn/)
+- [Olá, Arqueiro!](/pt-br/tutorials/beginner/hello-archer/)
+- [Trilha Básico](/pt-br/tutorials/basic/modules-values-functions/)
+- [Trilha Intermediário](/pt-br/tutorials/intermediate/ownership-and-borrows/)
+- [Trilha Avançado](/pt-br/tutorials/advanced/contracts-and-builds/)
+- [Trilha Unsafe](/pt-br/tutorials/unsafe/boundary/)
 
 ## Marco atual e histórico
 
@@ -32,4 +36,5 @@ Documentos históricos continuam disponíveis, mas não definem a API atual.
 - [Changelog e desenvolvimento atual — inglês](/docs/reference/changelog/)
 - [Versões publicadas](/pt-br/releases/)
 
-Use o seletor de idioma no cabeçalho para voltar à versão original em inglês de qualquer página traduzida.
+Use o seletor de idioma no cabeçalho para alternar entre as versões completas
+em português e inglês do currículo.

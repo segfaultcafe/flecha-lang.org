@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
+import { curriculumTracks } from './src/data/curriculum.mjs';
 
 const flechaGrammar = JSON.parse(
 	readFileSync(new URL('./src/data/flecha.tmLanguage.json', import.meta.url), 'utf8'),
@@ -18,7 +19,17 @@ const exampleCategories = [
 	['diagnostics', 'Compiler diagnostics', 'Diagnósticos do compilador'],
 	['other', 'Other examples', 'Outros exemplos'],
 ];
+/** @type {{ slug: string; title: string; category: string }[]} */
 const examplePages = Array.isArray(flechaSource.examplePages) ? flechaSource.examplePages : [];
+const curriculumSidebar = curriculumTracks.map((track) => ({
+	label: track.title,
+	translations: { 'pt-br': track.titlePt },
+	items: track.lessons.map((lesson) => ({
+		label: lesson.title,
+		translations: { 'pt-br': lesson.titlePt },
+		slug: `tutorials/${lesson.slug}`,
+	})),
+}));
 const exampleSidebarItems = exampleCategories.flatMap(([category, label, translation]) => {
 	const pages = examplePages.filter((page) => page.category === category);
 	if (!pages.length) return [];
@@ -39,13 +50,19 @@ export default defineConfig({
 	redirects: {
 		'/examples/modules/src/main/': '/examples/standard-library/',
 		'/examples/dynamic_array/src/main/': '/examples/dynamic-array/',
+		'/tutorials/first-project/': '/tutorials/beginner/hello-archer/',
+		'/tutorials/command-line-app/': '/tutorials/beginner/command-line-app/',
+		'/tutorials/publish-package/': '/tutorials/beginner/publish-package/',
+		'/pt-br/tutorials/first-project/': '/pt-br/tutorials/beginner/hello-archer/',
+		'/pt-br/tutorials/command-line-app/': '/pt-br/tutorials/beginner/command-line-app/',
+		'/pt-br/tutorials/publish-package/': '/pt-br/tutorials/beginner/publish-package/',
 	},
 	integrations: [
 		sitemap({
 			filter: (page) => {
 				const pathname = new URL(page).pathname;
 				if (!pathname.startsWith('/pt-br/')) return true;
-				return new Set([
+				return pathname.startsWith('/pt-br/tutorials/') || new Set([
 					'/pt-br/',
 					'/pt-br/install/',
 					'/pt-br/learn/',
@@ -65,7 +82,9 @@ export default defineConfig({
 			components: {
 				Head: './src/components/Head.astro',
 				Header: './src/components/Header.astro',
+				Pagination: './src/components/CurriculumPagination.astro',
 			},
+			pagination: false,
 			locales: {
 				root: { label: 'English', lang: 'en' },
 				'pt-br': { label: 'Português (Brasil)', lang: 'pt-BR' },
@@ -123,11 +142,7 @@ export default defineConfig({
 						{
 							label: 'Tutorials',
 							translations: { 'pt-br': 'Tutoriais' },
-							items: [
-								{ label: 'Your first Longbow project', slug: 'tutorials/first-project' },
-								{ label: 'Build a command-line application', slug: 'tutorials/command-line-app' },
-								{ label: 'Create and ship a package', slug: 'tutorials/publish-package' },
-							],
+							items: curriculumSidebar,
 						},
 						{
 							label: 'Language features',

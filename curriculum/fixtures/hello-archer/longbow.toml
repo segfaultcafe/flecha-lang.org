@@ -1,0 +1,6 @@
+[package]
+name = "hello-archer"
+version = "0.1.0"
+kind = "program"
+
+[dependencies]

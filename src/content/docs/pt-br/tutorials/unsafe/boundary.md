@@ -1,0 +1,27 @@
+---
+title: '1. O limite unsafe'
+description: Decida se unsafe é necessário, declare a prova ausente e mantenha a fronteira menor que a API segura ao redor.
+---
+
+:::danger[Pré-requisito, não atalho]
+Conclua a trilha Avançado. Unsafe não remove responsabilidade e nunca é atalho
+de desempenho. Meça desempenho separadamente; use unsafe apenas para uma
+fronteira que Flecha segura não consegue expressar.
+:::
+
+Flecha segura prova tempos de vida de referências, limites de slices,
+movimentos de recursos e chamadas tipadas. `unsafe` existe para endereços
+brutos, alocação bruta e contratos nativos cuja validade vem de fora dessas
+provas. Antes de usar, escreva a invariante e procure uma referência, slice,
+valor proprietário ou wrapper seguro que já a expresse.
+
+Coloque a operação bruta em função privada ou bloco pequeno. Valide tamanhos,
+alinhamento, nulidade, tempo de vida, propriedade e erros antes da fronteira.
+Retorne um valor seguro comum ou erro explícito.
+
+## O que aprender a seguir
+
+- [Memória bruta e o primeiro programa unsafe](/pt-br/tutorials/unsafe/raw-memory/)
+- [Contextos unsafe e ponteiros — em inglês](/docs/reference/unsafe_pointers/)
+- [Invariantes de segurança — em inglês](/docs/reference/memory_safety_invariants/)
+

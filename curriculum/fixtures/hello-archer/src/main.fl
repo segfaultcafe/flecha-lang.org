@@ -1,0 +1,9 @@
+module main;
+
+@imports
+    :: lib::std::fmt;
+
+i32 main() {
+    fmt::println("Hello, Archer!");
+    return 0;
+}

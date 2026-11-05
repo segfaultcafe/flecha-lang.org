@@ -1,0 +1,38 @@
+---
+import { curriculumLessons, curriculumPath, findCurriculumLesson } from '../data/curriculum.mjs';
+
+const locale = Astro.url.pathname.startsWith('/pt-br/') ? 'pt-br' : 'en';
+const current = findCurriculumLesson(Astro.url.pathname);
+const currentIndex = current ? curriculumLessons.findIndex((lesson) => lesson.slug === current.slug) : -1;
+const previous = currentIndex > 0 ? curriculumLessons[currentIndex - 1] : undefined;
+const next = currentIndex >= 0 && currentIndex < curriculumLessons.length - 1 ? curriculumLessons[currentIndex + 1] : undefined;
+const title = (lesson: (typeof curriculumLessons)[number]) => locale === 'pt-br' ? lesson.titlePt : lesson.title;
+---
+
+{current && (
+	<div class="curriculum-pagination print:hidden" data-curriculum-pagination data-track={current.track}>
+		{previous && (
+			<a href={curriculumPath(previous.slug, locale)} rel="prev">
+				<span class="direction">{locale === 'pt-br' ? 'Anterior' : 'Previous'}</span>
+				<span class="link-title">← {title(previous)}</span>
+			</a>
+		)}
+		{next && (
+			<a href={curriculumPath(next.slug, locale)} rel="next">
+				<span class="direction">{locale === 'pt-br' ? 'Próximo' : 'Next'}</span>
+				<span class="link-title">{title(next)} →</span>
+			</a>
+		)}
+	</div>
+)}
+
+<style>
+	@layer starlight.core {
+		.curriculum-pagination { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); gap: 1rem; }
+		a { display: flex; flex-direction: column; justify-content: center; gap: .25rem; width: 100%; border: 1px solid var(--sl-color-gray-5); border-radius: .5rem; padding: 1rem; text-decoration: none; color: var(--sl-color-gray-2); box-shadow: var(--sl-shadow-md); overflow-wrap: anywhere; }
+		a[rel='next'] { text-align: end; grid-column-end: -1; }
+		a:hover { border-color: var(--sl-color-gray-2); }
+		.direction { font-size: var(--sl-text-sm); }
+		.link-title { color: var(--sl-color-white); font-size: var(--sl-text-xl); line-height: var(--sl-line-height-headings); }
+	}
+</style>

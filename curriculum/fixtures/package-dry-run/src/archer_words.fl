@@ -1,0 +1,5 @@
+module archer_words;
+
+export i32 greeting_length() {
+    return 6;
+}

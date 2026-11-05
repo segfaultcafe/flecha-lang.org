@@ -45,12 +45,12 @@ cmake --build build --parallel
 
 ```sh
 build/flecha --version
-build/flecha check examples/factorial.fl
-build/flecha build examples/factorial.fl -o build/factorial
-./build/factorial
+build/flecha check examples/hello.fl
+build/flecha build examples/hello.fl -o build/hello
+./build/hello
 ```
 
-O exemplo imprime `Factorial: 120`. Adicione o diretório `build` absoluto ao
+O exemplo imprime `Flecha v0.3: 42`. Adicione o diretório `build` absoluto ao
 `PATH` para seguir os tutoriais e confirme que `flecha --version` e
 `longbow --version` mostram a mesma versão. Continue em
 [Aprender Flecha](/pt-br/learn/).

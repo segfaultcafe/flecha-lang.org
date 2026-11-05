@@ -1,0 +1,26 @@
+---
+title: '1. Ownership contracts and deterministic builds'
+description: Make resource transfer explicit across APIs and prove that package inputs produce reproducible outputs.
+---
+
+Advanced APIs must state whether an input is borrowed, consumed, returned, or
+retained. Apply ownership contracts at the narrowest boundary and test every
+exit: success, validation failure, allocation failure, and partial
+initialization. A custom lifecycle method does not excuse an ambiguous transfer.
+
+Deterministic builds begin before code generation. Pin the compiler and
+Longbow version, commit application lockfiles, verify package checksums, sort
+unordered inputs before serialization, and keep host paths and timestamps out
+of artifacts unless they are declared inputs. Rebuild from a clean cache and
+compare the artifact that matters, not just console output.
+
+Use [ownership contracts](/docs/reference/ownership_contracts/), [package
+ecosystem](/docs/reference/package_ecosystem/), and [native code
+generation](/docs/reference/native_codegen/) as audit checklists.
+
+## What to learn next
+
+- [Native boundaries and performance evidence](/tutorials/advanced/native-and-performance/)
+- [Lifecycle and structures](/docs/reference/structures/)
+- [Longbow lock and cache behavior](/docs/reference/longbow/)
+

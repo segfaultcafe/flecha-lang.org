@@ -1,0 +1,6 @@
+[package]
+name = "archer-greet"
+version = "0.1.0"
+kind = "program"
+
+[dependencies]

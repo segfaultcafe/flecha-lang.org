@@ -1,0 +1,23 @@
+---
+title: "Hello example"
+description: "Learn hello in Flecha with a complete source example you can inspect and run."
+editUrl: https://github.com/segfaultcafe/flecha/edit/master/examples/hello.fl
+---
+
+[View source on GitHub](https://github.com/segfaultcafe/flecha/blob/master/examples/hello.fl)
+
+```flecha title="hello.fl"
+module hello;
+
+i32 main() {
+    [3]i32 values = [7, 11, 24];
+    i32 total = 0;
+    for (_, value) := range values {
+        total = total + value;
+    }
+
+    stdout("Flecha v0.3: ");
+    stdoutln(total);
+    return 0;
+}
+```

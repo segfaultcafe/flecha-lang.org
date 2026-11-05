@@ -1,13 +1,13 @@
 {
   "repository": "segfaultcafe/flecha",
-  "commit": "d8282850dd6323b6a1c772719a13e9be6bc44d76",
-  "syncedAt": "2026-11-05T20:47:19.151Z",
+  "commit": "fc9576f22289b15abc5ad1ebf85eb1cdf541fac4",
+  "syncedAt": "2026-11-05T22:05:36.543Z",
   "docs": 76,
   "examples": 50,
   "examplePages": [
     {
-      "slug": "factorial",
-      "title": "Factorial example",
+      "slug": "hello",
+      "title": "Hello example",
       "category": "language"
     },
     {
