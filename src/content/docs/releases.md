@@ -3,6 +3,16 @@ title: Releases
 description: Current Flecha releases and project status.
 ---
 
+## 0.3.0
+
+Released November 5, 2026. Flecha 0.3.0 is the application-capable release: it adds a substantially broader portable standard library, deterministic source-package resolution and registry workflows, stronger compiler hardening, and clean installed-package qualification on Linux, Windows, and both macOS architectures.
+
+Longbow now resolves recursive path, pinned Git, and owner-scoped registry dependencies into deterministic locks with content verification and offline rebuilds. The compiler adds package-scoped aliases, inferred generic method arguments, forwarding packs, and compiler-derived JSON defaults. The standard library adds process, filesystem, path, time, random, DNS, TCP, UDP, buffered-I/O, SHA-2, HMAC, collection, testing, fixture, and benchmark facilities.
+
+The Windows archive targets MSYS2 UCRT64 with Clang and the MinGW ABI. Native MSVC and the `windows-msvc` ABI are deferred to the focused 0.3.1 toolchain patch.
+
+[Download v0.3.0 on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0) or read the [complete release and upgrade notes](/docs/reference/release_0_3_0/).
+
 ## 0.2.5
 
 Released October 27, 2026. Flecha 0.2.5 lets Longbow create and operate on projects whose names are not Flecha identifiers, including names with spaces and hyphens.
@@ -79,9 +89,8 @@ Flecha has not reached a stable language or ABI. Read each release's notes and p
 
 ## Current development
 
-Flecha v0.3.0 is the current development milestone; it has not been released.
-The latest released version is v0.2.5. The `master` branch tracks work
-toward v0.3.0, and features there remain development behavior until they appear
-in a tagged release.
+Flecha v0.3.0 is the latest tagged release. The `master` branch may contain
+changes intended for a future release; use the tag when you need the documented
+0.3.0 contract.
 
-Read the [v0.2.5 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.5), the [v0.3.0 standard-library milestone](/docs/reference/release_0_3/), or the [complete changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Read the [v0.3.0 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0), the [complete release and upgrade notes](/docs/reference/release_0_3_0/), or the [current changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).

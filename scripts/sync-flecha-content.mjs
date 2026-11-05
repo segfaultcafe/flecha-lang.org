@@ -234,6 +234,11 @@ function rewriteLinks(markdown) {
 				`](https://github.com/segfaultcafe/flecha/blob/master/${area}/${path}${anchor})`,
 		)
 		.replaceAll(
+			/\]\(\.\.\/(benchmarks)\/([^\s)#]+)(#[^)]+)?\)/gi,
+			(_match, area, path, anchor = '') =>
+				`](https://github.com/segfaultcafe/flecha/blob/master/${area}/${path}${anchor})`,
+		)
+		.replaceAll(
 			/\]\(\.\.\/examples\/modules\/src\/main\.fl(#[^)]+)?\)/gi,
 			'](/examples/standard-library/$1)',
 		)

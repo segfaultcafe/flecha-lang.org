@@ -3,6 +3,16 @@ title: Versões
 description: Versões atuais da Flecha e status do projeto.
 ---
 
+## 0.3.0
+
+Lançada em 5 de novembro de 2026. Flecha 0.3.0 é a versão voltada à criação de aplicativos: ela traz uma biblioteca padrão portátil muito mais ampla, resolução determinística de pacotes-fonte e fluxos de registro, maior robustez do compilador e qualificação de pacotes instalados de forma limpa em Linux, Windows e nas duas arquiteturas macOS.
+
+Longbow agora resolve dependências recursivas de caminhos, Git fixado e registro com escopo de proprietário em locks determinísticos, com verificação de conteúdo e recompilação offline. O compilador adiciona aliases com escopo de pacote, inferência de argumentos de métodos genéricos, pacotes de encaminhamento e padrões JSON derivados pelo compilador. A biblioteca padrão adiciona APIs de processos, sistema de arquivos, caminhos, tempo, aleatoriedade, DNS, TCP, UDP, I/O com buffer, SHA-2, HMAC, coleções, testes, fixtures e benchmarks.
+
+O arquivo para Windows usa MSYS2 UCRT64 com Clang e ABI MinGW. MSVC nativo e a ABI `windows-msvc` ficam para a correção de toolchain 0.3.1.
+
+[Baixe a v0.3.0 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0) ou leia as [notas completas de lançamento e atualização — em inglês](/docs/reference/release_0_3_0/).
+
 ## 0.2.5
 
 Lançada em 27 de outubro de 2026. A Flecha 0.2.5 permite que o Longbow crie e opere em projetos cujos nomes não são identificadores da Flecha, incluindo nomes com espaços e hífens.
@@ -79,9 +89,8 @@ Flecha ainda não possui uma linguagem ou ABI estável. Leia as notas de cada ve
 
 ## Desenvolvimento atual
 
-A Flecha v0.3.0 é o marco atual de desenvolvimento e ainda não foi lançada. A
-versão lançada mais recente é a v0.2.5. O branch `master`
-acompanha o trabalho rumo à v0.3.0, e seus recursos permanecem em desenvolvimento
-até aparecerem em uma versão marcada.
+Flecha v0.3.0 é a versão marcada mais recente. O branch `master` pode conter
+mudanças destinadas a uma versão futura; use a tag quando precisar do contrato
+0.3.0 documentado.
 
-Consulte a [versão v0.2.5 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.2.5), o [marco da biblioteca padrão v0.3.0 — em inglês](/docs/reference/release_0_3/) ou o [changelog completo no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Consulte a [versão v0.3.0 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0), as [notas completas de lançamento e atualização — em inglês](/docs/reference/release_0_3_0/) ou o [changelog atual no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
