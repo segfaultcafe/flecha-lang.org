@@ -1,0 +1,26 @@
+---
+title: '2. Collections, allocation errors, and generics'
+description: Grow containers deliberately, preserve allocation failure, and reuse algorithms through type parameters and callables.
+---
+
+Dynamic collections own allocations and can fail while growing. Reserve when
+you know a useful capacity, but still preserve the error result: lack of memory
+is not a value. Views borrow collection storage and therefore constrain moves,
+growth, replacement, and destruction until their final use.
+
+Generics specialize checked code for concrete types. Type sets express the
+operations a parameter supports; callables carry behavior across an API. Start
+with a concrete implementation, make the varying type or operation explicit,
+and inspect diagnostics at the specialization site. Avoid abstraction that
+merely hides ownership or allocation.
+
+Use [collections](/docs/reference/collections/), [runtime arrays and
+containers](/docs/reference/dynamic_arrays/), [generics](/docs/reference/generics/),
+and [callables](/examples/callables/) as focused companions.
+
+## What to learn next
+
+- [Packages and system interfaces](/tutorials/intermediate/system-interfaces/)
+- [Type sets](/docs/reference/type_sets/)
+- [Allocation failure contracts](/docs/reference/raw_allocation/)
+

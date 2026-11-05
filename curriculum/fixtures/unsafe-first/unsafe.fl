@@ -1,0 +1,8 @@
+i32 main() {
+    i32 value = 42;
+    unsafe {
+        *i32 pointer = &raw value;
+        stdoutln(*pointer);
+    }
+    return 0;
+}

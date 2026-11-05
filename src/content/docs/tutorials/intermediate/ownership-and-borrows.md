@@ -1,0 +1,26 @@
+---
+title: '1. Ownership, moves, and checked borrows'
+description: Follow resource identity through moves and use checked references and slices without hiding lifetimes.
+---
+
+An owning value has one cleanup responsibility. Moving it transfers that
+responsibility and makes the old place unavailable until it is reinitialized.
+Copying is reserved for values whose semantics permit independent copies.
+
+A checked `&T` or `&const T` borrow does not take ownership. Its lifetime keeps
+the owner alive and prevents conflicting access. A checked slice adds a length
+to that borrowed access, so indexing remains bounds-checked. Keep borrows short,
+return owned data when a caller must outlive the source, and let compiler
+diagnostics expose ambiguous ownership instead of reaching for raw pointers.
+
+Study [checked references](/docs/reference/checked_references/), [checked
+slices](/docs/reference/checked_slices/), and the [memory
+model](/docs/reference/memory_model/). Then modify an owned collection while a
+view is live and read the rejection as a statement about resource identity.
+
+## What to learn next
+
+- [Collections, allocation errors, and generics](/tutorials/intermediate/collections-and-generics/)
+- [Ownership contracts](/docs/reference/ownership_contracts/)
+- [Definite assignment](/docs/reference/definite_assignment/)
+

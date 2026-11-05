@@ -1,0 +1,6 @@
+i32 main() {
+    i32 value = 42;
+    reference := &value;
+    stdoutln(*reference);
+    return 0;
+}

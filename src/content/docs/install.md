@@ -45,12 +45,12 @@ cmake --build build --parallel
 
 ```sh
 build/flecha --version
-build/flecha check examples/factorial.fl
-build/flecha build examples/factorial.fl -o build/factorial
-./build/factorial
+build/flecha check examples/hello.fl
+build/flecha build examples/hello.fl -o build/hello
+./build/hello
 ```
 
-The example prints `Factorial: 120`.
+The example prints `Flecha v0.3: 42`.
 
 ## Put the development tools on PATH
 
@@ -76,4 +76,4 @@ projects do not configure a host-specific standard-library path.
 GitHub Releases include a VS Code extension named `flecha-language-VERSION.vsix`. Release archives also bundle Neovim support. Follow the [editor installation guide](/docs/reference/editors/) for setup and verification.
 
 Continue to [Learn Flecha](/learn/), browse the [runnable examples](/examples/),
-or follow the [package publishing tutorial](/tutorials/publish-package/).
+or begin with [Hello, Archer!](/tutorials/beginner/hello-archer/).

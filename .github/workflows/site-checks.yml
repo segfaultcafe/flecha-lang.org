@@ -19,6 +19,19 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm run check
+      - name: Download and verify the Flecha v0.3.0 toolchain
+        run: |
+          curl --fail --location --retry 3 --output /tmp/flecha-0.3.0-Linux-x86_64.tar.gz \
+            https://github.com/segfaultcafe/flecha/releases/download/v0.3.0/flecha-0.3.0-Linux-x86_64.tar.gz
+          curl --fail --location --retry 3 --output /tmp/flecha-v0.3.0-SHA256SUMS \
+            https://github.com/segfaultcafe/flecha/releases/download/v0.3.0/SHA256SUMS
+          grep ' flecha-0.3.0-Linux-x86_64.tar.gz$' /tmp/flecha-v0.3.0-SHA256SUMS \
+            | sed 's#  #  /tmp/#' | sha256sum --check --strict
+          mkdir -p /tmp/flecha-v0.3.0
+          tar -xzf /tmp/flecha-0.3.0-Linux-x86_64.tar.gz -C /tmp/flecha-v0.3.0
+      - name: Qualify curriculum snippets with Flecha v0.3.0
+        run: npm run check:curriculum -- --toolchain /tmp/flecha-v0.3.0/flecha-0.3.0-Linux-x86_64
       - run: npm run build
       - uses: actions/upload-artifact@v4
         with:

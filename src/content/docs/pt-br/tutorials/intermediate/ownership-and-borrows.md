@@ -1,0 +1,26 @@
+---
+title: '1. Propriedade, movimentos e empréstimos verificados'
+description: Acompanhe a identidade dos recursos em movimentos e use referências e slices verificadas com tempos de vida visíveis.
+---
+
+Um valor proprietário tem uma responsabilidade de limpeza. Movê-lo transfere
+essa responsabilidade e torna o lugar anterior indisponível até nova
+inicialização. Cópias existem apenas quando a semântica permite cópias
+independentes.
+
+Um empréstimo verificado `&T` ou `&const T` não assume propriedade. Seu tempo de
+vida mantém o proprietário vivo e impede acessos conflitantes. Uma slice
+verificada acrescenta comprimento, mantendo índices verificados. Mantenha
+empréstimos curtos, retorne dados próprios quando precisarem sobreviver à origem
+e deixe os diagnósticos exporem propriedade ambígua.
+
+Estude [referências verificadas](/docs/reference/checked_references/), [slices
+verificadas](/docs/reference/checked_slices/) e o [modelo de
+memória](/docs/reference/memory_model/).
+
+## O que aprender a seguir
+
+- [Coleções, erros de alocação e genéricos](/pt-br/tutorials/intermediate/collections-and-generics/)
+- [Contratos de propriedade — em inglês](/docs/reference/ownership_contracts/)
+- [Atribuição definida — em inglês](/docs/reference/definite_assignment/)
+

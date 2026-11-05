@@ -1,0 +1,26 @@
+---
+title: '4. Project: qualify Workspace Guard'
+description: Review and exercise a realistic multi-module application with filesystem, process, hashing, and deterministic diagnostics.
+---
+
+[Workspace Guard](/examples/workspace_guard/src/main/) snapshots a directory,
+verifies it later, compares manifests, and can run a child process only after
+verification. Its source separates commands, canonical manifests, the model,
+and recursive scanning.
+
+Qualification matters more than merely building. Check and test the project,
+snapshot a fixed fixture tree twice, and compare bytes. Mutate one file and
+confirm verify fails with the documented status. Run from a path containing a
+space. Finally, inspect cleanup on every early return and confirm directory
+iteration is sorted before serialization.
+
+This project combines owned strings and containers, borrowed views, allocation
+errors, multi-module imports, filesystem traversal, SHA-256, environment
+variables, and child processes without turning those concerns into one module.
+
+## Track complete
+
+Continue to [Advanced: ownership contracts and deterministic
+builds](/tutorials/advanced/contracts-and-builds/), or inspect the [Workspace
+Guard command implementation](/examples/workspace_guard/src/commands/).
+

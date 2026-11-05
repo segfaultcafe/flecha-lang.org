@@ -6,9 +6,9 @@ description: Current Flecha v0.3 language, standard-library, package, compiler, 
 Flecha's documentation is synced from the compiler repository so the guides here track the implementation while this website remains independently deployable.
 
 :::note[Version boundary]
-These pages track the developing v0.3 contract on `master`. Historical release
-and implementation documents are retained for archaeology, but they are not the
-current API. Pin a tagged toolchain when you need a frozen contract.
+The tutorials target the tagged v0.3.0 toolchain. Synced reference pages also
+show current `master` development, so use the release notes and a tagged
+toolchain when you need the frozen v0.3.0 contract.
 :::
 
 ## Start here
@@ -21,11 +21,14 @@ current API. Pin a tagged toolchain when you need a frozen contract.
 - [Package ecosystem](/docs/reference/package_ecosystem/)
 - [Complete v0.3 standard-library API inventory](/docs/reference/standard_library/)
 
-## Tutorials
+## Learning tracks
 
-- [Your first Longbow project](/tutorials/first-project/)
-- [Build a command-line application](/tutorials/command-line-app/)
-- [Create and ship a package](/tutorials/publish-package/)
+- [Five-level Learn path](/learn/)
+- [Hello, Archer!](/tutorials/beginner/hello-archer/)
+- [Basic language track](/tutorials/basic/modules-values-functions/)
+- [Intermediate ownership and systems track](/tutorials/intermediate/ownership-and-borrows/)
+- [Advanced qualification track](/tutorials/advanced/contracts-and-builds/)
+- [Unsafe boundaries track](/tutorials/unsafe/boundary/)
 
 ## Language features
 

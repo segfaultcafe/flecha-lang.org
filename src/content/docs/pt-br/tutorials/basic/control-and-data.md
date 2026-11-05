@@ -1,0 +1,25 @@
+---
+title: '2. Fluxo de controle e dados compostos'
+description: Organize decisões e iteração com arrays, slices, strings, estruturas e enums.
+---
+
+Use `if` para decisões, `while` quando a continuação depender de estado e
+`for (_, value) := range values` para percorrer uma sequência. Flecha exige
+condições booleanas; inteiros não viram valores verdade automaticamente.
+
+Arrays fixos possuem elementos inline. Slices verificadas emprestam um intervalo
+e mantêm o comprimento para validar limites. `string` possui o texto e
+`stringv` é uma view emprestada. Estruturas agrupam campos e ciclo de vida;
+enums definem uma família fechada de valores. Escolha a menor representação que
+descreva o tempo de vida necessário e converta explicitamente na fronteira.
+
+Consulte [arrays fixos](/docs/reference/fixed_arrays/), [slices
+verificadas](/docs/reference/checked_slices/), [strings](/docs/reference/string/),
+[estruturas](/docs/reference/structures/) e [enums](/docs/reference/enums/).
+
+## O que aprender a seguir
+
+- [Erros e testes](/pt-br/tutorials/basic/errors-and-tests/)
+- [Iteração — referência em inglês](/docs/reference/iteration/)
+- [Matching de enums — referência em inglês](/docs/reference/match/)
+

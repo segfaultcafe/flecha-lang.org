@@ -1,0 +1,11 @@
+module archer_words_test;
+
+@imports
+    :: root::archer_words
+    :: lib::std::tests::testing;
+
+test reports_greeting_length(&testing::UnitTest t) {
+    if archer_words::greeting_length() != 6 {
+        t->fail();
+    }
+}

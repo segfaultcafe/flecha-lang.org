@@ -84,7 +84,7 @@ const exampleCatalog = [
 	{
 		category: 'language',
 		slugs: [
-			'factorial',
+			'hello',
 			'stdout',
 			'native_functions',
 			'numeric_casts',
@@ -366,9 +366,9 @@ ${catalog}
 ## ${translated ? 'Executar um exemplo' : 'Run an example'}
 
 \`\`\`sh
-build/flecha check examples/factorial.fl
-build/flecha build examples/factorial.fl -o build/factorial
-./build/factorial
+build/flecha check examples/hello.fl
+build/flecha build examples/hello.fl -o build/hello
+./build/hello
 \`\`\`
 `;
 	const target = join(siteRoot, `src/content/docs/${translated ? 'pt-br/' : ''}examples.md`);

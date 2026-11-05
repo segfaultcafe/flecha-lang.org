@@ -1,0 +1,25 @@
+---
+title: '3. Tratamento de falhas e design de APIs'
+description: Limite falhas, teste pressão, faça benchmarks honestos e projete módulos com contratos compreensíveis.
+---
+
+Liste as falhas de cada operação antes de escolher a API. Preserve erros
+acionáveis, acrescente contexto determinístico em uma camada e converta para
+status de processo apenas na entrada. Exercite pressão de alocação, entrada
+truncada, chamadas repetidas, escritas parciais, timeouts e limpeza após erro.
+
+O benchmark deve medir a operação enfrentada pelo usuário: inclua preparação
+apenas se ele pagar esse custo, consuma os resultados, aqueça runtimes
+comparáveis e reporte distribuições. Registre versões, alvo, otimização, entrada
+e comando para criar uma linha de base futura.
+
+Mantenha módulos coesos e poucos exports. Separe formatos persistentes dos
+modelos em memória, dificulte estados inválidos e prefira uma conversão
+explícita a políticas implícitas espalhadas.
+
+## O que aprender a seguir
+
+- [Projeto: qualifique um ledger determinístico](/pt-br/tutorials/advanced/project/)
+- [Testes — em inglês](/docs/reference/testing/)
+- [Design de módulos e APIs — em inglês](/docs/reference/library_api_style/)
+

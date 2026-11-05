@@ -7,7 +7,7 @@ These 50 examples come directly from [`segfaultcafe/flecha`](https://github.com/
 
 ## Language and control flow
 
-- [Factorial](/examples/factorial/)
+- [Hello](/examples/hello/)
 - [Stdout](/examples/stdout/)
 - [Native Functions](/examples/native_functions/)
 - [Numeric Casts](/examples/numeric_casts/)
@@ -73,7 +73,7 @@ These 50 examples come directly from [`segfaultcafe/flecha`](https://github.com/
 ## Run an example
 
 ```sh
-build/flecha check examples/factorial.fl
-build/flecha build examples/factorial.fl -o build/factorial
-./build/factorial
+build/flecha check examples/hello.fl
+build/flecha build examples/hello.fl -o build/hello
+./build/hello
 ```

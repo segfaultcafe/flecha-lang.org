@@ -1,0 +1,19 @@
+module main;
+
+@imports
+    :: lib::std::fmt
+    :: lib::std::os::arguments;
+
+i32 main() {
+    values, captureError := arguments::capture();
+    if captureError != none {
+        fmt::eprintln("archer-greet: cannot capture arguments");
+        return 3;
+    }
+    if values.len() != 2 {
+        fmt::eprintln("usage: archer-greet <name>");
+        return 2;
+    }
+    fmt::println("Welcome, ", values[1].view(), "!");
+    return 0;
+}
