@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { Code } from 'astro-expressive-code/components';
 import { arrowfallById, arrowfallLessons, arrowfallPath } from '../data/arrowfall.mjs';
+import { narrativeFor } from '../data/arrowfall-narrative.mjs';
 
 interface Props {
 	id: string;
@@ -36,7 +37,6 @@ const snippets = lesson.snippets.map((snippet) => {
 	return { ...snippet, code };
 });
 const index = arrowfallLessons.findIndex((item) => item.id === id);
-const predecessor = index > 0 ? arrowfallLessons[index - 1] : undefined;
 const next = index < arrowfallLessons.length - 1 ? arrowfallLessons[index + 1] : undefined;
 const local = <T,>(english: T, portuguese: T) => locale === 'pt-br' ? portuguese : english;
 const field = (name: string) => (lesson as unknown as Record<string, any>)[locale === 'pt-br' ? `${name}Pt` : name];
@@ -44,68 +44,96 @@ const title = (item: (typeof arrowfallLessons)[number]) => locale === 'pt-br' ? 
 const publicFrame = (checkpointId: string) => `/arrowfall/frames/${checkpointId}.svg`;
 const lang = (path: string) => path.endsWith('.fl') ? 'flecha' : path.endsWith('.toml') ? 'toml' : path.endsWith('.sh') ? 'sh' : 'text';
 const commands = deliverable.commands.join('\n');
+const narrative = narrativeFor(id, locale);
+if (!narrative) throw new Error(`Missing ${locale} Arrowfall narrative: ${id}`);
+if (narrative.snippets.length !== snippets.length) {
+	throw new Error(`Arrowfall narrative/snippet mismatch: ${id} (${locale})`);
+}
 ---
 
 <article data-arrowfall-lesson={id}>
 <p><strong>{local('Current source', 'Fonte atual')}:</strong> <code>curriculum/arrowfall/checkpoints/{id}</code> · Flecha {manifest.toolchain.version} · {index + 1}/7.</p>
 
-<h2 id="already-built">{local('Current state', 'Estado atual')}</h2>
-<p>{field('built')}</p>
-
-<h2 id="run-the-current-checkpoint">{local('Run the current version', 'Execute a versão atual')}</h2>
-<p>{local(
-	'The command below runs this version with its recorded standard input. Running it first establishes the behavior that the rest of the page changes.',
-	'O comando abaixo executa esta versão com a entrada padrão registrada. Executá-lo primeiro estabelece o comportamento alterado no restante da página.',
-)}</p>
-<Code code={deliverable.commands[3]} lang="sh" meta={`title="${local('Run command', 'Comando de execução')}"`} />
-
-<h3>{local('Standard input', 'Entrada padrão')}</h3>
-<Code code={input || local('(empty)', '(vazia)')} lang="text" meta={`title="${local('Standard input', 'Entrada padrão')}"`} />
-
-<figure>
-	<img src={publicFrame(id)} alt={local(`Terminal frame produced by version ${index + 1}: ${lesson.title}`, `Frame de terminal produzido pela versão ${index + 1}: ${lesson.titlePt}`)} />
-	<figcaption>{local('Frame generated from the recorded output.', 'Frame gerado a partir da saída registrada.')}</figcaption>
-</figure>
-
-<h3>{local('Frame as text', 'Frame em texto')}</h3>
-<Code code={frame} lang="text" meta={`title="${local('Frame as text', 'Frame em texto')}"`} />
-
-{predecessor && (
-	<details>
-		<summary>{local('Previous and current frames', 'Frames anterior e atual')}</summary>
-		<p><strong>{local('Previous', 'Anterior')}:</strong> {title(predecessor)}</p>
-		<img src={publicFrame(predecessor.id)} alt={local(`Previous frame: ${predecessor.title}`, `Frame anterior: ${predecessor.titlePt}`)} />
-		<p><strong>{local('Current', 'Atual')}:</strong> {title(lesson)}</p>
-		<img src={publicFrame(id)} alt={local(`Current frame: ${lesson.title}`, `Frame atual: ${lesson.titlePt}`)} />
-	</details>
-)}
+<h2 id="already-built">{local('The program at this checkpoint', 'O programa neste checkpoint')}</h2>
+<p><strong>{local('Previously', 'Até aqui')}:</strong> {field('built')}</p>
+{narrative.context.map((paragraph: string) => <p>{paragraph}</p>)}
 
 <h2 id="observed-limitation">{local('Current limitation', 'Limitação atual')}</h2>
 <p>{field('limitation')}</p>
+<p><strong>{local('Required next behavior', 'Próximo comportamento necessário')}:</strong> {field('desired')}</p>
 
-<h2 id="desired-behaviour">{local('Required behavior', 'Comportamento necessário')}</h2>
-<p>{field('desired')}</p>
-
-<h2 id="design-decision">{local('Design', 'Projeto da mudança')}</h2>
+<h2 id="design-decision">{local('Model and invariants', 'Modelo e invariantes')}</h2>
 <p>{field('decision')}</p>
 <p>{field('concept')}</p>
+{narrative.model.map((paragraph: string) => <p>{paragraph}</p>)}
 
 <h2 id="implement">{local('Implementation', 'Implementação')}</h2>
 <p>{local(
-	'This version makes the following changes. The excerpts identify the relevant implementation points; they are not standalone programs. The complete source follows them and is the source compiled by the verification commands.',
-	'Esta versão faz as mudanças abaixo. Os trechos identificam os pontos relevantes da implementação; eles não são programas independentes. O código completo vem depois e é a fonte compilada pelos comandos de verificação.',
+	'The implementation is split into the changes below. Each excerpt is taken verbatim from the qualified checkpoint and is explained in the part of the data flow where it is used. The excerpts are not standalone programs; the complete compiled source is available after the run.',
+	'A implementação está dividida nas mudanças abaixo. Cada trecho vem literalmente do checkpoint qualificado e é explicado na parte do fluxo de dados em que participa. Os trechos não são programas independentes; o código completo compilado está disponível depois da execução.',
 )}</p>
 <ul>
 	{field('changes').map((change: string) => <li>{change}</li>)}
 </ul>
 
-{snippets.map((snippet) => (
+{snippets.map((snippet, snippetIndex) => (
 	<section>
-		<h3>{local('Excerpt', 'Trecho')}: {locale === 'pt-br' ? snippet.labelPt : snippet.label}</h3>
-		<p><code>{snippet.file}:{snippet.start}–{snippet.end}</code></p>
+		<h3>{locale === 'pt-br' ? snippet.labelPt : snippet.label}</h3>
+		{narrative.snippets[snippetIndex].before.map((paragraph: string) => <p>{paragraph}</p>)}
+		<p><strong>{local('Excerpt', 'Trecho')}:</strong> <code>{snippet.file}:{snippet.start}–{snippet.end}</code>. {local(
+			'The complete file appears in the source section below.',
+			'O arquivo completo aparece na seção de código abaixo.',
+		)}</p>
 		<Code code={snippet.code} lang="flecha" meta={`title="${snippet.file}:${snippet.start}-${snippet.end} (excerpt)"`} />
+		{narrative.snippets[snippetIndex].after.map((paragraph: string) => <p>{paragraph}</p>)}
 	</section>
 ))}
+
+<h2 id="run-and-compare">{local('Run and inspect the result', 'Execute e examine o resultado')}</h2>
+<p id="run-the-current-checkpoint">{local(
+	'The command uses the checkpoint’s recorded input, so the behavior described above can be reproduced without manual timing.',
+	'O comando usa a entrada registrada do checkpoint, portanto o comportamento descrito acima pode ser reproduzido sem depender de tempo manual.',
+)}</p>
+<Code code={deliverable.commands[3]} lang="sh" meta={`title="${local('Run command', 'Comando de execução')}"`} />
+
+{input.trim() && (
+	<details>
+		<summary>{local('Recorded standard input', 'Entrada padrão registrada')}</summary>
+		<Code code={input} lang="text" meta={`title="${local('Standard input', 'Entrada padrão')}"`} />
+	</details>
+)}
+
+{narrative.run.slice(0, 1).map((paragraph: string) => <p>{paragraph}</p>)}
+<figure>
+	<img src={publicFrame(id)} alt={local(`Terminal frame produced by version ${index + 1}: ${lesson.title}`, `Frame de terminal produzido pela versão ${index + 1}: ${lesson.titlePt}`)} />
+	<figcaption>{local(
+		`Representative frame from the recorded run of checkpoint ${index + 1}.`,
+		`Frame representativo da execução registrada do checkpoint ${index + 1}.`,
+	)}</figcaption>
+</figure>
+{narrative.run.slice(1).map((paragraph: string) => <p>{paragraph}</p>)}
+
+<details>
+	<summary>{local('Accessible frame transcript', 'Transcript acessível do frame')}</summary>
+	<Code code={frame} lang="text" meta={`title="${local('Frame transcript', 'Transcript do frame')}"`} />
+</details>
+
+<details>
+	<summary>{local('Complete recorded stdout', 'Stdout registrada completa')}</summary>
+	<Code code={output} lang="text" meta={`title="${local('Expected stdout', 'Stdout esperada')}"`} />
+</details>
+
+<h2 id="checkpoint-result">{local('What this checkpoint establishes', 'O que este checkpoint estabelece')}</h2>
+{narrative.conclusion.map((paragraph: string) => <p>{paragraph}</p>)}
+
+<h2 id="challenge">{local('Exercise', 'Exercício')}</h2>
+<p>{field('challenge')}</p>
+
+<h2 id="source-and-verification">{local('Complete source and verification', 'Código completo e verificação')}</h2>
+<p>{local(
+	'The sections below preserve the complete qualified source, the exact predecessor diff, and the command sequence used by CI. They are supporting evidence for the implementation explained above.',
+	'As seções abaixo preservam o código qualificado completo, o diff exato desde o predecessor e a sequência de comandos usada pela CI. São evidência de apoio para a implementação explicada acima.',
+)}</p>
 
 <details>
 	<summary>{local(`Complete tested source (${sourceFiles.length} files)`, `Código completo testado (${sourceFiles.length} arquivos)`)}</summary>
@@ -122,18 +150,10 @@ const commands = deliverable.commands.join('\n');
 	<Code code={diff} lang="diff" />
 </details>
 
-<h2 id="run-and-compare">{local('Verification', 'Verificação')}</h2>
-<p>{local(
-	'These commands check, test, build, and run the complete source shown above. The final command uses the committed input file; its stdout must match the recorded output byte for byte.',
-	'Estes comandos verificam, testam, compilam e executam o código completo mostrado acima. O último comando usa o arquivo de entrada versionado; sua stdout deve corresponder byte a byte à saída registrada.',
-)}</p>
-<Code code={commands} lang="sh" meta={`title="${local('Verification commands', 'Comandos de verificação')}"`} />
-
-<h3>{local('Expected stdout', 'Stdout esperada')}</h3>
-<Code code={output} lang="text" meta={`title="${local('Expected stdout', 'Stdout esperada')}"`} />
-
-<h2 id="challenge">{local('Exercise', 'Exercício')}</h2>
-<p>{field('challenge')}</p>
+<details>
+	<summary>{local('Check, test, build, and run commands', 'Comandos de check, teste, build e execução')}</summary>
+	<Code code={commands} lang="sh" meta={`title="${local('Verification commands', 'Comandos de verificação')}"`} />
+</details>
 
 <h2 id="cumulative-timeline">{local('Versions in this tutorial', 'Versões deste tutorial')}</h2>
 <ol>
