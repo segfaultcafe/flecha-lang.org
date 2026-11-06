@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "project": "Arrowfall",
+  "language": "Flecha",
+  "toolchain": {
+    "version": "0.3.0",
+    "tag_commit": "6dcea41dbdbee65773747b8474780977b6bb5fd0"
+  },
+  "style": {
+    "braces": "K&R expanded bodies",
+    "types": "PascalCase",
+    "member_functions": "camelCase",
+    "free_functions": "snake_case"
+  },
+  "deliverables": [
+    {
+      "order": 1,
+      "id": "01-scene",
+      "title": "A room appears",
+      "predecessor": null,
+      "path": "tutorial/checkpoints/01-scene",
+      "diff": "tutorial/diffs/01-scene.patch",
+      "input": "tutorial/checkpoints/01-scene/tests/input.txt",
+      "output": "tutorial/checkpoints/01-scene/tests/output.txt",
+      "frame_text": "tutorial/checkpoints/01-scene/tests/frame.txt",
+      "frame_visual": "tutorial/checkpoints/01-scene/tests/frame.svg",
+      "commands": [
+        "longbow check tutorial/checkpoints/01-scene",
+        "longbow test tutorial/checkpoints/01-scene",
+        "longbow build tutorial/checkpoints/01-scene",
+        "longbow run tutorial/checkpoints/01-scene < tutorial/checkpoints/01-scene/tests/input.txt"
+      ]
+    },
+    {
+      "order": 2,
+      "id": "02-state",
+      "title": "The picture becomes state",
+      "predecessor": "01-scene",
+      "path": "tutorial/checkpoints/02-state",
+      "diff": "tutorial/diffs/02-state.patch",
+      "input": "tutorial/checkpoints/02-state/tests/input.txt",
+      "output": "tutorial/checkpoints/02-state/tests/output.txt",
+      "frame_text": "tutorial/checkpoints/02-state/tests/frame.txt",
+      "frame_visual": "tutorial/checkpoints/02-state/tests/frame.svg",
+      "commands": [
+        "longbow check tutorial/checkpoints/02-state",
+        "longbow test tutorial/checkpoints/02-state",
+        "longbow build tutorial/checkpoints/02-state",
+        "longbow run tutorial/checkpoints/02-state < tutorial/checkpoints/02-state/tests/input.txt"
+      ]
+    },
+    {
+      "order": 3,
+      "id": "03-movement",
+      "title": "The player moves",
+      "predecessor": "02-state",
+      "path": "tutorial/checkpoints/03-movement",
+      "diff": "tutorial/diffs/03-movement.patch",
+      "input": "tutorial/checkpoints/03-movement/tests/input.txt",
+      "output": "tutorial/checkpoints/03-movement/tests/output.txt",
+      "frame_text": "tutorial/checkpoints/03-movement/tests/frame.txt",
+      "frame_visual": "tutorial/checkpoints/03-movement/tests/frame.svg",
+      "commands": [
+        "longbow check tutorial/checkpoints/03-movement",
+        "longbow test tutorial/checkpoints/03-movement",
+        "longbow build tutorial/checkpoints/03-movement",
+        "longbow run tutorial/checkpoints/03-movement < tutorial/checkpoints/03-movement/tests/input.txt"
+      ]
+    },
+    {
+      "order": 4,
+      "id": "04-map",
+      "title": "Walls make movement meaningful",
+      "predecessor": "03-movement",
+      "path": "tutorial/checkpoints/04-map",
+      "diff": "tutorial/diffs/04-map.patch",
+      "input": "tutorial/checkpoints/04-map/tests/input.txt",
+      "output": "tutorial/checkpoints/04-map/tests/output.txt",
+      "frame_text": "tutorial/checkpoints/04-map/tests/frame.txt",
+      "frame_visual": "tutorial/checkpoints/04-map/tests/frame.svg",
+      "commands": [
+        "longbow check tutorial/checkpoints/04-map",
+        "longbow test tutorial/checkpoints/04-map",
+        "longbow build tutorial/checkpoints/04-map",
+        "longbow run tutorial/checkpoints/04-map < tutorial/checkpoints/04-map/tests/input.txt"
+      ]
+    },
+    {
+      "order": 5,
+      "id": "05-goblin",
+      "title": "A turn now has consequences",
+      "predecessor": "04-map",
+      "path": "tutorial/checkpoints/05-goblin",
+      "diff": "tutorial/diffs/05-goblin.patch",
+      "input": "tutorial/checkpoints/05-goblin/tests/input.txt",
+      "output": "tutorial/checkpoints/05-goblin/tests/output.txt",
+      "frame_text": "tutorial/checkpoints/05-goblin/tests/frame.txt",
+      "frame_visual": "tutorial/checkpoints/05-goblin/tests/frame.svg",
+      "commands": [
+        "longbow check tutorial/checkpoints/05-goblin",
+        "longbow test tutorial/checkpoints/05-goblin",
+        "longbow build tutorial/checkpoints/05-goblin",
+        "longbow run tutorial/checkpoints/05-goblin < tutorial/checkpoints/05-goblin/tests/input.txt"
+      ]
+    },
+    {
+      "order": 6,
+      "id": "06-archery",
+      "title": "The archer earns the name",
+      "predecessor": "05-goblin",
+      "path": "tutorial/checkpoints/06-archery",
+      "diff": "tutorial/diffs/06-archery.patch",
+      "input": "tutorial/checkpoints/06-archery/tests/input.txt",
+      "output": "tutorial/checkpoints/06-archery/tests/output.txt",
+      "frame_text": "tutorial/checkpoints/06-archery/tests/frame.txt",
+      "frame_visual": "tutorial/checkpoints/06-archery/tests/frame.svg",
+      "commands": [
+        "longbow check tutorial/checkpoints/06-archery",
+        "longbow test tutorial/checkpoints/06-archery",
+        "longbow build tutorial/checkpoints/06-archery",
+        "longbow run tutorial/checkpoints/06-archery < tutorial/checkpoints/06-archery/tests/input.txt"
+      ]
+    },
+    {
+      "order": 7,
+      "id": "07-final",
+      "title": "Reproducible, testable, terminal-ready",
+      "predecessor": "06-archery",
+      "path": "tutorial/checkpoints/07-final",
+      "diff": "tutorial/diffs/07-final.patch",
+      "input": "tutorial/checkpoints/07-final/tests/input.txt",
+      "output": "tutorial/checkpoints/07-final/tests/output.txt",
+      "frame_text": "tutorial/checkpoints/07-final/tests/frame.txt",
+      "frame_visual": "tutorial/checkpoints/07-final/tests/frame.svg",
+      "commands": [
+        "longbow check tutorial/checkpoints/07-final",
+        "longbow test tutorial/checkpoints/07-final",
+        "longbow build tutorial/checkpoints/07-final",
+        "longbow run tutorial/checkpoints/07-final -- --no-clear --seed 20261105 < tutorial/checkpoints/07-final/tests/input.txt",
+        "LONGBOW=longbow tutorial/checkpoints/07-final/scripts/check-golden.sh"
+      ]
+    }
+  ]
+}

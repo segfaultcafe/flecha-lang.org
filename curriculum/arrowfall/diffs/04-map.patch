@@ -1,0 +1,574 @@
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/README.md tutorial/checkpoints/04-map/README.md
+--- tutorial/checkpoints/03-movement/README.md
++++ tutorial/checkpoints/04-map/README.md
+@@ -1 +1 @@
+-# 03 — The player moves
++# 04 — Walls make movement meaningful
+@@ -5,2 +5,2 @@
+-Checkpoint 02 derives the picture from a player position, but the position
+-never changes.
++Checkpoint 03 moves on an open rectangle. Every in-bounds direction succeeds,
++so movement has no spatial decision.
+@@ -10,2 +10,2 @@
+-A game cannot be played without input. We first learn blocking stdin on an
+-open floor, before walls add a second concern.
++The symbols introduced in checkpoint 01 should become rules. A real room needs
++solid walls, a reachable exit, and feedback when an action cannot happen.
+@@ -15,2 +15,4 @@
+-W/A/S/D moves within a 5x3 training floor. Q exits. Input is normalised once,
+-parsed into a `Command` enum, and applied through a mutable game reference.
++The fixed 9x7 map is stored as a checked slice over a fixed array. Walls reject
++movement without spending a turn; entering `>` wins. Engine, input, and render
++modules now separate rules from terminal I/O, and the first unit test protects
++collision and victory.
+@@ -22,0 +25,3 @@
++- `src/game.fl`
++- `src/game_test.fl`
++- `src/input.fl`
+@@ -23,0 +29 @@
++- `src/render.fl`
+@@ -29 +35 @@
+-See `../../diffs/03-movement.patch` for the exact predecessor diff.
++Exact changes: `../../diffs/04-map.patch`.
+@@ -34,4 +40,4 @@
+-longbow check tutorial/checkpoints/03-movement
+-longbow test tutorial/checkpoints/03-movement
+-longbow build tutorial/checkpoints/03-movement
+-longbow run tutorial/checkpoints/03-movement < tutorial/checkpoints/03-movement/tests/input.txt
++longbow check tutorial/checkpoints/04-map
++longbow test tutorial/checkpoints/04-map
++longbow build tutorial/checkpoints/04-map
++longbow run tutorial/checkpoints/04-map < tutorial/checkpoints/04-map/tests/input.txt
+@@ -42,3 +48,4 @@
+-1. A room appears — static terminal scene.
+-2. The picture becomes state — `Game` owns `Position`.
+-3. **The player moves** — blocking stdin drives mutation.
++1. A room appears — static scene.
++2. The picture becomes state — structs own position.
++3. The player moves — stdin drives an open floor.
++4. **Walls make movement meaningful** — map, collision, exit, modules, test.
+@@ -48,2 +55,2 @@
+-Run the recorded input. The last frame before `Run ended.` must place `@` at
+-column 2, row 2; an unknown key must not move it.
++The recorded leading `W` must print the wall message while the next frame still
++shows `Turn: 0`; four `S` moves must then win on turn 4.
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/longbow.lock tutorial/checkpoints/04-map/longbow.lock
+--- tutorial/checkpoints/03-movement/longbow.lock
++++ tutorial/checkpoints/04-map/longbow.lock
+@@ -7 +7 @@
+-      "identity": "local/arrowfall_step_03",
++      "identity": "local/arrowfall_step_04",
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/longbow.toml tutorial/checkpoints/04-map/longbow.toml
+--- tutorial/checkpoints/03-movement/longbow.toml
++++ tutorial/checkpoints/04-map/longbow.toml
+@@ -2 +2 @@
+-name = "arrowfall-step-03"
++name = "arrowfall-step-04"
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/src/game.fl tutorial/checkpoints/04-map/src/game.fl
+--- tutorial/checkpoints/03-movement/src/game.fl
++++ tutorial/checkpoints/04-map/src/game.fl
+@@ -0,0 +1,133 @@
++module game;
++
++const i32 WIDTH = 9;
++const i32 HEIGHT = 7;
++
++export enum Direction {
++    default Up,
++    Left,
++    Down,
++    Right
++}
++
++export enum Command {
++    default MoveUp,
++    MoveLeft,
++    MoveDown,
++    MoveRight,
++    Quit
++}
++
++export enum Outcome {
++    default Playing,
++    Won,
++    Quit
++}
++
++export enum Event {
++    default Moved,
++    Wall,
++    Won,
++    Quit
++}
++
++export structure Position {
++    i32 x;
++    i32 y;
++};
++
++export structure Game {
++    private Position player;
++    private u32 turnCount;
++    private Outcome gameOutcome;
++};
++
++Position Position::at(i32 x, i32 y) {
++    return build Position {
++        self.x = x;
++        self.y = y;
++    };
++}
++
++bool Position::equals(&const self, &const Position other) {
++    return self->x == other->x and self->y == other->y;
++}
++
++Position Position::moved(&const self, Direction direction) {
++    Position delta = match direction {
++        Direction.Up => Position::at(0, -1),
++        Direction.Left => Position::at(-1, 0),
++        Direction.Down => Position::at(0, 1),
++        Direction.Right => Position::at(1, 0),
++    };
++    return Position::at(self->x + delta.x, self->y + delta.y);
++}
++
++Game Game::start() {
++    return build Game {
++        self.player = Position::at(1, 1);
++        self.turnCount = 0;
++        self.gameOutcome = Outcome.Playing;
++    };
++}
++
++Event Game::apply(&self, Command command) {
++    if command == Command.Quit {
++        self->gameOutcome = Outcome.Quit;
++        return Event.Quit;
++    }
++    next := self->player.moved(command_direction(command));
++    if tile_at(next) == '#' {
++        return Event.Wall;
++    }
++    self->player = next;
++    self->turnCount++;
++    if tile_at(self->player) == '>' {
++        self->gameOutcome = Outcome.Won;
++        return Event.Won;
++    }
++    return Event.Moved;
++}
++
++Position Game::playerPosition(&const self) {
++    return self->player;
++}
++
++u32 Game::turn(&const self) {
++    return self->turnCount;
++}
++
++Outcome Game::outcome(&const self) {
++    return self->gameOutcome;
++}
++
++export char tile_at(Position position) {
++    [63]char tiles = [
++        '#','#','#','#','#','#','#','#','#',
++        '#','.','.','.','.','.','.','.','#',
++        '#','.','.','#','#','#','.','.','#',
++        '#','.','.','.','.','.','.','.','#',
++        '#','.','.','#','#','#','.','.','#',
++        '#','>','.','.','.','.','.','.','#',
++        '#','#','#','#','#','#','#','#','#'
++    ];
++    return tile_from_cells(tiles[:], position);
++}
++
++char tile_from_cells([]const char tiles, Position position) {
++    if position.x < 0 or position.x >= WIDTH or
++        position.y < 0 or position.y >= HEIGHT {
++        return '#';
++    }
++    return tiles[(position.y * WIDTH + position.x).cast<usize>];
++}
++
++Direction command_direction(Command command) {
++    return match command {
++        Command.MoveUp => Direction.Up,
++        Command.MoveLeft => Direction.Left,
++        Command.MoveDown => Direction.Down,
++        Command.MoveRight => Direction.Right,
++        Command.Quit => Direction.Up,
++    };
++}
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/src/game_test.fl tutorial/checkpoints/04-map/src/game_test.fl
+--- tutorial/checkpoints/03-movement/src/game_test.fl
++++ tutorial/checkpoints/04-map/src/game_test.fl
+@@ -0,0 +1,21 @@
++module game_test;
++
++@imports
++    :: root::game
++    :: lib::std::tests::asserts
++    :: lib::std::tests::testing;
++
++test walls_are_free_and_the_exit_wins(&testing::UnitTest t) {
++    state := game::Game::start();
++    wall := state.apply(game::Command.MoveUp);
++    state.apply(game::Command.MoveDown);
++    state.apply(game::Command.MoveDown);
++    state.apply(game::Command.MoveDown);
++    won := state.apply(game::Command.MoveDown);
++    asserts::is_true(
++        t,
++        wall == game::Event.Wall and won == game::Event.Won and
++            state.turn() == 4 and state.outcome() == game::Outcome.Won,
++        "walls are free while entering the exit wins"
++    );
++}
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/src/input.fl tutorial/checkpoints/04-map/src/input.fl
+--- tutorial/checkpoints/03-movement/src/input.fl
++++ tutorial/checkpoints/04-map/src/input.fl
+@@ -0,0 +1,36 @@
++module input;
++
++@imports :: root::game :: lib::std::text::{ascii, strings};
++
++export error CommandError {
++    InvalidCommand
++}
++
++export (game::Command, error) read_command() {
++    string line;
++    inputError := stdin("command>", &line);
++    if inputError != none {
++        return (game::Command.Quit, none);
++    }
++    value := strings::trim_ascii(line.view());
++    if value.len() != 1 {
++        return (none, CommandError.InvalidCommand);
++    }
++    const char KEY = ascii::to_ascii_lowercase(value[0].cast<char>);
++    if KEY == 'w' {
++        return (game::Command.MoveUp, none);
++    }
++    if KEY == 'a' {
++        return (game::Command.MoveLeft, none);
++    }
++    if KEY == 's' {
++        return (game::Command.MoveDown, none);
++    }
++    if KEY == 'd' {
++        return (game::Command.MoveRight, none);
++    }
++    if KEY == 'q' {
++        return (game::Command.Quit, none);
++    }
++    return (none, CommandError.InvalidCommand);
++}
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/src/main.fl tutorial/checkpoints/04-map/src/main.fl
+--- tutorial/checkpoints/03-movement/src/main.fl
++++ tutorial/checkpoints/04-map/src/main.fl
+@@ -3,51 +3 @@
+-@imports :: lib::std::text::{ascii, strings};
+-
+-enum Command {
+-    default Up,
+-    Left,
+-    Down,
+-    Right,
+-    Quit
+-}
+-
+-error CommandError {
+-    InvalidCommand
+-}
+-
+-structure Position {
+-    i32 x;
+-    i32 y;
+-};
+-
+-structure Game {
+-    private Position player;
+-};
+-
+-Position Position::at(i32 x, i32 y) {
+-    return build Position {
+-        self.x = x;
+-        self.y = y;
+-    };
+-}
+-
+-Game Game::start() {
+-    return build Game {
+-        self.player = Position::at(1, 1);
+-    };
+-}
+-
+-void Game::apply(&self, Command command) {
+-    if command == Command.Up and self->player.y > 0 {
+-        self->player.y--;
+-    } else if command == Command.Left and self->player.x > 0 {
+-        self->player.x--;
+-    } else if command == Command.Down and self->player.y < 2 {
+-        self->player.y++;
+-    } else if command == Command.Right and self->player.x < 4 {
+-        self->player.x++;
+-    }
+-}
+-
+-Position Game::playerPosition(&const self) {
+-    return self->player;
+-}
++@imports :: root::game :: root::input :: root::render;
+@@ -56,5 +6,10 @@
+-    state := Game::start();
+-    bool running = true;
+-    while running {
+-        draw(&state);
+-        command, commandError := read_command();
++    state := game::Game::start();
++    while state.outcome() == game::Outcome.Playing {
++        frame, frameError := render::draw(&state);
++        if frameError != none {
++            stdoutln("Could not render the room.");
++            return;
++        }
++        stdoutln(frame);
++        command, commandError := input::read_command();
++        stdoutln();
+@@ -62 +17 @@
+-            stdoutln("Unknown command; use W/A/S/D or Q.");
++            stdoutln("Unknown command. No turn spent.");
+@@ -65,43 +20,2 @@
+-        if command == Command.Quit {
+-            running = false;
+-        } else {
+-            state.apply(command);
+-        }
+-    }
+-    stdoutln("Run ended.");
+-}
+-
+-void draw(&const Game state) {
+-    player := state->playerPosition();
+-    stdoutln("ARROWFALL — open training floor");
+-    loop i32 y = 0; y < 3; y++ {
+-        loop i32 x = 0; x < 5; x++ {
+-            if player.x == x and player.y == y {
+-                stdout("@");
+-            } else {
+-                stdout(".");
+-            }
+-        }
+-        stdoutln();
+-    }
+-}
+-
+-(Command, error) read_command() {
+-    string line;
+-    inputError := stdin("command>", &line);
+-    if inputError != none {
+-        return (Command.Quit, none);
+-    }
+-    value := strings::trim_ascii(line.view());
+-    if value.len() != 1 {
+-        return (none, CommandError.InvalidCommand);
+-    }
+-    const char KEY = ascii::to_ascii_lowercase(value[0].cast<char>);
+-    if KEY == 'w' {
+-        return (Command.Up, none);
+-    }
+-    if KEY == 'a' {
+-        return (Command.Left, none);
+-    }
+-    if KEY == 's' {
+-        return (Command.Down, none);
++        event := state.apply(command);
++        stdoutln(render::event_message(event));
+@@ -109,2 +23,3 @@
+-    if KEY == 'd' {
+-        return (Command.Right, none);
++    finalFrame, finalError := render::draw(&state);
++    if finalError == none {
++        stdoutln(finalFrame);
+@@ -112,2 +27,2 @@
+-    if KEY == 'q' {
+-        return (Command.Quit, none);
++    if state.outcome() == game::Outcome.Won {
++        stdoutln("You escaped Arrowfall!");
+@@ -115 +29,0 @@
+-    return (none, CommandError.InvalidCommand);
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/src/render.fl tutorial/checkpoints/04-map/src/render.fl
+--- tutorial/checkpoints/03-movement/src/render.fl
++++ tutorial/checkpoints/04-map/src/render.fl
+@@ -0,0 +1,44 @@
++module render;
++
++@imports :: root::game :: lib::std::text::strings;
++
++export (string, error) draw(&const game::Game state) {
++    canvas, allocationError := strings::StringBuilder::withCapacity(112);
++    if allocationError != none {
++        return (none, allocationError);
++    }
++    player := state->playerPosition();
++    loop i32 y = 0; y < 7; y++ {
++        loop i32 x = 0; x < 9; x++ {
++            position := game::Position::at(x, y);
++            char tile = game::tile_at(position);
++            if position.equals(&player) {
++                tile = '@';
++            }
++            if canvas.appendChar(tile) != none {
++                return (none, AllocationError.OutOfMemory);
++            }
++        }
++        if canvas.appendChar('\n') != none {
++            return (none, AllocationError.OutOfMemory);
++        }
++    }
++    if canvas.append("Turn: ") != none or
++        canvas.appendInteger(state->turn()) != none {
++        return (none, AllocationError.OutOfMemory);
++    }
++    return canvas.toString();
++}
++
++export stringv event_message(game::Event event) {
++    if event == game::Event.Wall {
++        return "A wall blocks your way. No turn spent.";
++    }
++    if event == game::Event.Won {
++        return "You reach the exit.";
++    }
++    if event == game::Event.Quit {
++        return "You leave the room.";
++    }
++    return "You move.";
++}
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/tests/frame.svg tutorial/checkpoints/04-map/tests/frame.svg
+--- tutorial/checkpoints/03-movement/tests/frame.svg
++++ tutorial/checkpoints/04-map/tests/frame.svg
+@@ -2,2 +2,2 @@
+-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="124" viewBox="0 0 360 124" role="img">
+-  <title>03-movement representative frame</title>
++<svg xmlns="http://www.w3.org/2000/svg" width="360" height="200" viewBox="0 0 360 200" role="img">
++  <title>04-map representative frame</title>
+@@ -6,4 +6,8 @@
+-  <text x="24" y="37" class="terminal">ARROWFALL — open training floor</text>
+-  <text x="24" y="56" class="terminal">.....</text>
+-  <text x="24" y="75" class="terminal">.....</text>
+-  <text x="24" y="94" class="terminal">..@..</text>
++  <text x="24" y="37" class="terminal">#########</text>
++  <text x="24" y="56" class="terminal">#.......#</text>
++  <text x="24" y="75" class="terminal">#..###..#</text>
++  <text x="24" y="94" class="terminal">#.......#</text>
++  <text x="24" y="113" class="terminal">#..###..#</text>
++  <text x="24" y="132" class="terminal">#@......#</text>
++  <text x="24" y="151" class="terminal">#########</text>
++  <text x="24" y="170" class="terminal">Turn: 4</text>
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/tests/frame.txt tutorial/checkpoints/04-map/tests/frame.txt
+--- tutorial/checkpoints/03-movement/tests/frame.txt
++++ tutorial/checkpoints/04-map/tests/frame.txt
+@@ -1,4 +1,8 @@
+-ARROWFALL — open training floor
+-.....
+-.....
+-..@..
++#########
++#.......#
++#..###..#
++#.......#
++#..###..#
++#@......#
++#########
++Turn: 4
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/tests/input.txt tutorial/checkpoints/04-map/tests/input.txt
+--- tutorial/checkpoints/03-movement/tests/input.txt
++++ tutorial/checkpoints/04-map/tests/input.txt
+@@ -1 +1,4 @@
+-d
++w
++s
++s
++s
+@@ -3 +5,0 @@
+-q
+diff -rN -U0 --exclude target tutorial/checkpoints/03-movement/tests/output.txt tutorial/checkpoints/04-map/tests/output.txt
+--- tutorial/checkpoints/03-movement/tests/output.txt
++++ tutorial/checkpoints/04-map/tests/output.txt
+@@ -1,13 +1,59 @@
+-ARROWFALL — open training floor
+-.....
+-.@...
+-.....
+-command>ARROWFALL — open training floor
+-.....
+-..@..
+-.....
+-command>ARROWFALL — open training floor
+-.....
+-.....
+-..@..
+-command>Run ended.
++#########
++#@......#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++Turn: 0
++command>
++A wall blocks your way. No turn spent.
++#########
++#@......#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++Turn: 0
++command>
++You move.
++#########
++#.......#
++#@.###..#
++#.......#
++#..###..#
++#>......#
++#########
++Turn: 1
++command>
++You move.
++#########
++#.......#
++#..###..#
++#@......#
++#..###..#
++#>......#
++#########
++Turn: 2
++command>
++You move.
++#########
++#.......#
++#..###..#
++#.......#
++#@.###..#
++#>......#
++#########
++Turn: 3
++command>
++You reach the exit.
++#########
++#.......#
++#..###..#
++#.......#
++#..###..#
++#@......#
++#########
++Turn: 4
++You escaped Arrowfall!

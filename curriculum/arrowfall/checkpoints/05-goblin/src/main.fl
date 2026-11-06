@@ -1,0 +1,36 @@
+module main;
+
+@imports :: root::game :: root::input :: root::render;
+
+void main() {
+    state := game::Game::start();
+    while state.outcome() == game::Outcome.Playing {
+        frame, frameError := render::draw(&state);
+        if frameError != none {
+            stdoutln("Could not render the room.");
+            return;
+        }
+        stdoutln(frame);
+        command, commandError := input::read_command();
+        stdoutln();
+        if commandError != none {
+            stdoutln("Unknown command. No turn spent.");
+            proceed;
+        }
+        result := state.apply(command);
+        stdoutln(render::player_message(result.player));
+        enemyText := render::enemy_message(result.enemy);
+        if enemyText.len() > 0 {
+            stdoutln(enemyText);
+        }
+    }
+    finalFrame, finalError := render::draw(&state);
+    if finalError == none {
+        stdoutln(finalFrame);
+    }
+    if state.outcome() == game::Outcome.Won {
+        stdoutln("You escaped Arrowfall!");
+    } else if state.outcome() == game::Outcome.Lost {
+        stdoutln("The goblin caught you.");
+    }
+}

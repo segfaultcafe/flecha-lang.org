@@ -1,0 +1,485 @@
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/README.md tutorial/checkpoints/05-goblin/README.md
+--- tutorial/checkpoints/04-map/README.md
++++ tutorial/checkpoints/05-goblin/README.md
+@@ -1 +1 @@
+-# 04 — Walls make movement meaningful
++# 05 — A turn now has consequences
+@@ -5,2 +5,2 @@
+-Checkpoint 03 moves on an open rectangle. Every in-bounds direction succeeds,
+-so movement has no spatial decision.
++Checkpoint 04 has meaningful walls and an exit, but the room is safe and the
++shortest path is automatic.
+@@ -10,2 +10,2 @@
+-The symbols introduced in checkpoint 01 should become rules. A real room needs
+-solid walls, a reachable exit, and feedback when an action cannot happen.
++Without pressure there is no reason to weigh one movement against another. A
++single pursuer makes the turn model visible before combat adds another action.
+@@ -15,4 +15,4 @@
+-The fixed 9x7 map is stored as a checked slice over a fixed array. Walls reject
+-movement without spending a turn; entering `>` wins. Engine, input, and render
+-modules now separate rules from terminal I/O, and the first unit test protects
+-collision and victory.
++A goblin takes one response after each effective player turn. First adjacency
++only warns. If the player begins the next action adjacent and fails to escape,
++the goblin deals one HP; safe no-ops remain free. `TurnResult` carries player
++and enemy events so rules are observable instead of inferred by the CLI.
+@@ -35 +35 @@
+-Exact changes: `../../diffs/04-map.patch`.
++Exact changes: `../../diffs/05-goblin.patch`.
+@@ -40,4 +40,4 @@
+-longbow check tutorial/checkpoints/04-map
+-longbow test tutorial/checkpoints/04-map
+-longbow build tutorial/checkpoints/04-map
+-longbow run tutorial/checkpoints/04-map < tutorial/checkpoints/04-map/tests/input.txt
++longbow check tutorial/checkpoints/05-goblin
++longbow test tutorial/checkpoints/05-goblin
++longbow build tutorial/checkpoints/05-goblin
++longbow run tutorial/checkpoints/05-goblin < tutorial/checkpoints/05-goblin/tests/input.txt
+@@ -48,4 +48,5 @@
+-1. A room appears — static scene.
+-2. The picture becomes state — structs own position.
+-3. The player moves — stdin drives an open floor.
+-4. **Walls make movement meaningful** — map, collision, exit, modules, test.
++1. A room appears.
++2. The picture becomes state.
++3. The player moves.
++4. Walls create collision and victory.
++5. **A turn has consequences** — pursuit, warning, HP, defeat, events.
+@@ -55,2 +56,2 @@
+-The recorded leading `W` must print the wall message while the next frame still
+-shows `Turn: 0`; four `S` moves must then win on turn 4.
++The first adjacent frame must show a warning at 3 HP. Only a later failed
++response may show `-1 HP`; the goblin must never move and attack together.
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/longbow.lock tutorial/checkpoints/05-goblin/longbow.lock
+--- tutorial/checkpoints/04-map/longbow.lock
++++ tutorial/checkpoints/05-goblin/longbow.lock
+@@ -7 +7 @@
+-      "identity": "local/arrowfall_step_04",
++      "identity": "local/arrowfall_step_05",
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/longbow.toml tutorial/checkpoints/05-goblin/longbow.toml
+--- tutorial/checkpoints/04-map/longbow.toml
++++ tutorial/checkpoints/05-goblin/longbow.toml
+@@ -2 +2 @@
+-name = "arrowfall-step-04"
++name = "arrowfall-step-05"
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/src/game.fl tutorial/checkpoints/05-goblin/src/game.fl
+--- tutorial/checkpoints/04-map/src/game.fl
++++ tutorial/checkpoints/05-goblin/src/game.fl
+@@ -17,0 +18 @@
++    Help,
+@@ -23,0 +25 @@
++    Lost,
+@@ -27,2 +29,3 @@
+-export enum Event {
+-    default Moved,
++export enum PlayerEvent {
++    default None,
++    Moved,
+@@ -29,0 +33,2 @@
++    GoblinBlocks,
++    Help,
+@@ -33,0 +39,7 @@
++export enum EnemyEvent {
++    default None,
++    Moved,
++    Threatened,
++    Attacked
++}
++
+@@ -38,0 +51,6 @@
++export structure TurnResult {
++    PlayerEvent player;
++    EnemyEvent enemy;
++    bool spentTurn;
++};
++
+@@ -40,0 +59,2 @@
++    private Position goblin;
++    private i32 playerHealth;
+@@ -44,0 +65,12 @@
++TurnResult TurnResult::make(
++    PlayerEvent player,
++    EnemyEvent enemy = EnemyEvent.None,
++    bool spentTurn = false
++) {
++    return build TurnResult {
++        self.player = player;
++        self.enemy = enemy;
++        self.spentTurn = spentTurn;
++    };
++}
++
+@@ -68,0 +101,2 @@
++        self.goblin = Position::at(7, 3);
++        self.playerHealth = 3;
+@@ -74 +108,4 @@
+-Event Game::apply(&self, Command command) {
++TurnResult Game::apply(&self, Command command) {
++    if command == Command.Help {
++        return TurnResult::make(PlayerEvent.Help);
++    }
+@@ -77 +114 @@
+-        return Event.Quit;
++        return TurnResult::make(PlayerEvent.Quit);
+@@ -78,0 +116 @@
++    const bool DANGER_BEFORE = adjacent(self->goblin, self->player);
+@@ -81 +119,16 @@
+-        return Event.Wall;
++        if !DANGER_BEFORE {
++            return TurnResult::make(PlayerEvent.Wall);
++        }
++        self->turnCount++;
++        return TurnResult::make(PlayerEvent.Wall, self->goblinTurn(true), true);
++    }
++    if next.equals(&self->goblin) {
++        if !DANGER_BEFORE {
++            return TurnResult::make(PlayerEvent.GoblinBlocks);
++        }
++        self->turnCount++;
++        return TurnResult::make(
++            PlayerEvent.GoblinBlocks,
++            self->goblinTurn(true),
++            true
++        );
+@@ -87 +140 @@
+-        return Event.Won;
++        return TurnResult::make(PlayerEvent.Won, EnemyEvent.None, true);
+@@ -89 +142,54 @@
+-    return Event.Moved;
++    return TurnResult::make(
++        PlayerEvent.Moved,
++        self->goblinTurn(DANGER_BEFORE),
++        true
++    );
++}
++
++private EnemyEvent Game::goblinTurn(&self, bool canAttack) {
++    if canAttack and adjacent(self->goblin, self->player) {
++        self->playerHealth--;
++        if self->playerHealth == 0 {
++            self->gameOutcome = Outcome.Lost;
++        }
++        return EnemyEvent.Attacked;
++    }
++    if adjacent(self->goblin, self->player) {
++        return EnemyEvent.Threatened;
++    }
++    const i32 DX = self->player.x - self->goblin.x;
++    const i32 DY = self->player.y - self->goblin.y;
++    Direction horizontal = Direction.Right;
++    Direction vertical = Direction.Down;
++    if DX < 0 {
++        horizontal = Direction.Left;
++    }
++    if DY < 0 {
++        vertical = Direction.Up;
++    }
++    bool moved = false;
++    if DX != 0 {
++        moved = self->tryGoblinStep(horizontal);
++    }
++    if !moved and DY != 0 {
++        moved = self->tryGoblinStep(vertical);
++    }
++    if moved and adjacent(self->goblin, self->player) {
++        return EnemyEvent.Threatened;
++    }
++    if moved {
++        return EnemyEvent.Moved;
++    }
++    return EnemyEvent.None;
++}
++
++private bool Game::tryGoblinStep(&self, Direction direction) {
++    next := self->goblin.moved(direction);
++    if next.equals(&self->player) {
++        return false;
++    }
++    if tile_at(next) != '#' and tile_at(next) != '>' {
++        self->goblin = next;
++        return true;
++    }
++    return false;
+@@ -95,0 +202,8 @@
++Position Game::goblinPosition(&const self) {
++    return self->goblin;
++}
++
++i32 Game::health(&const self) {
++    return self->playerHealth;
++}
++
+@@ -130,0 +245 @@
++        Command.Help => Direction.Up,
+@@ -132,0 +248,7 @@
++}
++
++bool adjacent(Position left, Position right) {
++    const i32 DX = left.x - right.x;
++    const i32 DY = left.y - right.y;
++    return (DX == 0 and (DY == 1 or DY == -1)) or
++        (DY == 0 and (DX == 1 or DX == -1));
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/src/game_test.fl tutorial/checkpoints/05-goblin/src/game_test.fl
+--- tutorial/checkpoints/04-map/src/game_test.fl
++++ tutorial/checkpoints/05-goblin/src/game_test.fl
+@@ -8 +8 @@
+-test walls_are_free_and_the_exit_wins(&testing::UnitTest t) {
++test safe_wall_is_free(&testing::UnitTest t) {
+@@ -11,4 +10,0 @@
+-    state.apply(game::Command.MoveDown);
+-    state.apply(game::Command.MoveDown);
+-    state.apply(game::Command.MoveDown);
+-    won := state.apply(game::Command.MoveDown);
+@@ -17,3 +13,22 @@
+-        wall == game::Event.Wall and won == game::Event.Won and
+-            state.turn() == 4 and state.outcome() == game::Outcome.Won,
+-        "walls are free while entering the exit wins"
++        wall.player == game::PlayerEvent.Wall and !wall.spentTurn and
++            state.turn() == 0,
++        "a safe wall bump does not advance the goblin"
++    );
++}
++
++test approach_warns_before_a_later_attack(&testing::UnitTest t) {
++    state := game::Game::start();
++    state.apply(game::Command.MoveRight);
++    state.apply(game::Command.MoveLeft);
++    state.apply(game::Command.MoveRight);
++    state.apply(game::Command.MoveLeft);
++    state.apply(game::Command.MoveRight);
++    state.apply(game::Command.MoveLeft);
++    warning := state.apply(game::Command.MoveDown);
++    blocked := state.apply(game::Command.MoveDown);
++    asserts::is_true(
++        t,
++        warning.enemy == game::EnemyEvent.Threatened and
++            blocked.enemy == game::EnemyEvent.Attacked and
++            state.health() == 2,
++        "the first adjacency warns and a later failed response takes one HP"
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/src/input.fl tutorial/checkpoints/05-goblin/src/input.fl
+--- tutorial/checkpoints/04-map/src/input.fl
++++ tutorial/checkpoints/05-goblin/src/input.fl
+@@ -31,0 +32,3 @@
++    if KEY == 'h' {
++        return (game::Command.Help, none);
++    }
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/src/main.fl tutorial/checkpoints/05-goblin/src/main.fl
+--- tutorial/checkpoints/04-map/src/main.fl
++++ tutorial/checkpoints/05-goblin/src/main.fl
+@@ -20,2 +20,6 @@
+-        event := state.apply(command);
+-        stdoutln(render::event_message(event));
++        result := state.apply(command);
++        stdoutln(render::player_message(result.player));
++        enemyText := render::enemy_message(result.enemy);
++        if enemyText.len() > 0 {
++            stdoutln(enemyText);
++        }
+@@ -28,0 +33,2 @@
++    } else if state.outcome() == game::Outcome.Lost {
++        stdoutln("The goblin caught you.");
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/src/render.fl tutorial/checkpoints/05-goblin/src/render.fl
+--- tutorial/checkpoints/04-map/src/render.fl
++++ tutorial/checkpoints/05-goblin/src/render.fl
+@@ -10,0 +11 @@
++    goblin := state->goblinPosition();
+@@ -16,0 +18,2 @@
++            } else if position.equals(&goblin) {
++                tile = 'g';
+@@ -26 +29,3 @@
+-    if canvas.append("Turn: ") != none or
++    if canvas.append("HP: ") != none or
++        canvas.appendInteger(state->health()) != none or
++        canvas.append("  Turn: ") != none or
+@@ -33,2 +38,2 @@
+-export stringv event_message(game::Event event) {
+-    if event == game::Event.Wall {
++export stringv player_message(game::PlayerEvent event) {
++    if event == game::PlayerEvent.Wall {
+@@ -37 +42,7 @@
+-    if event == game::Event.Won {
++    if event == game::PlayerEvent.GoblinBlocks {
++        return "The goblin blocks that tile.";
++    }
++    if event == game::PlayerEvent.Help {
++        return "Move: W/A/S/D | H help | Q quit";
++    }
++    if event == game::PlayerEvent.Won {
+@@ -40 +51 @@
+-    if event == game::Event.Quit {
++    if event == game::PlayerEvent.Quit {
+@@ -43,0 +55,13 @@
++}
++
++export stringv enemy_message(game::EnemyEvent event) {
++    if event == game::EnemyEvent.Moved {
++        return "The goblin moves closer.";
++    }
++    if event == game::EnemyEvent.Threatened {
++        return "The goblin closes in! Move before its next turn.";
++    }
++    if event == game::EnemyEvent.Attacked {
++        return "The goblin attacks: -1 HP.";
++    }
++    return "";
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/tests/frame.svg tutorial/checkpoints/05-goblin/tests/frame.svg
+--- tutorial/checkpoints/04-map/tests/frame.svg
++++ tutorial/checkpoints/05-goblin/tests/frame.svg
+@@ -3 +3 @@
+-  <title>04-map representative frame</title>
++  <title>05-goblin representative frame</title>
+@@ -8,2 +8,2 @@
+-  <text x="24" y="75" class="terminal">#..###..#</text>
+-  <text x="24" y="94" class="terminal">#.......#</text>
++  <text x="24" y="75" class="terminal">#@.###..#</text>
++  <text x="24" y="94" class="terminal">#g......#</text>
+@@ -11 +11 @@
+-  <text x="24" y="132" class="terminal">#@......#</text>
++  <text x="24" y="132" class="terminal">#&gt;......#</text>
+@@ -13 +13 @@
+-  <text x="24" y="170" class="terminal">Turn: 4</text>
++  <text x="24" y="170" class="terminal">HP: 0  Turn: 10</text>
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/tests/frame.txt tutorial/checkpoints/05-goblin/tests/frame.txt
+--- tutorial/checkpoints/04-map/tests/frame.txt
++++ tutorial/checkpoints/05-goblin/tests/frame.txt
+@@ -2,0 +3,2 @@
++#@.###..#
++#g......#
+@@ -4,3 +6 @@
+-#.......#
+-#..###..#
+-#@......#
++#>......#
+@@ -8 +8 @@
+-Turn: 4
++HP: 0  Turn: 10
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/tests/input.txt tutorial/checkpoints/05-goblin/tests/input.txt
+--- tutorial/checkpoints/04-map/tests/input.txt
++++ tutorial/checkpoints/05-goblin/tests/input.txt
+@@ -1 +1,6 @@
+-w
++d
++a
++d
++a
++d
++a
+diff -rN -U0 --exclude target tutorial/checkpoints/04-map/tests/output.txt tutorial/checkpoints/05-goblin/tests/output.txt
+--- tutorial/checkpoints/04-map/tests/output.txt
++++ tutorial/checkpoints/05-goblin/tests/output.txt
+@@ -4 +4 @@
+-#.......#
++#......g#
+@@ -8 +8 @@
+-Turn: 0
++HP: 3  Turn: 0
+@@ -10 +10,13 @@
+-A wall blocks your way. No turn spent.
++You move.
++The goblin moves closer.
++#########
++#.@.....#
++#..###..#
++#.....g.#
++#..###..#
++#>......#
++#########
++HP: 3  Turn: 1
++command>
++You move.
++The goblin moves closer.
+@@ -14 +26 @@
+-#.......#
++#....g..#
+@@ -18 +30 @@
+-Turn: 0
++HP: 3  Turn: 2
+@@ -20,0 +33 @@
++The goblin moves closer.
+@@ -22,3 +35,3 @@
+-#.......#
+-#@.###..#
+-#.......#
++#.@.....#
++#..###..#
++#...g...#
+@@ -28 +41 @@
+-Turn: 1
++HP: 3  Turn: 3
+@@ -30,0 +44 @@
++The goblin moves closer.
+@@ -32 +46,14 @@
+-#.......#
++#@......#
++#..###..#
++#..g....#
++#..###..#
++#>......#
++#########
++HP: 3  Turn: 4
++command>
++You move.
++The goblin moves closer.
++#########
++#.@.....#
++#..###..#
++#.g.....#
+@@ -33,0 +61,7 @@
++#>......#
++#########
++HP: 3  Turn: 5
++command>
++You move.
++The goblin moves closer.
++#########
+@@ -35,0 +70,2 @@
++#g......#
++#..###..#
+@@ -38 +74 @@
+-Turn: 2
++HP: 3  Turn: 6
+@@ -40,0 +77 @@
++The goblin closes in! Move before its next turn.
+@@ -42,0 +80,2 @@
++#@.###..#
++#g......#
+@@ -43,0 +83,7 @@
++#>......#
++#########
++HP: 3  Turn: 7
++command>
++The goblin blocks that tile.
++The goblin attacks: -1 HP.
++#########
+@@ -45,0 +92,2 @@
++#g......#
++#..###..#
+@@ -48 +96 @@
+-Turn: 3
++HP: 2  Turn: 8
+@@ -50 +98,2 @@
+-You reach the exit.
++The goblin blocks that tile.
++The goblin attacks: -1 HP.
+@@ -52,0 +102,2 @@
++#@.###..#
++#g......#
+@@ -53,0 +105,7 @@
++#>......#
++#########
++HP: 1  Turn: 9
++command>
++The goblin blocks that tile.
++The goblin attacks: -1 HP.
++#########
+@@ -54,0 +113,2 @@
++#@.###..#
++#g......#
+@@ -56 +116 @@
+-#@......#
++#>......#
+@@ -58,2 +118,2 @@
+-Turn: 4
+-You escaped Arrowfall!
++HP: 0  Turn: 10
++The goblin caught you.

@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
+import { arrowfallLessons } from './src/data/arrowfall.mjs';
 import { curriculumTracks } from './src/data/curriculum.mjs';
 
 const flechaGrammar = JSON.parse(
@@ -30,6 +31,15 @@ const curriculumSidebar = curriculumTracks.map((track) => ({
 		slug: `tutorials/${lesson.slug}`,
 	})),
 }));
+const arrowfallSidebar = {
+	label: 'Build ARROWFALL',
+	translations: { 'pt-br': 'Construa ARROWFALL' },
+	items: arrowfallLessons.map((lesson) => ({
+		label: lesson.title,
+		translations: { 'pt-br': lesson.titlePt },
+		slug: `tutorials/${lesson.slug}`,
+	})),
+};
 const exampleSidebarItems = exampleCategories.flatMap(([category, label, translation]) => {
 	const pages = examplePages.filter((page) => page.category === category);
 	if (!pages.length) return [];
@@ -142,7 +152,7 @@ export default defineConfig({
 						{
 							label: 'Tutorials',
 							translations: { 'pt-br': 'Tutoriais' },
-							items: curriculumSidebar,
+							items: [...curriculumSidebar, arrowfallSidebar],
 						},
 						{
 							label: 'Language features',

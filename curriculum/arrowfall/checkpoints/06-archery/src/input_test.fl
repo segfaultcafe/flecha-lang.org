@@ -1,0 +1,18 @@
+module input_test;
+
+@imports
+    :: root::game
+    :: root::input
+    :: lib::std::tests::asserts
+    :: lib::std::tests::testing;
+
+test direct_key_diamonds_parse(&testing::UnitTest t) {
+    move, moveError := input::parse("W");
+    shot, shotError := input::parse("l");
+    asserts::is_true(
+        t,
+        moveError == none and move == game::Command.MoveUp and
+            shotError == none and shot == game::Command.ShootRight,
+        "WASD moves and IJKL shoots after one lowercase normalization"
+    );
+}

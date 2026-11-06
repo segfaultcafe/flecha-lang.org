@@ -1,0 +1,44 @@
+module render;
+
+@imports :: root::game :: lib::std::text::strings;
+
+export (string, error) draw(&const game::Game state) {
+    canvas, allocationError := strings::StringBuilder::withCapacity(112);
+    if allocationError != none {
+        return (none, allocationError);
+    }
+    player := state->playerPosition();
+    loop i32 y = 0; y < 7; y++ {
+        loop i32 x = 0; x < 9; x++ {
+            position := game::Position::at(x, y);
+            char tile = game::tile_at(position);
+            if position.equals(&player) {
+                tile = '@';
+            }
+            if canvas.appendChar(tile) != none {
+                return (none, AllocationError.OutOfMemory);
+            }
+        }
+        if canvas.appendChar('\n') != none {
+            return (none, AllocationError.OutOfMemory);
+        }
+    }
+    if canvas.append("Turn: ") != none or
+        canvas.appendInteger(state->turn()) != none {
+        return (none, AllocationError.OutOfMemory);
+    }
+    return canvas.toString();
+}
+
+export stringv event_message(game::Event event) {
+    if event == game::Event.Wall {
+        return "A wall blocks your way. No turn spent.";
+    }
+    if event == game::Event.Won {
+        return "You reach the exit.";
+    }
+    if event == game::Event.Quit {
+        return "You leave the room.";
+    }
+    return "You move.";
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="124" viewBox="0 0 360 124" role="img">
+  <title>01-scene representative frame</title>
+  <rect width="100%" height="100%" rx="12" fill="#10151c"/>
+  <style>.terminal { fill: #d7f9e9; font: 15px monospace; white-space: pre; }</style>
+  <text x="24" y="37" class="terminal">ARROWFALL</text>
+  <text x="24" y="56" class="terminal">#####</text>
+  <text x="24" y="75" class="terminal">#@.&gt;#</text>
+  <text x="24" y="94" class="terminal">#####</text>
+</svg>

@@ -1,0 +1,131 @@
+--- /dev/null
++++ tutorial/checkpoints/01-scene/README.md
+@@ -0,0 +1,50 @@
++# 01 — A room appears
++
++## Starting point
++
++There is no previous checkpoint: we begin with an empty Flecha program.
++
++## Why now?
++
++A terminal game first needs something recognisable on screen. Before state,
++input, or rules, a static room gives the project a visible identity.
++
++## New behaviour
++
++Running the program prints Arrowfall's title and a tiny room containing the
++player (`@`), floor (`.`), walls (`#`), and exit (`>`).
++
++## Files changed
++
++- `README.md`
++- `longbow.lock`
++- `longbow.toml`
++- `src/main.fl`
++- `tests/input.txt`
++- `tests/output.txt`
++- `tests/frame.txt`
++- `tests/frame.svg`
++
++The exact source diff is `../../diffs/01-scene.patch`. This directory contains
++the complete current code, not a fragment.
++
++## Verify
++
++```sh
++longbow check tutorial/checkpoints/01-scene
++longbow test tutorial/checkpoints/01-scene
++longbow build tutorial/checkpoints/01-scene
++longbow run tutorial/checkpoints/01-scene < tutorial/checkpoints/01-scene/tests/input.txt
++```
++
++Expected stdout is `tests/output.txt`; the representative frame is
++`tests/frame.txt` and `tests/frame.svg`.
++
++## Timeline
++
++1. **A room appears** — a static scene establishes the game's visual goal.
++
++## Challenge / acceptance
++
++Change one floor dot to a wall, rebuild, and verify exactly one character in
++the frame changes. Restore it before moving on.
+--- /dev/null
++++ tutorial/checkpoints/01-scene/longbow.lock
+@@ -0,0 +1,27 @@
++{
++  "schema": 1,
++  "root": "root",
++  "packages": [
++    {
++      "id": "root",
++      "identity": "local/arrowfall_step_01",
++      "source": {
++        "kind": "workspace",
++        "path": "."
++      },
++      "version": "0.1.0",
++      "flecha": ">=0.3.0, <0.4.0",
++      "dependencies": {
++        "std": "toolchain-std"
++      }
++    },
++    {
++      "id": "toolchain-std",
++      "identity": "flecha/std",
++      "source": {
++        "kind": "toolchain"
++      },
++      "dependencies": {}
++    }
++  ]
++}
+--- /dev/null
++++ tutorial/checkpoints/01-scene/longbow.toml
+@@ -0,0 +1,7 @@
++[package]
++name = "arrowfall-step-01"
++version = "0.1.0"
++kind = "program"
++flecha = ">=0.3.0, <0.4.0"
++
++[dependencies]
+--- /dev/null
++++ tutorial/checkpoints/01-scene/src/main.fl
+@@ -0,0 +1,8 @@
++module main;
++
++void main() {
++    stdoutln("ARROWFALL");
++    stdoutln("#####");
++    stdoutln("#@.>#");
++    stdoutln("#####");
++}
+--- /dev/null
++++ tutorial/checkpoints/01-scene/tests/frame.svg
+@@ -0,0 +1,10 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<svg xmlns="http://www.w3.org/2000/svg" width="360" height="124" viewBox="0 0 360 124" role="img">
++  <title>01-scene representative frame</title>
++  <rect width="100%" height="100%" rx="12" fill="#10151c"/>
++  <style>.terminal { fill: #d7f9e9; font: 15px monospace; white-space: pre; }</style>
++  <text x="24" y="37" class="terminal">ARROWFALL</text>
++  <text x="24" y="56" class="terminal">#####</text>
++  <text x="24" y="75" class="terminal">#@.&gt;#</text>
++  <text x="24" y="94" class="terminal">#####</text>
++</svg>
+--- /dev/null
++++ tutorial/checkpoints/01-scene/tests/frame.txt
+@@ -0,0 +1,4 @@
++ARROWFALL
++#####
++#@.>#
++#####
+--- /dev/null
++++ tutorial/checkpoints/01-scene/tests/output.txt
+@@ -0,0 +1,4 @@
++ARROWFALL
++#####
++#@.>#
++#####

@@ -15,7 +15,8 @@ const normalize = (value) => value.replace(/\r\n/g, '\n').trimEnd();
 
 for (const locale of ['en', 'pt-br']) {
 	for (const lesson of curriculumLessons) {
-		const file = join(contentRoot, locale === 'pt-br' ? 'pt-br' : '', 'tutorials', `${lesson.slug}.md`);
+		const base = join(contentRoot, locale === 'pt-br' ? 'pt-br' : '', 'tutorials', lesson.slug);
+		const file = existsSync(`${base}.mdx`) ? `${base}.mdx` : `${base}.md`;
 		if (!existsSync(file)) {
 			failures.push(`missing ${locale} curriculum page: ${file}`);
 			continue;
@@ -58,6 +59,10 @@ const expectedBlocks = new Map([
 		fixture('unsafe-first', 'safe.fl'),
 		fixture('unsafe-first', 'unsafe.fl'),
 	])],
+	['unsafe-first-run:sh', new Set([
+		'flecha check curriculum/fixtures/unsafe-first/safe.fl\nflecha build curriculum/fixtures/unsafe-first/safe.fl -o build/safe-first\nbuild/safe-first\nflecha check curriculum/fixtures/unsafe-first/unsafe.fl\nflecha build curriculum/fixtures/unsafe-first/unsafe.fl -o build/unsafe-first\nbuild/unsafe-first',
+	])],
+	['unsafe-first-run:text', new Set(['42\n42'])],
 ]);
 
 for (const [key, expected] of expectedBlocks) {
@@ -77,7 +82,7 @@ const tutorialFiles = (locale) => {
 		for (const entry of readdirSync(directory, { withFileTypes: true })) {
 			const path = join(directory, entry.name);
 			if (entry.isDirectory()) walk(path);
-			else if (entry.name.endsWith('.md')) output.push(path);
+			else if (entry.name.endsWith('.md') || entry.name.endsWith('.mdx')) output.push(path);
 		}
 	};
 	walk(root);
@@ -89,8 +94,9 @@ for (const locale of ['en', 'pt-br']) {
 	if (expected.size !== curriculumLessons.length) failures.push(`${locale}: duplicate curriculum route`);
 	for (const file of tutorialFiles(locale)) {
 		if (/\/(first-project|command-line-app|publish-package)\.md$/.test(file)) continue;
+		if (file.includes(`${join('tutorials', 'arrowfall')}/`)) continue;
 		const relative = file.slice(join(contentRoot, locale === 'pt-br' ? 'pt-br' : '').length)
-			.replace(/\.md$/, '/').replaceAll('\\', '/');
+			.replace(/\.mdx?$/, '/').replaceAll('\\', '/');
 		const route = `${locale === 'pt-br' ? '/pt-br' : ''}${relative}`;
 		if (!expected.has(route)) failures.push(`${locale}: tutorial page is outside centralized order: ${route}`);
 	}

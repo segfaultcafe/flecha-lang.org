@@ -1,0 +1,24 @@
+module render_test;
+
+@imports
+    :: root::game
+    :: root::render
+    :: lib::std::tests::asserts
+    :: lib::std::tests::testing;
+
+test renderer_and_event_messages_explain_the_run(&testing::UnitTest t) {
+    state := game::Game::start(42);
+    frame, frameError := render::draw(&state);
+    const stringv EXPECTED = "#########\n#@......#\n#..###..#\n#......g#\n#..###..#\n#>......#\n#########\nHP: 3  Arrows: 3  Turn: 0  Seed: 42";
+    asserts::is_true(
+        t,
+        frameError == none and frame.view() == EXPECTED and
+            render::player_message(game::PlayerEvent.ShotHit) ==
+                "Your arrow hits! The goblin falls." and
+            render::player_message(game::PlayerEvent.ShotMiss) ==
+                "Your arrow misses; a wall stops it." and
+            render::enemy_message(game::EnemyEvent.Threatened) ==
+                "The goblin closes in! Move or shoot before its next turn.",
+        "the room, status, hit, miss, and danger messages are stable"
+    );
+}

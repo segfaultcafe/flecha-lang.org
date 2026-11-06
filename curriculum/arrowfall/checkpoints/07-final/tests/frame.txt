@@ -1,0 +1,10 @@
+#########
+#.......#
+#..###..#
+#.......#
+#..###..#
+#@......#
+#########
+HP: 3  Arrows: 2  Turn: 5  Seed: 20261105
+You reach the exit.
+You escaped Arrowfall!

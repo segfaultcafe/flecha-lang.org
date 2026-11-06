@@ -1,0 +1,135 @@
+module main;
+
+@imports :: root::game :: root::input :: root::options :: root::render
+         :: lib::std::os::arguments;
+
+i32 main() {
+    values, argumentError := arguments::capture();
+    if argumentError != none {
+        stdoutln("arrowfall: cannot read command-line options");
+        print_usage();
+        return 2;
+    }
+    parser := options::Parser::start();
+    error optionError = none;
+    loop usize index = 1; index < values.len(); index++ {
+        optionError = parser.consume(values[index].view());
+        if optionError != none {
+            break;
+        }
+    }
+    if optionError != none {
+        if optionError == options::OptionError.InvalidSeed {
+            stdoutln("arrowfall: seed must be a decimal u64");
+        } else {
+            stdoutln("arrowfall: unknown option");
+        }
+        print_usage();
+        return 2;
+    }
+    selected := parser.finish();
+
+    state := game::Game::start(selected.seed);
+    game::PlayerEvent lastPlayer = game::PlayerEvent.None;
+    game::EnemyEvent lastEnemy = game::EnemyEvent.None;
+    bool invalidCommand = false;
+    bool firstFrame = true;
+    while state.outcome() == game::Outcome.Playing {
+        frame, renderError := render::draw(&state);
+        if renderError != none {
+            stdoutln("Could not render the dungeon.");
+            return 1;
+        }
+        present_frame(
+            frame.view(),
+            lastPlayer,
+            lastEnemy,
+            invalidCommand,
+            selected.clearFrames,
+            firstFrame
+        );
+        firstFrame = false;
+        lastPlayer = game::PlayerEvent.None;
+        lastEnemy = game::EnemyEvent.None;
+        invalidCommand = false;
+
+        command, commandError := input::read_command();
+        if !selected.clearFrames {
+            stdoutln();
+        }
+        if commandError == input::CommandError.InvalidCommand {
+            invalidCommand = true;
+            proceed;
+        }
+        if commandError != none {
+            stdoutln("Input closed.");
+            quitResult := state.apply(game::Command.Quit);
+            lastPlayer = quitResult.player;
+            proceed;
+        }
+        result := state.apply(command);
+        lastPlayer = result.player;
+        lastEnemy = result.enemy;
+    }
+
+    finalFrame, finalError := render::draw(&state);
+    if finalError == none {
+        present_frame(
+            finalFrame.view(),
+            lastPlayer,
+            lastEnemy,
+            false,
+            selected.clearFrames,
+            false
+        );
+    }
+    if state.outcome() == game::Outcome.Won {
+        stdoutln("You escaped Arrowfall!");
+    } else if state.outcome() == game::Outcome.Lost {
+        stdoutln("The goblin caught you.");
+    } else {
+        stdoutln("You leave the dungeon for another day.");
+    }
+    return 0;
+}
+
+void print_usage() {
+    stdoutln("usage: arrowfall [--no-clear] [--seed <u64>]");
+}
+
+void present_frame(
+    stringv frame,
+    game::PlayerEvent player,
+    game::EnemyEvent enemy,
+    bool invalidCommand,
+    bool clear,
+    bool first
+) {
+    clear_terminal(clear);
+    if clear or first {
+        stdoutln("ARROWFALL — reach >, survive g");
+        stdoutln(render::player_message(game::PlayerEvent.Help));
+    }
+    stdoutln(frame);
+    playerText := render::player_message(player);
+    enemyText := render::enemy_message(enemy);
+    if playerText.len() > 0 {
+        stdoutln(playerText);
+    }
+    if enemyText.len() > 0 {
+        stdoutln(enemyText);
+    }
+    if invalidCommand {
+        stdoutln("Unknown command. Type H for help. No turn spent.");
+    }
+}
+
+void clear_terminal(bool enabled) {
+    if !enabled {
+        return;
+    }
+    stdout(27.cast<u8>.cast<char>);
+    stdout("[2J");
+    stdout(27.cast<u8>.cast<char>);
+    stdout("[H");
+}

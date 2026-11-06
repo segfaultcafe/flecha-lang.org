@@ -1,0 +1,69 @@
+module options_test;
+
+@imports
+    :: root::options
+    :: lib::std::tests::asserts
+    :: lib::std::tests::testing;
+
+test seed_defaults_for_every_empty_form(&testing::UnitTest t) {
+    absentParser := options::Parser::start();
+    emptyParser := options::Parser::start();
+    emptyError := emptyParser.consume("--seed");
+    emptyError = emptyParser.consume("");
+    missingParser := options::Parser::start();
+    missingError := missingParser.consume("--seed");
+    optionParser := options::Parser::start();
+    followedError := optionParser.consume("--seed");
+    followedError = optionParser.consume("--no-clear");
+    absent := absentParser.finish();
+    empty := emptyParser.finish();
+    missing := missingParser.finish();
+    followed := optionParser.finish();
+    asserts::is_true(
+        t,
+        emptyError == none and missingError == none and followedError == none and
+            absent.seed == options::DEFAULT_SEED and
+            empty.seed == options::DEFAULT_SEED and
+            missing.seed == options::DEFAULT_SEED and
+            followed.seed == options::DEFAULT_SEED and
+            !followed.clearFrames,
+        "absent, empty, missing, or option-followed seeds use the default"
+    );
+}
+
+test seed_and_plain_mode_accept_either_order(&testing::UnitTest t) {
+    firstParser := options::Parser::start();
+    error firstError = firstParser.consume("--seed");
+    firstError = firstParser.consume("42");
+    firstError = firstParser.consume("--no-clear");
+    secondParser := options::Parser::start();
+    error secondError = secondParser.consume("--no-clear");
+    secondError = secondParser.consume("--seed");
+    secondError = secondParser.consume("42");
+    first := firstParser.finish();
+    second := secondParser.finish();
+    asserts::is_true(
+        t,
+        firstError == none and secondError == none and first.seed == 42 and
+            second.seed == 42 and !first.clearFrames and !second.clearFrames,
+        "seed and no-clear compose in either order"
+    );
+}
+
+test invalid_seed_and_unknown_option_are_rejected(&testing::UnitTest t) {
+    invalidParser := options::Parser::start();
+    invalidParser.consume("--seed");
+    invalidError := invalidParser.consume("twelve");
+    overflowParser := options::Parser::start();
+    overflowParser.consume("--seed");
+    overflowError := overflowParser.consume("18446744073709551616");
+    unknownParser := options::Parser::start();
+    unknownError := unknownParser.consume("--wat");
+    asserts::is_true(
+        t,
+        invalidError == options::OptionError.InvalidSeed and
+            overflowError == options::OptionError.InvalidSeed and
+            unknownError == options::OptionError.InvalidOption,
+        "non-decimal, out-of-range, and unknown options fail explicitly"
+    );
+}

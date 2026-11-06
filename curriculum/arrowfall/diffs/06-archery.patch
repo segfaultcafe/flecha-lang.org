@@ -1,0 +1,402 @@
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/README.md tutorial/checkpoints/06-archery/README.md
+--- tutorial/checkpoints/05-goblin/README.md
++++ tutorial/checkpoints/06-archery/README.md
+@@ -1 +1 @@
+-# 05 — A turn now has consequences
++# 06 — The archer earns the name
+@@ -5,2 +5 @@
+-Checkpoint 04 has meaningful walls and an exit, but the room is safe and the
+-shortest path is automatic.
++Checkpoint 05 adds pressure and fair warning, but the only response is to run.
+@@ -10,2 +9,2 @@
+-Without pressure there is no reason to weigh one movement against another. A
+-single pursuer makes the turn model visible before combat adds another action.
++An archer should trade a scarce resource for safety. The existing map already
++makes direction and line of sight meaningful.
+@@ -15,4 +14,4 @@
+-A goblin takes one response after each effective player turn. First adjacency
+-only warns. If the player begins the next action adjacent and fails to escape,
+-the goblin deals one HP; safe no-ops remain free. `TurnResult` carries player
+-and enemy events so rules are observable instead of inferred by the CLI.
++I/J/K/L shoots up/left/down/right. A shot consumes one of three arrows, walks
++cell by cell until a wall, and kills the goblin if the line crosses it. Hit,
++miss, and empty-quiver outcomes are distinct; twin control diamonds make both
++directional action families visible.
+@@ -27,0 +27 @@
++- `src/input_test.fl`
+@@ -35 +35 @@
+-Exact changes: `../../diffs/05-goblin.patch`.
++Exact changes: `../../diffs/06-archery.patch`.
+@@ -40,4 +40,4 @@
+-longbow check tutorial/checkpoints/05-goblin
+-longbow test tutorial/checkpoints/05-goblin
+-longbow build tutorial/checkpoints/05-goblin
+-longbow run tutorial/checkpoints/05-goblin < tutorial/checkpoints/05-goblin/tests/input.txt
++longbow check tutorial/checkpoints/06-archery
++longbow test tutorial/checkpoints/06-archery
++longbow build tutorial/checkpoints/06-archery
++longbow run tutorial/checkpoints/06-archery < tutorial/checkpoints/06-archery/tests/input.txt
+@@ -52 +52,2 @@
+-5. **A turn has consequences** — pursuit, warning, HP, defeat, events.
++5. A goblin creates turns, threat, and defeat.
++6. **The archer earns the name** — IJKL, arrows, line of sight, combat win.
+@@ -56,2 +57,2 @@
+-The first adjacent frame must show a warning at 3 HP. Only a later failed
+-response may show `-1 HP`; the goblin must never move and attack together.
++The recorded `S S L S S` run must kill the goblin on turn 3 and reach the exit
++on turn 5 with 3 HP and 2 arrows. An upward shot from start must miss.
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/longbow.lock tutorial/checkpoints/06-archery/longbow.lock
+--- tutorial/checkpoints/05-goblin/longbow.lock
++++ tutorial/checkpoints/06-archery/longbow.lock
+@@ -7 +7 @@
+-      "identity": "local/arrowfall_step_05",
++      "identity": "local/arrowfall_step_06",
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/longbow.toml tutorial/checkpoints/06-archery/longbow.toml
+--- tutorial/checkpoints/05-goblin/longbow.toml
++++ tutorial/checkpoints/06-archery/longbow.toml
+@@ -2 +2 @@
+-name = "arrowfall-step-05"
++name = "arrowfall-step-06"
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/src/game.fl tutorial/checkpoints/06-archery/src/game.fl
+--- tutorial/checkpoints/05-goblin/src/game.fl
++++ tutorial/checkpoints/06-archery/src/game.fl
+@@ -17,0 +18,4 @@
++    ShootUp,
++    ShootLeft,
++    ShootDown,
++    ShootRight,
+@@ -33,0 +38,3 @@
++    ShotHit,
++    ShotMiss,
++    NoArrows,
+@@ -59,0 +67 @@
++    private bool goblinAlive;
+@@ -60,0 +69 @@
++    private u32 arrowCount;
+@@ -101,0 +111 @@
++        self.goblinAlive = true;
+@@ -102,0 +113 @@
++        self.arrowCount = 3;
+@@ -116,10 +127,11 @@
+-    const bool DANGER_BEFORE = adjacent(self->goblin, self->player);
+-    next := self->player.moved(command_direction(command));
+-    if tile_at(next) == '#' {
+-        if !DANGER_BEFORE {
+-            return TurnResult::make(PlayerEvent.Wall);
+-        }
+-        self->turnCount++;
+-        return TurnResult::make(PlayerEvent.Wall, self->goblinTurn(true), true);
+-    }
+-    if next.equals(&self->goblin) {
++    const bool DANGER_BEFORE = self->goblinAlive and
++        adjacent(self->goblin, self->player);
++    PlayerEvent action = PlayerEvent.None;
++    if is_shot(command) {
++        action = self->shoot(command_direction(command));
++    } else {
++        action = self->movePlayer(command_direction(command));
++    }
++    if action == PlayerEvent.Wall or
++        action == PlayerEvent.GoblinBlocks or
++        action == PlayerEvent.NoArrows {
+@@ -127 +139 @@
+-            return TurnResult::make(PlayerEvent.GoblinBlocks);
++            return TurnResult::make(action);
+@@ -131 +143 @@
+-            PlayerEvent.GoblinBlocks,
++            action,
+@@ -136 +147,0 @@
+-    self->player = next;
+@@ -143 +154 @@
+-        PlayerEvent.Moved,
++        action,
+@@ -148,0 +160,28 @@
++private PlayerEvent Game::movePlayer(&self, Direction direction) {
++    next := self->player.moved(direction);
++    if tile_at(next) == '#' {
++        return PlayerEvent.Wall;
++    }
++    if self->goblinAlive and next.equals(&self->goblin) {
++        return PlayerEvent.GoblinBlocks;
++    }
++    self->player = next;
++    return PlayerEvent.Moved;
++}
++
++private PlayerEvent Game::shoot(&self, Direction direction) {
++    if self->arrowCount == 0 {
++        return PlayerEvent.NoArrows;
++    }
++    self->arrowCount--;
++    cursor := self->player.moved(direction);
++    while tile_at(cursor) != '#' {
++        if self->goblinAlive and cursor.equals(&self->goblin) {
++            self->goblinAlive = false;
++            return PlayerEvent.ShotHit;
++        }
++        cursor = cursor.moved(direction);
++    }
++    return PlayerEvent.ShotMiss;
++}
++
+@@ -149,0 +189,3 @@
++    if !self->goblinAlive {
++        return EnemyEvent.None;
++    }
+@@ -205,0 +248,4 @@
++bool Game::isGoblinAlive(&const self) {
++    return self->goblinAlive;
++}
++
+@@ -209,0 +256,4 @@
++u32 Game::arrows(&const self) {
++    return self->arrowCount;
++}
++
+@@ -244,0 +295,4 @@
++        Command.ShootUp => Direction.Up,
++        Command.ShootLeft => Direction.Left,
++        Command.ShootDown => Direction.Down,
++        Command.ShootRight => Direction.Right,
+@@ -247,0 +302,5 @@
++}
++
++bool is_shot(Command command) {
++    return command == Command.ShootUp or command == Command.ShootLeft or
++        command == Command.ShootDown or command == Command.ShootRight;
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/src/input.fl tutorial/checkpoints/06-archery/src/input.fl
+--- tutorial/checkpoints/05-goblin/src/input.fl
++++ tutorial/checkpoints/06-archery/src/input.fl
+@@ -9,7 +9,2 @@
+-export (game::Command, error) read_command() {
+-    string line;
+-    inputError := stdin("command>", &line);
+-    if inputError != none {
+-        return (game::Command.Quit, none);
+-    }
+-    value := strings::trim_ascii(line.view());
++export (game::Command, error) parse(stringv text) {
++    value := strings::trim_ascii(text);
+@@ -31,0 +27,12 @@
++    if KEY == 'i' {
++        return (game::Command.ShootUp, none);
++    }
++    if KEY == 'j' {
++        return (game::Command.ShootLeft, none);
++    }
++    if KEY == 'k' {
++        return (game::Command.ShootDown, none);
++    }
++    if KEY == 'l' {
++        return (game::Command.ShootRight, none);
++    }
+@@ -38,0 +46,9 @@
++}
++
++export (game::Command, error) read_command() {
++    string line;
++    inputError := stdin("command>", &line);
++    if inputError != none {
++        return (game::Command.Quit, none);
++    }
++    return parse(line.view());
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/src/input_test.fl tutorial/checkpoints/06-archery/src/input_test.fl
+--- tutorial/checkpoints/05-goblin/src/input_test.fl
++++ tutorial/checkpoints/06-archery/src/input_test.fl
+@@ -0,0 +1,18 @@
++module input_test;
++
++@imports
++    :: root::game
++    :: root::input
++    :: lib::std::tests::asserts
++    :: lib::std::tests::testing;
++
++test direct_key_diamonds_parse(&testing::UnitTest t) {
++    move, moveError := input::parse("W");
++    shot, shotError := input::parse("l");
++    asserts::is_true(
++        t,
++        moveError == none and move == game::Command.MoveUp and
++            shotError == none and shot == game::Command.ShootRight,
++        "WASD moves and IJKL shoots after one lowercase normalization"
++    );
++}
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/src/render.fl tutorial/checkpoints/06-archery/src/render.fl
+--- tutorial/checkpoints/05-goblin/src/render.fl
++++ tutorial/checkpoints/06-archery/src/render.fl
+@@ -18 +18 @@
+-            } else if position.equals(&goblin) {
++            } else if state->isGoblinAlive() and position.equals(&goblin) {
+@@ -30,0 +31,2 @@
++        canvas.append("  Arrows: ") != none or
++        canvas.appendInteger(state->arrows()) != none or
+@@ -44,0 +47,9 @@
++    if event == game::PlayerEvent.ShotHit {
++        return "Your arrow hits! The goblin falls.";
++    }
++    if event == game::PlayerEvent.ShotMiss {
++        return "Your arrow misses; a wall stops it.";
++    }
++    if event == game::PlayerEvent.NoArrows {
++        return "Your quiver is empty.";
++    }
+@@ -46 +57 @@
+-        return "Move: W/A/S/D | H help | Q quit";
++        return "Move       Shoot\n  W          I\nA S D      J K L\nH help | Q quit";
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/tests/frame.svg tutorial/checkpoints/06-archery/tests/frame.svg
+--- tutorial/checkpoints/05-goblin/tests/frame.svg
++++ tutorial/checkpoints/06-archery/tests/frame.svg
+@@ -3 +3 @@
+-  <title>05-goblin representative frame</title>
++  <title>06-archery representative frame</title>
+@@ -8,2 +8,2 @@
+-  <text x="24" y="75" class="terminal">#@.###..#</text>
+-  <text x="24" y="94" class="terminal">#g......#</text>
++  <text x="24" y="75" class="terminal">#..###..#</text>
++  <text x="24" y="94" class="terminal">#.......#</text>
+@@ -11 +11 @@
+-  <text x="24" y="132" class="terminal">#&gt;......#</text>
++  <text x="24" y="132" class="terminal">#@......#</text>
+@@ -13 +13 @@
+-  <text x="24" y="170" class="terminal">HP: 0  Turn: 10</text>
++  <text x="24" y="170" class="terminal">HP: 3  Arrows: 2  Turn: 5</text>
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/tests/frame.txt tutorial/checkpoints/06-archery/tests/frame.txt
+--- tutorial/checkpoints/05-goblin/tests/frame.txt
++++ tutorial/checkpoints/06-archery/tests/frame.txt
+@@ -3,2 +2,0 @@
+-#@.###..#
+-#g......#
+@@ -6 +4,3 @@
+-#>......#
++#.......#
++#..###..#
++#@......#
+@@ -8 +8 @@
+-HP: 0  Turn: 10
++HP: 3  Arrows: 2  Turn: 5
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/tests/input.txt tutorial/checkpoints/06-archery/tests/input.txt
+--- tutorial/checkpoints/05-goblin/tests/input.txt
++++ tutorial/checkpoints/06-archery/tests/input.txt
+@@ -1,6 +0,0 @@
+-d
+-a
+-d
+-a
+-d
+-a
+@@ -8,0 +3 @@
++l
+diff -rN -U0 --exclude target tutorial/checkpoints/05-goblin/tests/output.txt tutorial/checkpoints/06-archery/tests/output.txt
+--- tutorial/checkpoints/05-goblin/tests/output.txt
++++ tutorial/checkpoints/06-archery/tests/output.txt
+@@ -8 +8 @@
+-HP: 3  Turn: 0
++HP: 3  Arrows: 3  Turn: 0
+@@ -13,2 +13,2 @@
+-#.@.....#
+-#..###..#
++#.......#
++#@.###..#
+@@ -19,12 +19 @@
+-HP: 3  Turn: 1
+-command>
+-You move.
+-The goblin moves closer.
+-#########
+-#@......#
+-#..###..#
+-#....g..#
+-#..###..#
+-#>......#
+-#########
+-HP: 3  Turn: 2
++HP: 3  Arrows: 3  Turn: 1
+@@ -35,12 +24 @@
+-#.@.....#
+-#..###..#
+-#...g...#
+-#..###..#
+-#>......#
+-#########
+-HP: 3  Turn: 3
+-command>
+-You move.
+-The goblin moves closer.
+-#########
+-#@......#
++#.......#
+@@ -48 +26 @@
+-#..g....#
++#@...g..#
+@@ -52 +30 @@
+-HP: 3  Turn: 4
++HP: 3  Arrows: 3  Turn: 2
+@@ -54,2 +32 @@
+-You move.
+-The goblin moves closer.
++Your arrow hits! The goblin falls.
+@@ -57,3 +34 @@
+-#.@.....#
+-#..###..#
+-#.g.....#
++#.......#
+@@ -61,7 +35,0 @@
+-#>......#
+-#########
+-HP: 3  Turn: 5
+-command>
+-You move.
+-The goblin moves closer.
+-#########
+@@ -70,2 +37,0 @@
+-#g......#
+-#..###..#
+@@ -74 +40 @@
+-HP: 3  Turn: 6
++HP: 3  Arrows: 2  Turn: 3
+@@ -77 +42,0 @@
+-The goblin closes in! Move before its next turn.
+@@ -80,2 +44,0 @@
+-#@.###..#
+-#g......#
+@@ -83,7 +45,0 @@
+-#>......#
+-#########
+-HP: 3  Turn: 7
+-command>
+-The goblin blocks that tile.
+-The goblin attacks: -1 HP.
+-#########
+@@ -92,2 +47,0 @@
+-#g......#
+-#..###..#
+@@ -96 +50 @@
+-HP: 2  Turn: 8
++HP: 3  Arrows: 2  Turn: 4
+@@ -98,2 +52 @@
+-The goblin blocks that tile.
+-The goblin attacks: -1 HP.
++You reach the exit.
+@@ -102,2 +54,0 @@
+-#@.###..#
+-#g......#
+@@ -105,7 +55,0 @@
+-#>......#
+-#########
+-HP: 1  Turn: 9
+-command>
+-The goblin blocks that tile.
+-The goblin attacks: -1 HP.
+-#########
+@@ -113,2 +56,0 @@
+-#@.###..#
+-#g......#
+@@ -116 +58 @@
+-#>......#
++#@......#
+@@ -118,2 +60,2 @@
+-HP: 0  Turn: 10
+-The goblin caught you.
++HP: 3  Arrows: 2  Turn: 5
++You escaped Arrowfall!

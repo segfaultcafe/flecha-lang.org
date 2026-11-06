@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "root": "root",
+  "packages": [
+    {
+      "id": "root",
+      "identity": "local/arrowfall_step_03",
+      "source": {
+        "kind": "workspace",
+        "path": "."
+      },
+      "version": "0.1.0",
+      "flecha": ">=0.3.0, <0.4.0",
+      "dependencies": {
+        "std": "toolchain-std"
+      }
+    },
+    {
+      "id": "toolchain-std",
+      "identity": "flecha/std",
+      "source": {
+        "kind": "toolchain"
+      },
+      "dependencies": {}
+    }
+  ]
+}
