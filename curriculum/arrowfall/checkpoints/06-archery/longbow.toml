@@ -1,0 +1,7 @@
+[package]
+name = "arrowfall-step-06"
+version = "0.1.0"
+kind = "program"
+flecha = ">=0.3.0, <0.4.0"
+
+[dependencies]

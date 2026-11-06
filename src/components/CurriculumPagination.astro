@@ -1,24 +1,29 @@
 ---
 import { curriculumLessons, curriculumPath, findCurriculumLesson } from '../data/curriculum.mjs';
+import { arrowfallLessons, arrowfallPath, findArrowfallLesson } from '../data/arrowfall.mjs';
 
 const locale = Astro.url.pathname.startsWith('/pt-br/') ? 'pt-br' : 'en';
-const current = findCurriculumLesson(Astro.url.pathname);
-const currentIndex = current ? curriculumLessons.findIndex((lesson) => lesson.slug === current.slug) : -1;
-const previous = currentIndex > 0 ? curriculumLessons[currentIndex - 1] : undefined;
-const next = currentIndex >= 0 && currentIndex < curriculumLessons.length - 1 ? curriculumLessons[currentIndex + 1] : undefined;
-const title = (lesson: (typeof curriculumLessons)[number]) => locale === 'pt-br' ? lesson.titlePt : lesson.title;
+const curriculumCurrent = findCurriculumLesson(Astro.url.pathname);
+const arrowfallCurrent = findArrowfallLesson(Astro.url.pathname);
+const series = arrowfallCurrent ? arrowfallLessons : curriculumLessons;
+const current = arrowfallCurrent ?? curriculumCurrent;
+const currentIndex = current ? series.findIndex((lesson) => lesson.slug === current.slug) : -1;
+const previous = currentIndex > 0 ? series[currentIndex - 1] : undefined;
+const next = currentIndex >= 0 && currentIndex < series.length - 1 ? series[currentIndex + 1] : undefined;
+const path = (slug: string) => arrowfallCurrent ? arrowfallPath(slug, locale) : curriculumPath(slug, locale);
+const title = (lesson: (typeof series)[number]) => locale === 'pt-br' ? lesson.titlePt : lesson.title;
 ---
 
 {current && (
-	<div class="curriculum-pagination print:hidden" data-curriculum-pagination data-track={current.track}>
+	<div class="curriculum-pagination print:hidden" data-curriculum-pagination data-series={arrowfallCurrent ? 'arrowfall' : 'main'} data-track={'track' in current ? current.track : undefined}>
 		{previous && (
-			<a href={curriculumPath(previous.slug, locale)} rel="prev">
+			<a href={path(previous.slug)} rel="prev">
 				<span class="direction">{locale === 'pt-br' ? 'Anterior' : 'Previous'}</span>
 				<span class="link-title">← {title(previous)}</span>
 			</a>
 		)}
 		{next && (
-			<a href={curriculumPath(next.slug, locale)} rel="next">
+			<a href={path(next.slug)} rel="next">
 				<span class="direction">{locale === 'pt-br' ? 'Próximo' : 'Next'}</span>
 				<span class="link-title">{title(next)} →</span>
 			</a>

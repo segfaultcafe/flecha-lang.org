@@ -1,0 +1,21 @@
+module game_test;
+
+@imports
+    :: root::game
+    :: lib::std::tests::asserts
+    :: lib::std::tests::testing;
+
+test walls_are_free_and_the_exit_wins(&testing::UnitTest t) {
+    state := game::Game::start();
+    wall := state.apply(game::Command.MoveUp);
+    state.apply(game::Command.MoveDown);
+    state.apply(game::Command.MoveDown);
+    state.apply(game::Command.MoveDown);
+    won := state.apply(game::Command.MoveDown);
+    asserts::is_true(
+        t,
+        wall == game::Event.Wall and won == game::Event.Won and
+            state.turn() == 4 and state.outcome() == game::Outcome.Won,
+        "walls are free while entering the exit wins"
+    );
+}

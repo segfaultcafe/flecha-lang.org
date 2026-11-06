@@ -1,0 +1,133 @@
+module game;
+
+const i32 WIDTH = 9;
+const i32 HEIGHT = 7;
+
+export enum Direction {
+    default Up,
+    Left,
+    Down,
+    Right
+}
+
+export enum Command {
+    default MoveUp,
+    MoveLeft,
+    MoveDown,
+    MoveRight,
+    Quit
+}
+
+export enum Outcome {
+    default Playing,
+    Won,
+    Quit
+}
+
+export enum Event {
+    default Moved,
+    Wall,
+    Won,
+    Quit
+}
+
+export structure Position {
+    i32 x;
+    i32 y;
+};
+
+export structure Game {
+    private Position player;
+    private u32 turnCount;
+    private Outcome gameOutcome;
+};
+
+Position Position::at(i32 x, i32 y) {
+    return build Position {
+        self.x = x;
+        self.y = y;
+    };
+}
+
+bool Position::equals(&const self, &const Position other) {
+    return self->x == other->x and self->y == other->y;
+}
+
+Position Position::moved(&const self, Direction direction) {
+    Position delta = match direction {
+        Direction.Up => Position::at(0, -1),
+        Direction.Left => Position::at(-1, 0),
+        Direction.Down => Position::at(0, 1),
+        Direction.Right => Position::at(1, 0),
+    };
+    return Position::at(self->x + delta.x, self->y + delta.y);
+}
+
+Game Game::start() {
+    return build Game {
+        self.player = Position::at(1, 1);
+        self.turnCount = 0;
+        self.gameOutcome = Outcome.Playing;
+    };
+}
+
+Event Game::apply(&self, Command command) {
+    if command == Command.Quit {
+        self->gameOutcome = Outcome.Quit;
+        return Event.Quit;
+    }
+    next := self->player.moved(command_direction(command));
+    if tile_at(next) == '#' {
+        return Event.Wall;
+    }
+    self->player = next;
+    self->turnCount++;
+    if tile_at(self->player) == '>' {
+        self->gameOutcome = Outcome.Won;
+        return Event.Won;
+    }
+    return Event.Moved;
+}
+
+Position Game::playerPosition(&const self) {
+    return self->player;
+}
+
+u32 Game::turn(&const self) {
+    return self->turnCount;
+}
+
+Outcome Game::outcome(&const self) {
+    return self->gameOutcome;
+}
+
+export char tile_at(Position position) {
+    [63]char tiles = [
+        '#','#','#','#','#','#','#','#','#',
+        '#','.','.','.','.','.','.','.','#',
+        '#','.','.','#','#','#','.','.','#',
+        '#','.','.','.','.','.','.','.','#',
+        '#','.','.','#','#','#','.','.','#',
+        '#','>','.','.','.','.','.','.','#',
+        '#','#','#','#','#','#','#','#','#'
+    ];
+    return tile_from_cells(tiles[:], position);
+}
+
+char tile_from_cells([]const char tiles, Position position) {
+    if position.x < 0 or position.x >= WIDTH or
+        position.y < 0 or position.y >= HEIGHT {
+        return '#';
+    }
+    return tiles[(position.y * WIDTH + position.x).cast<usize>];
+}
+
+Direction command_direction(Command command) {
+    return match command {
+        Command.MoveUp => Direction.Up,
+        Command.MoveLeft => Direction.Left,
+        Command.MoveDown => Direction.Down,
+        Command.MoveRight => Direction.Right,
+        Command.Quit => Direction.Up,
+    };
+}

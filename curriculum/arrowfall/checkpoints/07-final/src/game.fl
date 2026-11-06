@@ -1,0 +1,336 @@
+module game;
+
+@imports :: lib::std::random::generator;
+
+const i32 WIDTH = 9;
+const i32 HEIGHT = 7;
+
+export enum Direction {
+    default Up,
+    Left,
+    Down,
+    Right
+}
+
+export enum Command {
+    default MoveUp,
+    MoveLeft,
+    MoveDown,
+    MoveRight,
+    ShootUp,
+    ShootLeft,
+    ShootDown,
+    ShootRight,
+    Help,
+    Quit
+}
+
+export enum Outcome {
+    default Playing,
+    Won,
+    Lost,
+    Quit
+}
+
+export enum PlayerEvent {
+    default None,
+    Moved,
+    Wall,
+    GoblinBlocks,
+    ShotHit,
+    ShotMiss,
+    NoArrows,
+    Help,
+    Quit,
+    Won
+}
+
+export enum EnemyEvent {
+    default None,
+    Moved,
+    Threatened,
+    Attacked
+}
+
+export structure Position {
+    i32 x;
+    i32 y;
+};
+
+export structure TurnResult {
+    PlayerEvent player;
+    EnemyEvent enemy;
+    bool spentTurn;
+};
+
+Position Position::at(i32 x, i32 y) {
+    return build Position {
+        self.x = x;
+        self.y = y;
+    };
+}
+
+bool Position::equals(&const self, &const Position other) {
+    return self->x == other->x and self->y == other->y;
+}
+
+Position Position::moved(&const self, Direction direction) {
+    Position delta = match direction {
+        Direction.Up => Position::at(0, -1),
+        Direction.Left => Position::at(-1, 0),
+        Direction.Down => Position::at(0, 1),
+        Direction.Right => Position::at(1, 0),
+    };
+    return Position::at(self->x + delta.x, self->y + delta.y);
+}
+
+TurnResult TurnResult::make(
+    PlayerEvent player,
+    EnemyEvent enemy = EnemyEvent.None,
+    bool spentTurn = false
+) {
+    return build TurnResult {
+        self.player = player;
+        self.enemy = enemy;
+        self.spentTurn = spentTurn;
+    };
+}
+
+export structure Game {
+    private Position player;
+    private Position goblin;
+    private bool goblinAlive;
+    private i32 playerHealth;
+    private u32 arrowCount;
+    private u32 turnCount;
+    private u64 sourceSeed;
+    private Outcome gameOutcome;
+    private generator::Generator random;
+};
+
+Game Game::start(u64 seed) {
+    return build Game {
+        self.player = Position::at(1, 1);
+        self.goblin = Position::at(7, 3);
+        self.goblinAlive = true;
+        self.playerHealth = 3;
+        self.arrowCount = 3;
+        self.turnCount = 0;
+        self.sourceSeed = seed;
+        self.gameOutcome = Outcome.Playing;
+        self.random = generator::Generator::fromSeed(seed);
+    };
+}
+
+TurnResult Game::apply(&self, Command command) {
+    if self->gameOutcome != Outcome.Playing {
+        return TurnResult::make(PlayerEvent.None);
+    }
+    if command == Command.Help {
+        return TurnResult::make(PlayerEvent.Help);
+    }
+    if command == Command.Quit {
+        self->gameOutcome = Outcome.Quit;
+        return TurnResult::make(PlayerEvent.Quit);
+    }
+
+    const bool DANGER_BEFORE = self->goblinAlive and
+        adjacent(self->goblin, self->player);
+    PlayerEvent action = PlayerEvent.None;
+    if is_shot(command) {
+        action = self->shoot(command_direction(command));
+    } else {
+        action = self->movePlayer(command_direction(command));
+    }
+    if action == PlayerEvent.Wall or
+        action == PlayerEvent.GoblinBlocks or
+        action == PlayerEvent.NoArrows {
+        if !DANGER_BEFORE {
+            return TurnResult::make(action);
+        }
+        self->turnCount++;
+        return TurnResult::make(action, self->goblinTurn(true), true);
+    }
+
+    self->turnCount++;
+    if tile_at(self->player) == '>' {
+        self->gameOutcome = Outcome.Won;
+        return TurnResult::make(PlayerEvent.Won, EnemyEvent.None, true);
+    }
+    return TurnResult::make(
+        action,
+        self->goblinTurn(DANGER_BEFORE),
+        true
+    );
+}
+
+private PlayerEvent Game::movePlayer(&self, Direction direction) {
+    next := self->player.moved(direction);
+    if !walkable(next) {
+        return PlayerEvent.Wall;
+    }
+    if self->goblinAlive and next.equals(&self->goblin) {
+        return PlayerEvent.GoblinBlocks;
+    }
+    self->player = next;
+    return PlayerEvent.Moved;
+}
+
+private PlayerEvent Game::shoot(&self, Direction direction) {
+    if self->arrowCount == 0 {
+        return PlayerEvent.NoArrows;
+    }
+    self->arrowCount--;
+    cursor := self->player.moved(direction);
+    while tile_at(cursor) != '#' {
+        if self->goblinAlive and cursor.equals(&self->goblin) {
+            self->goblinAlive = false;
+            return PlayerEvent.ShotHit;
+        }
+        cursor = cursor.moved(direction);
+    }
+    return PlayerEvent.ShotMiss;
+}
+
+private EnemyEvent Game::goblinTurn(&self, bool canAttack) {
+    if !self->goblinAlive {
+        return EnemyEvent.None;
+    }
+    if canAttack and adjacent(self->goblin, self->player) {
+        self->playerHealth--;
+        if self->playerHealth == 0 {
+            self->gameOutcome = Outcome.Lost;
+        }
+        return EnemyEvent.Attacked;
+    }
+    if adjacent(self->goblin, self->player) {
+        return EnemyEvent.Threatened;
+    }
+
+    const i32 DX = self->player.x - self->goblin.x;
+    const i32 DY = self->player.y - self->goblin.y;
+    Direction horizontal = Direction.Right;
+    Direction vertical = Direction.Down;
+    if DX < 0 {
+        horizontal = Direction.Left;
+    }
+    if DY < 0 {
+        vertical = Direction.Up;
+    }
+    if DX != 0 and DY != 0 and self->random.boolean() {
+        first := horizontal;
+        horizontal = vertical;
+        vertical = first;
+    }
+
+    bool moved = false;
+    if DX != 0 {
+        moved = self->tryGoblinStep(horizontal);
+    }
+    if !moved and DY != 0 {
+        moved = self->tryGoblinStep(vertical);
+    }
+    if moved and adjacent(self->goblin, self->player) {
+        return EnemyEvent.Threatened;
+    }
+    if moved {
+        return EnemyEvent.Moved;
+    }
+    return EnemyEvent.None;
+}
+
+private bool Game::tryGoblinStep(&self, Direction direction) {
+    next := self->goblin.moved(direction);
+    if next.equals(&self->player) {
+        return false;
+    }
+    if walkable(next) and tile_at(next) != '>' {
+        self->goblin = next;
+        return true;
+    }
+    return false;
+}
+
+Position Game::playerPosition(&const self) {
+    return self->player;
+}
+
+Position Game::goblinPosition(&const self) {
+    return self->goblin;
+}
+
+bool Game::isGoblinAlive(&const self) {
+    return self->goblinAlive;
+}
+
+i32 Game::health(&const self) {
+    return self->playerHealth;
+}
+
+u32 Game::arrows(&const self) {
+    return self->arrowCount;
+}
+
+u32 Game::turn(&const self) {
+    return self->turnCount;
+}
+
+u64 Game::seed(&const self) {
+    return self->sourceSeed;
+}
+
+Outcome Game::outcome(&const self) {
+    return self->gameOutcome;
+}
+
+export char tile_at(Position position) {
+    [63]char tiles = [
+        '#','#','#','#','#','#','#','#','#',
+        '#','.','.','.','.','.','.','.','#',
+        '#','.','.','#','#','#','.','.','#',
+        '#','.','.','.','.','.','.','.','#',
+        '#','.','.','#','#','#','.','.','#',
+        '#','>','.','.','.','.','.','.','#',
+        '#','#','#','#','#','#','#','#','#'
+    ];
+    return tile_from_cells(tiles[:], position);
+}
+
+char tile_from_cells([]const char tiles, Position position) {
+    if position.x < 0 or position.x >= WIDTH or
+        position.y < 0 or position.y >= HEIGHT {
+        return '#';
+    }
+    return tiles[(position.y * WIDTH + position.x).cast<usize>];
+}
+
+bool walkable(Position position) {
+    return tile_at(position) != '#';
+}
+
+bool adjacent(Position left, Position right) {
+    const i32 DX = left.x - right.x;
+    const i32 DY = left.y - right.y;
+    return (DX == 0 and (DY == 1 or DY == -1)) or
+        (DY == 0 and (DX == 1 or DX == -1));
+}
+
+bool is_shot(Command command) {
+    return command == Command.ShootUp or command == Command.ShootLeft or
+        command == Command.ShootDown or command == Command.ShootRight;
+}
+
+Direction command_direction(Command command) {
+    return match command {
+        Command.MoveUp => Direction.Up,
+        Command.MoveLeft => Direction.Left,
+        Command.MoveDown => Direction.Down,
+        Command.MoveRight => Direction.Right,
+        Command.ShootUp => Direction.Up,
+        Command.ShootLeft => Direction.Left,
+        Command.ShootDown => Direction.Down,
+        Command.ShootRight => Direction.Right,
+        Command.Help => Direction.Up,
+        Command.Quit => Direction.Up,
+    };
+}

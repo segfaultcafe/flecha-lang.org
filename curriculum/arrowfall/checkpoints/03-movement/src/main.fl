@@ -1,0 +1,116 @@
+module main;
+
+@imports :: lib::std::text::{ascii, strings};
+
+enum Command {
+    default Up,
+    Left,
+    Down,
+    Right,
+    Quit
+}
+
+error CommandError {
+    InvalidCommand
+}
+
+structure Position {
+    i32 x;
+    i32 y;
+};
+
+structure Game {
+    private Position player;
+};
+
+Position Position::at(i32 x, i32 y) {
+    return build Position {
+        self.x = x;
+        self.y = y;
+    };
+}
+
+Game Game::start() {
+    return build Game {
+        self.player = Position::at(1, 1);
+    };
+}
+
+void Game::apply(&self, Command command) {
+    if command == Command.Up and self->player.y > 0 {
+        self->player.y--;
+    } else if command == Command.Left and self->player.x > 0 {
+        self->player.x--;
+    } else if command == Command.Down and self->player.y < 2 {
+        self->player.y++;
+    } else if command == Command.Right and self->player.x < 4 {
+        self->player.x++;
+    }
+}
+
+Position Game::playerPosition(&const self) {
+    return self->player;
+}
+
+void main() {
+    state := Game::start();
+    bool running = true;
+    while running {
+        draw(&state);
+        command, commandError := read_command();
+        if commandError != none {
+            stdoutln("Unknown command; use W/A/S/D or Q.");
+            proceed;
+        }
+        if command == Command.Quit {
+            running = false;
+        } else {
+            state.apply(command);
+        }
+    }
+    stdoutln("Run ended.");
+}
+
+void draw(&const Game state) {
+    player := state->playerPosition();
+    stdoutln("ARROWFALL — open training floor");
+    loop i32 y = 0; y < 3; y++ {
+        loop i32 x = 0; x < 5; x++ {
+            if player.x == x and player.y == y {
+                stdout("@");
+            } else {
+                stdout(".");
+            }
+        }
+        stdoutln();
+    }
+}
+
+(Command, error) read_command() {
+    string line;
+    inputError := stdin("command>", &line);
+    if inputError != none {
+        return (Command.Quit, none);
+    }
+    value := strings::trim_ascii(line.view());
+    if value.len() != 1 {
+        return (none, CommandError.InvalidCommand);
+    }
+    const char KEY = ascii::to_ascii_lowercase(value[0].cast<char>);
+    if KEY == 'w' {
+        return (Command.Up, none);
+    }
+    if KEY == 'a' {
+        return (Command.Left, none);
+    }
+    if KEY == 's' {
+        return (Command.Down, none);
+    }
+    if KEY == 'd' {
+        return (Command.Right, none);
+    }
+    if KEY == 'q' {
+        return (Command.Quit, none);
+    }
+    return (none, CommandError.InvalidCommand);
+}

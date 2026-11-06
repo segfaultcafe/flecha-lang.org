@@ -1,0 +1,55 @@
+module input;
+
+@imports :: root::game :: lib::std::text::{ascii, strings};
+
+export error CommandError {
+    InvalidCommand
+}
+
+export (game::Command, error) parse(stringv text) {
+    value := strings::trim_ascii(text);
+    if value.len() != 1 {
+        return (none, CommandError.InvalidCommand);
+    }
+    const char KEY = ascii::to_ascii_lowercase(value[0].cast<char>);
+    if KEY == 'w' {
+        return (game::Command.MoveUp, none);
+    }
+    if KEY == 'a' {
+        return (game::Command.MoveLeft, none);
+    }
+    if KEY == 's' {
+        return (game::Command.MoveDown, none);
+    }
+    if KEY == 'd' {
+        return (game::Command.MoveRight, none);
+    }
+    if KEY == 'i' {
+        return (game::Command.ShootUp, none);
+    }
+    if KEY == 'j' {
+        return (game::Command.ShootLeft, none);
+    }
+    if KEY == 'k' {
+        return (game::Command.ShootDown, none);
+    }
+    if KEY == 'l' {
+        return (game::Command.ShootRight, none);
+    }
+    if KEY == 'h' {
+        return (game::Command.Help, none);
+    }
+    if KEY == 'q' {
+        return (game::Command.Quit, none);
+    }
+    return (none, CommandError.InvalidCommand);
+}
+
+export (game::Command, error) read_command() {
+    string line;
+    inputError := stdin("command>", &line);
+    if inputError != none {
+        return (game::Command.Quit, none);
+    }
+    return parse(line.view());
+}

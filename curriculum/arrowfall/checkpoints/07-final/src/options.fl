@@ -1,0 +1,70 @@
+module options;
+
+@imports :: lib::std::text::strings;
+
+export const u64 DEFAULT_SEED = 20261105;
+
+export error OptionError {
+    InvalidOption,
+    InvalidSeed
+}
+
+export structure Options {
+    bool clearFrames;
+    u64 seed;
+};
+
+export structure Parser {
+    private Options selected;
+    private bool expectsSeed;
+};
+
+Options Options::defaults() {
+    return build Options {
+        self.clearFrames = true;
+        self.seed = DEFAULT_SEED;
+    };
+}
+
+Parser Parser::start() {
+    return build Parser {
+        self.selected = Options::defaults();
+        self.expectsSeed = false;
+    };
+}
+
+error Parser::consume(&self, stringv value) {
+    if self->expectsSeed and !starts_with_option(value) {
+        self->expectsSeed = false;
+        if value.len() == 0 {
+            self->selected.seed = DEFAULT_SEED;
+            return none;
+        }
+        seed, seedError := strings::stringv_to_int<u64>(value);
+        if seedError != none {
+            return OptionError.InvalidSeed;
+        }
+        self->selected.seed = seed;
+        return none;
+    }
+
+    self->expectsSeed = false;
+    if value == "--no-clear" {
+        self->selected.clearFrames = false;
+        return none;
+    }
+    if value == "--seed" {
+        self->selected.seed = DEFAULT_SEED;
+        self->expectsSeed = true;
+        return none;
+    }
+    return OptionError.InvalidOption;
+}
+
+Options Parser::finish(&const self) {
+    return self->selected;
+}
+
+bool starts_with_option(stringv value) {
+    return value.len() >= 2 and value[0] == '-' and value[1] == '-';
+}

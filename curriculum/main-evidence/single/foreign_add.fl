@@ -1,0 +1,14 @@
+foreign c {
+    #include <stdint.h>
+
+    int32_t native_add(int32_t left, int32_t right) {
+        return left + right;
+    }
+}
+
+extern i32 native_add(i32 left, i32 right);
+
+i32 main() {
+    stdoutln(native_add(20, 22));
+    return 0;
+}

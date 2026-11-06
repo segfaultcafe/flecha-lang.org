@@ -1,0 +1,130 @@
+diff -rN -U0 --exclude target tutorial/checkpoints/01-scene/README.md tutorial/checkpoints/02-state/README.md
+--- tutorial/checkpoints/01-scene/README.md
++++ tutorial/checkpoints/02-state/README.md
+@@ -1 +1 @@
+-# 01 — A room appears
++# 02 — The picture becomes state
+@@ -5 +5 @@
+-There is no previous checkpoint: we begin with an empty Flecha program.
++Checkpoint 01 prints a recognisable but hard-coded room.
+@@ -9,2 +9,2 @@
+-A terminal game first needs something recognisable on screen. Before state,
+-input, or rules, a static room gives the project a visible identity.
++Changing a character in a string cannot express movement. The player needs a
++position owned by game state, and drawing must read that position.
+@@ -14,2 +14,2 @@
+-Running the program prints Arrowfall's title and a tiny room containing the
+-player (`@`), floor (`.`), walls (`#`), and exit (`>`).
++`Game` owns a `Position`; the scene derives `@` from it and reports `(1, 1)`.
++The visible room is unchanged, but its source of truth is now data.
+@@ -28,2 +28,2 @@
+-The exact source diff is `../../diffs/01-scene.patch`. This directory contains
+-the complete current code, not a fragment.
++See `../../diffs/02-state.patch` for the exact predecessor diff. All current
++source is present in this directory.
+@@ -34,4 +34,4 @@
+-longbow check tutorial/checkpoints/01-scene
+-longbow test tutorial/checkpoints/01-scene
+-longbow build tutorial/checkpoints/01-scene
+-longbow run tutorial/checkpoints/01-scene < tutorial/checkpoints/01-scene/tests/input.txt
++longbow check tutorial/checkpoints/02-state
++longbow test tutorial/checkpoints/02-state
++longbow build tutorial/checkpoints/02-state
++longbow run tutorial/checkpoints/02-state < tutorial/checkpoints/02-state/tests/input.txt
+@@ -40,3 +39,0 @@
+-Expected stdout is `tests/output.txt`; the representative frame is
+-`tests/frame.txt` and `tests/frame.svg`.
+-
+@@ -45 +42,2 @@
+-1. **A room appears** — a static scene establishes the game's visual goal.
++1. A room appears — static terminal scene.
++2. **The picture becomes state** — structs and methods own the player position.
+@@ -49,2 +47,2 @@
+-Change one floor dot to a wall, rebuild, and verify exactly one character in
+-the frame changes. Restore it before moving on.
++Set the start position to `(2, 1)`: both `@` and the reported coordinate must
++move. Restore `(1, 1)` afterward.
+diff -rN -U0 --exclude target tutorial/checkpoints/01-scene/longbow.lock tutorial/checkpoints/02-state/longbow.lock
+--- tutorial/checkpoints/01-scene/longbow.lock
++++ tutorial/checkpoints/02-state/longbow.lock
+@@ -7 +7 @@
+-      "identity": "local/arrowfall_step_01",
++      "identity": "local/arrowfall_step_02",
+diff -rN -U0 --exclude target tutorial/checkpoints/01-scene/longbow.toml tutorial/checkpoints/02-state/longbow.toml
+--- tutorial/checkpoints/01-scene/longbow.toml
++++ tutorial/checkpoints/02-state/longbow.toml
+@@ -2 +2 @@
+-name = "arrowfall-step-01"
++name = "arrowfall-step-02"
+diff -rN -U0 --exclude target tutorial/checkpoints/01-scene/src/main.fl tutorial/checkpoints/02-state/src/main.fl
+--- tutorial/checkpoints/01-scene/src/main.fl
++++ tutorial/checkpoints/02-state/src/main.fl
+@@ -2,0 +3,26 @@
++structure Position {
++    i32 x;
++    i32 y;
++};
++
++structure Game {
++    private Position player;
++};
++
++Position Position::at(i32 x, i32 y) {
++    return build Position {
++        self.x = x;
++        self.y = y;
++    };
++}
++
++Game Game::start() {
++    return build Game {
++        self.player = Position::at(1, 1);
++    };
++}
++
++Position Game::playerPosition(&const self) {
++    return self->player;
++}
++
+@@ -3,0 +30,2 @@
++    state := Game::start();
++    player := state.playerPosition();
+@@ -6 +34 @@
+-    stdoutln("#@.>#");
++    draw_row(player);
+@@ -7,0 +36,15 @@
++    stdoutln("Player: (", player.x, ", ", player.y, ")");
++}
++
++void draw_row(Position player) {
++    stdout("#");
++    loop i32 x = 1; x < 4; x++ {
++        if player.x == x and player.y == 1 {
++            stdout("@");
++        } else if x == 3 {
++            stdout(">");
++        } else {
++            stdout(".");
++        }
++    }
++    stdoutln("#");
+diff -rN -U0 --exclude target tutorial/checkpoints/01-scene/tests/frame.svg tutorial/checkpoints/02-state/tests/frame.svg
+--- tutorial/checkpoints/01-scene/tests/frame.svg
++++ tutorial/checkpoints/02-state/tests/frame.svg
+@@ -2,2 +2,2 @@
+-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="124" viewBox="0 0 360 124" role="img">
+-  <title>01-scene representative frame</title>
++<svg xmlns="http://www.w3.org/2000/svg" width="360" height="143" viewBox="0 0 360 143" role="img">
++  <title>02-state representative frame</title>
+@@ -9,0 +10 @@
++  <text x="24" y="113" class="terminal">Player: (1, 1)</text>
+diff -rN -U0 --exclude target tutorial/checkpoints/01-scene/tests/frame.txt tutorial/checkpoints/02-state/tests/frame.txt
+--- tutorial/checkpoints/01-scene/tests/frame.txt
++++ tutorial/checkpoints/02-state/tests/frame.txt
+@@ -4,0 +5 @@
++Player: (1, 1)
+diff -rN -U0 --exclude target tutorial/checkpoints/01-scene/tests/output.txt tutorial/checkpoints/02-state/tests/output.txt
+--- tutorial/checkpoints/01-scene/tests/output.txt
++++ tutorial/checkpoints/02-state/tests/output.txt
+@@ -4,0 +5 @@
++Player: (1, 1)

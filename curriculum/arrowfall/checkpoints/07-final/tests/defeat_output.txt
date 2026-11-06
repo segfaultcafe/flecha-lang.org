@@ -1,0 +1,124 @@
+ARROWFALL — reach >, survive g
+Move       Shoot
+  W          I
+A S D      J K L
+H help | Q quit
+#########
+#@......#
+#..###..#
+#......g#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 0  Seed: 20261105
+command>
+#########
+#.@.....#
+#..###.g#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 1  Seed: 20261105
+You move.
+The goblin moves closer.
+command>
+#########
+#@.....g#
+#..###..#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 2  Seed: 20261105
+You move.
+The goblin moves closer.
+command>
+#########
+#.@...g.#
+#..###..#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 3  Seed: 20261105
+You move.
+The goblin moves closer.
+command>
+#########
+#@...g..#
+#..###..#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 4  Seed: 20261105
+You move.
+The goblin moves closer.
+command>
+#########
+#.@.g...#
+#..###..#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 5  Seed: 20261105
+You move.
+The goblin moves closer.
+command>
+#########
+#@.g....#
+#..###..#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 6  Seed: 20261105
+You move.
+The goblin moves closer.
+command>
+#########
+#.@g....#
+#..###..#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 7  Seed: 20261105
+You move.
+The goblin closes in! Move or shoot before its next turn.
+command>
+#########
+#.@g....#
+#..###..#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 2  Arrows: 3  Turn: 8  Seed: 20261105
+The goblin blocks that tile.
+The goblin attacks: -1 HP.
+command>
+#########
+#.@g....#
+#..###..#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 1  Arrows: 3  Turn: 9  Seed: 20261105
+The goblin blocks that tile.
+The goblin attacks: -1 HP.
+command>
+#########
+#.@g....#
+#..###..#
+#.......#
+#..###..#
+#>......#
+#########
+HP: 0  Arrows: 3  Turn: 10  Seed: 20261105
+The goblin blocks that tile.
+The goblin attacks: -1 HP.
+The goblin caught you.

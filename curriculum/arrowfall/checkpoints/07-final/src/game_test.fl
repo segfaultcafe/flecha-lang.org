@@ -1,0 +1,146 @@
+module game_test;
+
+@imports
+    :: root::game
+    :: lib::std::tests::asserts
+    :: lib::std::tests::testing;
+
+game::TurnResult approach_goblin(&game::Game state) {
+    state->apply(game::Command.MoveRight);
+    state->apply(game::Command.MoveLeft);
+    state->apply(game::Command.MoveRight);
+    state->apply(game::Command.MoveLeft);
+    state->apply(game::Command.MoveRight);
+    state->apply(game::Command.MoveLeft);
+    return state->apply(game::Command.MoveRight);
+}
+
+test wall_bumps_and_help_are_free(&testing::UnitTest t) {
+    state := game::Game::start(20261105);
+    goblinBefore := state.goblinPosition();
+    wall := state.apply(game::Command.MoveUp);
+    help := state.apply(game::Command.Help);
+    goblinAfter := state.goblinPosition();
+    asserts::is_true(
+        t,
+        wall.player == game::PlayerEvent.Wall and !wall.spentTurn and
+            help.player == game::PlayerEvent.Help and !help.spentTurn and
+            state.turn() == 0 and goblinBefore.equals(&goblinAfter),
+        "wall bumps and help neither spend a turn nor move the goblin"
+    );
+}
+
+test approach_warns_then_goblin_block_causes_damage(&testing::UnitTest t) {
+    state := game::Game::start(20261105);
+    warning := approach_goblin(&state);
+    player := state.playerPosition();
+    goblin := state.goblinPosition();
+    const u32 TURN_BEFORE = state.turn();
+    blocked := state.apply(game::Command.MoveRight);
+    asserts::is_true(
+        t,
+        warning.enemy == game::EnemyEvent.Threatened and
+            player.x + 1 == goblin.x and player.y == goblin.y and
+            state.health() == 2 and
+            blocked.player == game::PlayerEvent.GoblinBlocks and
+            blocked.enemy == game::EnemyEvent.Attacked and
+            blocked.spentTurn and state.turn() == TURN_BEFORE + 1,
+        "approach warns without damage, then blocking against the goblin hurts"
+    );
+}
+
+test shots_report_miss_hit_and_empty_quiver_without_underflow(
+    &testing::UnitTest t
+) {
+    missState := game::Game::start(20261105);
+    miss := missState.apply(game::Command.ShootUp);
+    hitState := game::Game::start(20261105);
+    hitState.apply(game::Command.MoveDown);
+    hitState.apply(game::Command.MoveDown);
+    hit := hitState.apply(game::Command.ShootRight);
+    hitState.apply(game::Command.ShootUp);
+    hitState.apply(game::Command.ShootUp);
+    const u32 TURN_BEFORE = hitState.turn();
+    empty := hitState.apply(game::Command.ShootUp);
+    asserts::is_true(
+        t,
+        miss.player == game::PlayerEvent.ShotMiss and
+            hit.player == game::PlayerEvent.ShotHit and
+            !hitState.isGoblinAlive() and hitState.arrows() == 0 and
+            empty.player == game::PlayerEvent.NoArrows and
+            !empty.spentTurn and hitState.turn() == TURN_BEFORE,
+        "shots distinguish miss, hit, and a free empty-quiver attempt"
+    );
+}
+
+test threatened_wall_and_empty_quiver_both_allow_the_attack(
+    &testing::UnitTest t
+) {
+    wallState := game::Game::start(20261105);
+    approach_goblin(&wallState);
+    wall := wallState.apply(game::Command.MoveUp);
+
+    emptyState := game::Game::start(20261105);
+    emptyState.apply(game::Command.ShootUp);
+    emptyState.apply(game::Command.ShootUp);
+    emptyState.apply(game::Command.ShootUp);
+    game::EnemyEvent approach = game::EnemyEvent.None;
+    u32 steps = 0;
+    while approach != game::EnemyEvent.Threatened and steps < 12 {
+        game::Command movement = game::Command.MoveRight;
+        if steps % 2 == 1 {
+            movement = game::Command.MoveLeft;
+        }
+        turn := emptyState.apply(movement);
+        approach = turn.enemy;
+        steps++;
+    }
+    empty := emptyState.apply(game::Command.ShootUp);
+    asserts::is_true(
+        t,
+        wall.player == game::PlayerEvent.Wall and
+            wall.enemy == game::EnemyEvent.Attacked and wallState.health() == 2 and
+            empty.player == game::PlayerEvent.NoArrows and
+            empty.enemy == game::EnemyEvent.Attacked and emptyState.health() == 2,
+        "under threat, a wall bump or empty quiver spends the turn and hurts"
+    );
+}
+
+test fleeing_or_killing_after_the_warning_avoids_damage(&testing::UnitTest t) {
+    fleeState := game::Game::start(20261105);
+    approach_goblin(&fleeState);
+    flee := fleeState.apply(game::Command.MoveLeft);
+    killState := game::Game::start(20261105);
+    approach_goblin(&killState);
+    kill := killState.apply(game::Command.ShootRight);
+    asserts::is_true(
+        t,
+        flee.player == game::PlayerEvent.Moved and
+            flee.enemy != game::EnemyEvent.Attacked and fleeState.health() == 3 and
+            kill.player == game::PlayerEvent.ShotHit and
+            kill.enemy == game::EnemyEvent.None and killState.health() == 3,
+        "a successful escape or killing shot answers the warning safely"
+    );
+}
+
+test both_documented_routes_win(&testing::UnitTest t) {
+    combat := game::Game::start(20261105);
+    combat.apply(game::Command.MoveDown);
+    combat.apply(game::Command.MoveDown);
+    combat.apply(game::Command.ShootRight);
+    combat.apply(game::Command.MoveDown);
+    combatResult := combat.apply(game::Command.MoveDown);
+    flee := game::Game::start(20261105);
+    flee.apply(game::Command.MoveDown);
+    flee.apply(game::Command.MoveDown);
+    flee.apply(game::Command.MoveDown);
+    flee.apply(game::Command.MoveDown);
+    asserts::is_true(
+        t,
+        combatResult.player == game::PlayerEvent.Won and
+            combat.outcome() == game::Outcome.Won and combat.turn() == 5 and
+            flee.outcome() == game::Outcome.Won and flee.isGoblinAlive() and
+            flee.health() == 3 and flee.turn() == 4,
+        "combat and no-combat routes both reach the exit"
+    );
+}

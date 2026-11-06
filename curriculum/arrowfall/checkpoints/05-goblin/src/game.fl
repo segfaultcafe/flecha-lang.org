@@ -1,0 +1,255 @@
+module game;
+
+const i32 WIDTH = 9;
+const i32 HEIGHT = 7;
+
+export enum Direction {
+    default Up,
+    Left,
+    Down,
+    Right
+}
+
+export enum Command {
+    default MoveUp,
+    MoveLeft,
+    MoveDown,
+    MoveRight,
+    Help,
+    Quit
+}
+
+export enum Outcome {
+    default Playing,
+    Won,
+    Lost,
+    Quit
+}
+
+export enum PlayerEvent {
+    default None,
+    Moved,
+    Wall,
+    GoblinBlocks,
+    Help,
+    Won,
+    Quit
+}
+
+export enum EnemyEvent {
+    default None,
+    Moved,
+    Threatened,
+    Attacked
+}
+
+export structure Position {
+    i32 x;
+    i32 y;
+};
+
+export structure TurnResult {
+    PlayerEvent player;
+    EnemyEvent enemy;
+    bool spentTurn;
+};
+
+export structure Game {
+    private Position player;
+    private Position goblin;
+    private i32 playerHealth;
+    private u32 turnCount;
+    private Outcome gameOutcome;
+};
+
+TurnResult TurnResult::make(
+    PlayerEvent player,
+    EnemyEvent enemy = EnemyEvent.None,
+    bool spentTurn = false
+) {
+    return build TurnResult {
+        self.player = player;
+        self.enemy = enemy;
+        self.spentTurn = spentTurn;
+    };
+}
+
+Position Position::at(i32 x, i32 y) {
+    return build Position {
+        self.x = x;
+        self.y = y;
+    };
+}
+
+bool Position::equals(&const self, &const Position other) {
+    return self->x == other->x and self->y == other->y;
+}
+
+Position Position::moved(&const self, Direction direction) {
+    Position delta = match direction {
+        Direction.Up => Position::at(0, -1),
+        Direction.Left => Position::at(-1, 0),
+        Direction.Down => Position::at(0, 1),
+        Direction.Right => Position::at(1, 0),
+    };
+    return Position::at(self->x + delta.x, self->y + delta.y);
+}
+
+Game Game::start() {
+    return build Game {
+        self.player = Position::at(1, 1);
+        self.goblin = Position::at(7, 3);
+        self.playerHealth = 3;
+        self.turnCount = 0;
+        self.gameOutcome = Outcome.Playing;
+    };
+}
+
+TurnResult Game::apply(&self, Command command) {
+    if command == Command.Help {
+        return TurnResult::make(PlayerEvent.Help);
+    }
+    if command == Command.Quit {
+        self->gameOutcome = Outcome.Quit;
+        return TurnResult::make(PlayerEvent.Quit);
+    }
+    const bool DANGER_BEFORE = adjacent(self->goblin, self->player);
+    next := self->player.moved(command_direction(command));
+    if tile_at(next) == '#' {
+        if !DANGER_BEFORE {
+            return TurnResult::make(PlayerEvent.Wall);
+        }
+        self->turnCount++;
+        return TurnResult::make(PlayerEvent.Wall, self->goblinTurn(true), true);
+    }
+    if next.equals(&self->goblin) {
+        if !DANGER_BEFORE {
+            return TurnResult::make(PlayerEvent.GoblinBlocks);
+        }
+        self->turnCount++;
+        return TurnResult::make(
+            PlayerEvent.GoblinBlocks,
+            self->goblinTurn(true),
+            true
+        );
+    }
+    self->player = next;
+    self->turnCount++;
+    if tile_at(self->player) == '>' {
+        self->gameOutcome = Outcome.Won;
+        return TurnResult::make(PlayerEvent.Won, EnemyEvent.None, true);
+    }
+    return TurnResult::make(
+        PlayerEvent.Moved,
+        self->goblinTurn(DANGER_BEFORE),
+        true
+    );
+}
+
+private EnemyEvent Game::goblinTurn(&self, bool canAttack) {
+    if canAttack and adjacent(self->goblin, self->player) {
+        self->playerHealth--;
+        if self->playerHealth == 0 {
+            self->gameOutcome = Outcome.Lost;
+        }
+        return EnemyEvent.Attacked;
+    }
+    if adjacent(self->goblin, self->player) {
+        return EnemyEvent.Threatened;
+    }
+    const i32 DX = self->player.x - self->goblin.x;
+    const i32 DY = self->player.y - self->goblin.y;
+    Direction horizontal = Direction.Right;
+    Direction vertical = Direction.Down;
+    if DX < 0 {
+        horizontal = Direction.Left;
+    }
+    if DY < 0 {
+        vertical = Direction.Up;
+    }
+    bool moved = false;
+    if DX != 0 {
+        moved = self->tryGoblinStep(horizontal);
+    }
+    if !moved and DY != 0 {
+        moved = self->tryGoblinStep(vertical);
+    }
+    if moved and adjacent(self->goblin, self->player) {
+        return EnemyEvent.Threatened;
+    }
+    if moved {
+        return EnemyEvent.Moved;
+    }
+    return EnemyEvent.None;
+}
+
+private bool Game::tryGoblinStep(&self, Direction direction) {
+    next := self->goblin.moved(direction);
+    if next.equals(&self->player) {
+        return false;
+    }
+    if tile_at(next) != '#' and tile_at(next) != '>' {
+        self->goblin = next;
+        return true;
+    }
+    return false;
+}
+
+Position Game::playerPosition(&const self) {
+    return self->player;
+}
+
+Position Game::goblinPosition(&const self) {
+    return self->goblin;
+}
+
+i32 Game::health(&const self) {
+    return self->playerHealth;
+}
+
+u32 Game::turn(&const self) {
+    return self->turnCount;
+}
+
+Outcome Game::outcome(&const self) {
+    return self->gameOutcome;
+}
+
+export char tile_at(Position position) {
+    [63]char tiles = [
+        '#','#','#','#','#','#','#','#','#',
+        '#','.','.','.','.','.','.','.','#',
+        '#','.','.','#','#','#','.','.','#',
+        '#','.','.','.','.','.','.','.','#',
+        '#','.','.','#','#','#','.','.','#',
+        '#','>','.','.','.','.','.','.','#',
+        '#','#','#','#','#','#','#','#','#'
+    ];
+    return tile_from_cells(tiles[:], position);
+}
+
+char tile_from_cells([]const char tiles, Position position) {
+    if position.x < 0 or position.x >= WIDTH or
+        position.y < 0 or position.y >= HEIGHT {
+        return '#';
+    }
+    return tiles[(position.y * WIDTH + position.x).cast<usize>];
+}
+
+Direction command_direction(Command command) {
+    return match command {
+        Command.MoveUp => Direction.Up,
+        Command.MoveLeft => Direction.Left,
+        Command.MoveDown => Direction.Down,
+        Command.MoveRight => Direction.Right,
+        Command.Help => Direction.Up,
+        Command.Quit => Direction.Up,
+    };
+}
+
+bool adjacent(Position left, Position right) {
+    const i32 DX = left.x - right.x;
+    const i32 DY = left.y - right.y;
+    return (DX == 0 and (DY == 1 or DY == -1)) or
+        (DY == 0 and (DX == 1 or DX == -1));
+}

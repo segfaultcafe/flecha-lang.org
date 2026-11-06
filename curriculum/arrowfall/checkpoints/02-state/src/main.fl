@@ -1,0 +1,51 @@
+module main;
+
+structure Position {
+    i32 x;
+    i32 y;
+};
+
+structure Game {
+    private Position player;
+};
+
+Position Position::at(i32 x, i32 y) {
+    return build Position {
+        self.x = x;
+        self.y = y;
+    };
+}
+
+Game Game::start() {
+    return build Game {
+        self.player = Position::at(1, 1);
+    };
+}
+
+Position Game::playerPosition(&const self) {
+    return self->player;
+}
+
+void main() {
+    state := Game::start();
+    player := state.playerPosition();
+    stdoutln("ARROWFALL");
+    stdoutln("#####");
+    draw_row(player);
+    stdoutln("#####");
+    stdoutln("Player: (", player.x, ", ", player.y, ")");
+}
+
+void draw_row(Position player) {
+    stdout("#");
+    loop i32 x = 1; x < 4; x++ {
+        if player.x == x and player.y == 1 {
+            stdout("@");
+        } else if x == 3 {
+            stdout(">");
+        } else {
+            stdout(".");
+        }
+    }
+    stdoutln("#");
+}

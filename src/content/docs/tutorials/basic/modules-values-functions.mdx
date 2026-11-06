@@ -1,0 +1,30 @@
+---
+title: '1. Modules, values, and functions'
+description: Learn Flecha declarations, primitive values, explicit types, inferred locals, and function boundaries.
+---
+
+import MainPractice from '../../../../components/MainPractice.astro';
+
+A Flecha file contributes declarations to the logical module named by its
+`module` header. Files are not namespaces: two files can contribute to one
+module, while `@imports` selects exported declarations from another module.
+
+Declarations place the type before the name. Primitive families include signed
+and unsigned integers, floating-point values, `bool`, `char`, and string views.
+Use `:=` when the initializer makes a local type obvious; use an explicit type
+at public boundaries and where width matters. Functions state parameter and
+return types, and `export` is an API decision rather than a default.
+
+Read [modules and imports](/docs/reference/modules/) beside the [language
+specification](/docs/specification/). In a scratch project, split one pure
+calculation into `src/score.fl` and call it from `src/main.fl`; then use
+`longbow check` to confirm module and type names without linking.
+
+<MainPractice id="basic-modules" locale="en" />
+
+## What to learn next
+
+- [Control flow and compound data](/tutorials/basic/control-and-data/)
+- [Numeric casts](/examples/numeric_casts/)
+- [Const declarations](/docs/reference/const_types/)
+

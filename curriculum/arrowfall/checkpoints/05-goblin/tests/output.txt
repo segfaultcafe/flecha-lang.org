@@ -1,0 +1,119 @@
+#########
+#@......#
+#..###..#
+#......g#
+#..###..#
+#>......#
+#########
+HP: 3  Turn: 0
+command>
+You move.
+The goblin moves closer.
+#########
+#.@.....#
+#..###..#
+#.....g.#
+#..###..#
+#>......#
+#########
+HP: 3  Turn: 1
+command>
+You move.
+The goblin moves closer.
+#########
+#@......#
+#..###..#
+#....g..#
+#..###..#
+#>......#
+#########
+HP: 3  Turn: 2
+command>
+You move.
+The goblin moves closer.
+#########
+#.@.....#
+#..###..#
+#...g...#
+#..###..#
+#>......#
+#########
+HP: 3  Turn: 3
+command>
+You move.
+The goblin moves closer.
+#########
+#@......#
+#..###..#
+#..g....#
+#..###..#
+#>......#
+#########
+HP: 3  Turn: 4
+command>
+You move.
+The goblin moves closer.
+#########
+#.@.....#
+#..###..#
+#.g.....#
+#..###..#
+#>......#
+#########
+HP: 3  Turn: 5
+command>
+You move.
+The goblin moves closer.
+#########
+#@......#
+#..###..#
+#g......#
+#..###..#
+#>......#
+#########
+HP: 3  Turn: 6
+command>
+You move.
+The goblin closes in! Move before its next turn.
+#########
+#.......#
+#@.###..#
+#g......#
+#..###..#
+#>......#
+#########
+HP: 3  Turn: 7
+command>
+The goblin blocks that tile.
+The goblin attacks: -1 HP.
+#########
+#.......#
+#@.###..#
+#g......#
+#..###..#
+#>......#
+#########
+HP: 2  Turn: 8
+command>
+The goblin blocks that tile.
+The goblin attacks: -1 HP.
+#########
+#.......#
+#@.###..#
+#g......#
+#..###..#
+#>......#
+#########
+HP: 1  Turn: 9
+command>
+The goblin blocks that tile.
+The goblin attacks: -1 HP.
+#########
+#.......#
+#@.###..#
+#g......#
+#..###..#
+#>......#
+#########
+HP: 0  Turn: 10
+The goblin caught you.

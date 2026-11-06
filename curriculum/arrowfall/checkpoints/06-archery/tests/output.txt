@@ -1,0 +1,61 @@
+#########
+#@......#
+#..###..#
+#......g#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 0
+command>
+You move.
+The goblin moves closer.
+#########
+#.......#
+#@.###..#
+#.....g.#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 1
+command>
+You move.
+The goblin moves closer.
+#########
+#.......#
+#..###..#
+#@...g..#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 3  Turn: 2
+command>
+Your arrow hits! The goblin falls.
+#########
+#.......#
+#..###..#
+#@......#
+#..###..#
+#>......#
+#########
+HP: 3  Arrows: 2  Turn: 3
+command>
+You move.
+#########
+#.......#
+#..###..#
+#.......#
+#@.###..#
+#>......#
+#########
+HP: 3  Arrows: 2  Turn: 4
+command>
+You reach the exit.
+#########
+#.......#
+#..###..#
+#.......#
+#..###..#
+#@......#
+#########
+HP: 3  Arrows: 2  Turn: 5
+You escaped Arrowfall!

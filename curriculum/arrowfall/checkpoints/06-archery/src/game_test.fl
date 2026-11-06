@@ -1,0 +1,36 @@
+module game_test;
+
+@imports
+    :: root::game
+    :: lib::std::tests::asserts
+    :: lib::std::tests::testing;
+
+test safe_wall_is_free(&testing::UnitTest t) {
+    state := game::Game::start();
+    wall := state.apply(game::Command.MoveUp);
+    asserts::is_true(
+        t,
+        wall.player == game::PlayerEvent.Wall and !wall.spentTurn and
+            state.turn() == 0,
+        "a safe wall bump does not advance the goblin"
+    );
+}
+
+test approach_warns_before_a_later_attack(&testing::UnitTest t) {
+    state := game::Game::start();
+    state.apply(game::Command.MoveRight);
+    state.apply(game::Command.MoveLeft);
+    state.apply(game::Command.MoveRight);
+    state.apply(game::Command.MoveLeft);
+    state.apply(game::Command.MoveRight);
+    state.apply(game::Command.MoveLeft);
+    warning := state.apply(game::Command.MoveDown);
+    blocked := state.apply(game::Command.MoveDown);
+    asserts::is_true(
+        t,
+        warning.enemy == game::EnemyEvent.Threatened and
+            blocked.enemy == game::EnemyEvent.Attacked and
+            state.health() == 2,
+        "the first adjacency warns and a later failed response takes one HP"
+    );
+}

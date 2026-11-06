@@ -1,0 +1,29 @@
+---
+title: '3. Pacotes e interfaces do sistema'
+description: Componha pacotes com vários módulos e trate filesystem, processos e rede como fronteiras falíveis explícitas.
+---
+
+import MainPractice from '../../../../../components/MainPractice.astro';
+
+Divida o pacote por responsabilidade: modelo, parsing, operações e política da
+entrada. `root` importa o pacote atual; `lib::<alias>` importa a dependência
+selecionada pelo manifesto. Mantenha o grafo visível e fixe resoluções de
+aplicativos em `longbow.lock`.
+
+APIs de filesystem, processos e rede retornam erros explícitos e possuem
+recursos do host. Feche ou adie a limpeza no escopo que adquiriu o recurso.
+Normalize paths antes de decisões, passe argumentos como valores em vez de uma
+string de shell e limite leituras, esperas e tentativas de rede.
+
+Consulte [filesystem](/docs/reference/filesystem/), [processos
+filhos](/docs/reference/process/) e [rede](/docs/reference/network/) apenas para
+a interface usada.
+
+<MainPractice id="intermediate-systems" locale="pt-br" />
+
+## O que aprender a seguir
+
+- [Projeto: qualifique o Workspace Guard](/pt-br/tutorials/intermediate/project/)
+- [Paths — em inglês](/docs/reference/path/)
+- [Ecossistema de pacotes — em inglês](/docs/reference/package_ecosystem/)
+

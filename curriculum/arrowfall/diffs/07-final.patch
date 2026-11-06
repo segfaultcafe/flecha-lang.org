@@ -1,0 +1,1056 @@
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/README.md tutorial/checkpoints/07-final/README.md
+--- tutorial/checkpoints/06-archery/README.md
++++ tutorial/checkpoints/07-final/README.md
+@@ -1 +1 @@
+-# 06 — The archer earns the name
++# 07 — Reproducible, testable, terminal-ready
+@@ -5 +5,3 @@
+-Checkpoint 05 adds pressure and fair warning, but the only response is to run.
++Checkpoint 06 is a complete small game, but pursuit always makes the same
++choice, transcripts scroll interactively, and changing behaviour requires
++editing source.
+@@ -9,2 +11,3 @@
+-An archer should trade a scarce resource for safety. The existing map already
+-makes direction and line of sight meaningful.
++Different runs are fun; flaky lessons and tests are not. We need controlled
++variation, a clean terminal presentation, and a release-quality verification
++boundary without changing the pure engine/render split.
+@@ -14,4 +17,5 @@
+-I/J/K/L shoots up/left/down/right. A shot consumes one of three arrows, walks
+-cell by cell until a wall, and kills the goblin if the line crosses it. Hit,
+-miss, and empty-quiver outcomes are distinct; twin control diamonds make both
+-directional action families visible.
++`Generator::fromSeed` breaks pursuit ties reproducibly. `--seed <u64>` lets the
++player select a run, defaulting empty/absent values to `20261105`.
++Interactive mode redraws with isolated ANSI; `--no-clear` preserves accessible
++goldens and logs. Eleven focused tests plus winning, defeat, option, no-control,
++and visible-damage checks qualify the complete project.
+@@ -23,0 +28 @@
++- `scripts/check-golden.sh`
+@@ -28,0 +34,2 @@
++- `src/options.fl`
++- `src/options_test.fl`
+@@ -29,0 +37 @@
++- `src/render_test.fl`
+@@ -31,0 +40,2 @@
++- `tests/defeat_input.txt`
++- `tests/defeat_output.txt`
+@@ -35 +45,2 @@
+-Exact changes: `../../diffs/06-archery.patch`.
++Exact changes: `../../diffs/07-final.patch`. This snapshot contains the full
++final source; it does not depend on files above this directory.
+@@ -40,4 +51,11 @@
+-longbow check tutorial/checkpoints/06-archery
+-longbow test tutorial/checkpoints/06-archery
+-longbow build tutorial/checkpoints/06-archery
+-longbow run tutorial/checkpoints/06-archery < tutorial/checkpoints/06-archery/tests/input.txt
++longbow check tutorial/checkpoints/07-final
++longbow test tutorial/checkpoints/07-final
++longbow build tutorial/checkpoints/07-final
++longbow run tutorial/checkpoints/07-final -- --no-clear --seed 20261105 < tutorial/checkpoints/07-final/tests/input.txt
++LONGBOW=longbow tutorial/checkpoints/07-final/scripts/check-golden.sh
++```
++
++Try controlled variation:
++
++```sh
++longbow run tutorial/checkpoints/07-final -- --seed 42
+@@ -48,6 +66,8 @@
+-1. A room appears.
+-2. The picture becomes state.
+-3. The player moves.
+-4. Walls create collision and victory.
+-5. A goblin creates turns, threat, and defeat.
+-6. **The archer earns the name** — IJKL, arrows, line of sight, combat win.
++1. A room appears — static scene.
++2. The picture becomes state — structs and methods.
++3. The player moves — stdin and typed commands.
++4. Walls create collision and victory — map, modules, first test.
++5. A goblin creates turn pressure — threat, HP, observable events.
++6. The archer earns the name — IJKL, inventory, line of sight.
++7. **Reproducible and terminal-ready** — seeded RNG, CLI options, ANSI/plain
++   modes, persistent feedback, full rule and golden qualification.
+@@ -57,2 +77,3 @@
+-The recorded `S S L S S` run must kill the goblin on turn 3 and reach the exit
+-on turn 5 with 3 HP and 2 arrows. An upward shot from start must miss.
++Run the same seed twice: stdout and decisions must match. Run seed 42 and
++observe the displayed seed and possibly different tie choices. `--no-clear`
++must contain no control bytes, and invalid non-empty seeds must not launch.
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/longbow.lock tutorial/checkpoints/07-final/longbow.lock
+--- tutorial/checkpoints/06-archery/longbow.lock
++++ tutorial/checkpoints/07-final/longbow.lock
+@@ -7 +7 @@
+-      "identity": "local/arrowfall_step_06",
++      "identity": "local/arrowfall_step_07",
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/longbow.toml tutorial/checkpoints/07-final/longbow.toml
+--- tutorial/checkpoints/06-archery/longbow.toml
++++ tutorial/checkpoints/07-final/longbow.toml
+@@ -2 +2 @@
+-name = "arrowfall-step-06"
++name = "arrowfall-step-07"
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/scripts/check-golden.sh tutorial/checkpoints/07-final/scripts/check-golden.sh
+--- tutorial/checkpoints/06-archery/scripts/check-golden.sh
++++ tutorial/checkpoints/07-final/scripts/check-golden.sh
+@@ -0,0 +1,84 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
++longbow_bin="${LONGBOW:-longbow}"
++cd "$project_root"
++
++check_transcript() {
++    local name="$1"
++    local input="$2"
++    local expected="$3"
++    local actual
++    actual="$(mktemp)"
++    trap 'rm -f "$actual"' RETURN
++    "$longbow_bin" run -- --no-clear --seed 20261105 < "$input" > "$actual"
++    diff -u "$expected" "$actual"
++    if od -An -tu1 "$actual" | awk '
++        { for (i = 1; i <= NF; i++) if ($i < 32 && $i != 10) found = 1 }
++        END { exit found ? 0 : 1 }
++    '; then
++        echo "$name transcript contains a control byte" >&2
++        return 1
++    fi
++    echo "$name transcript: OK"
++}
++
++check_transcript "winning" tests/input.txt tests/output.txt
++check_transcript "defeat" tests/defeat_input.txt tests/defeat_output.txt
++
++visible_damage="$(mktemp)"
++trap 'rm -f "$visible_damage"' EXIT
++"$longbow_bin" run -- --seed 20261105 < tests/defeat_input.txt > "$visible_damage"
++awk '
++    BEGIN {
++        escape = sprintf("%c", 27)
++        RS = escape "\\[2J" escape "\\[H"
++    }
++    index($0, "HP: 2") && index($0, "The goblin attacks: -1 HP.") {
++        visible = 1
++    }
++    END { exit visible ? 0 : 1 }
++' "$visible_damage"
++echo "clear-screen damage frame: OK"
++
++check_seed() {
++    local name="$1"
++    local expected="$2"
++    shift 2
++    local actual
++    actual="$(mktemp)"
++    trap 'rm -f "$actual"' RETURN
++    printf 'q\n' | "$longbow_bin" run -- "$@" > "$actual"
++    grep -F "Seed: $expected" "$actual" > /dev/null
++    echo "$name seed: OK"
++}
++
++check_seed "absent" 20261105 --no-clear
++check_seed "explicit empty" 20261105 --no-clear --seed ""
++check_seed "missing value" 20261105 --no-clear --seed
++check_seed "option follows" 20261105 --seed --no-clear
++check_seed "explicit value" 42 --seed 42 --no-clear
++check_seed "reverse option order" 42 --no-clear --seed 42
++
++check_seed_error() {
++    local name="$1"
++    local value="$2"
++    local actual
++    actual="$(mktemp)"
++    trap 'rm -f "$actual"' RETURN
++    if "$longbow_bin" run -- --seed "$value" > "$actual"; then
++        echo "$name unexpectedly launched" >&2
++        return 1
++    fi
++    grep -F "arrowfall: seed must be a decimal u64" "$actual" > /dev/null
++    grep -F "usage: arrowfall [--no-clear] [--seed <u64>]" "$actual" > /dev/null
++    if grep -F "ARROWFALL" "$actual" > /dev/null; then
++        echo "$name launched the game" >&2
++        return 1
++    fi
++    echo "$name seed error: OK"
++}
++
++check_seed_error "invalid" "twelve"
++check_seed_error "out-of-range" "18446744073709551616"
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/src/game.fl tutorial/checkpoints/07-final/src/game.fl
+--- tutorial/checkpoints/06-archery/src/game.fl
++++ tutorial/checkpoints/07-final/src/game.fl
+@@ -2,0 +3,2 @@
++@imports :: lib::std::random::generator;
++
+@@ -42,2 +44,2 @@
+-    Won,
+-    Quit
++    Quit,
++    Won
+@@ -64,22 +65,0 @@
+-export structure Game {
+-    private Position player;
+-    private Position goblin;
+-    private bool goblinAlive;
+-    private i32 playerHealth;
+-    private u32 arrowCount;
+-    private u32 turnCount;
+-    private Outcome gameOutcome;
+-};
+-
+-TurnResult TurnResult::make(
+-    PlayerEvent player,
+-    EnemyEvent enemy = EnemyEvent.None,
+-    bool spentTurn = false
+-) {
+-    return build TurnResult {
+-        self.player = player;
+-        self.enemy = enemy;
+-        self.spentTurn = spentTurn;
+-    };
+-}
+-
+@@ -107 +87,25 @@
+-Game Game::start() {
++TurnResult TurnResult::make(
++    PlayerEvent player,
++    EnemyEvent enemy = EnemyEvent.None,
++    bool spentTurn = false
++) {
++    return build TurnResult {
++        self.player = player;
++        self.enemy = enemy;
++        self.spentTurn = spentTurn;
++    };
++}
++
++export structure Game {
++    private Position player;
++    private Position goblin;
++    private bool goblinAlive;
++    private i32 playerHealth;
++    private u32 arrowCount;
++    private u32 turnCount;
++    private u64 sourceSeed;
++    private Outcome gameOutcome;
++    private generator::Generator random;
++};
++
++Game Game::start(u64 seed) {
+@@ -114,0 +119 @@
++        self.sourceSeed = seed;
+@@ -115,0 +121 @@
++        self.random = generator::Generator::fromSeed(seed);
+@@ -119,0 +126,3 @@
++    if self->gameOutcome != Outcome.Playing {
++        return TurnResult::make(PlayerEvent.None);
++    }
+@@ -126,0 +136 @@
++
+@@ -142,5 +152 @@
+-        return TurnResult::make(
+-            action,
+-            self->goblinTurn(true),
+-            true
+-        );
++        return TurnResult::make(action, self->goblinTurn(true), true);
+@@ -147,0 +154 @@
++
+@@ -162 +169 @@
+-    if tile_at(next) == '#' {
++    if !walkable(next) {
+@@ -201,0 +209 @@
++
+@@ -211,0 +220,6 @@
++    if DX != 0 and DY != 0 and self->random.boolean() {
++        first := horizontal;
++        horizontal = vertical;
++        vertical = first;
++    }
++
+@@ -233 +247 @@
+-    if tile_at(next) != '#' and tile_at(next) != '>' {
++    if walkable(next) and tile_at(next) != '>' {
+@@ -263,0 +278,4 @@
++u64 Game::seed(&const self) {
++    return self->sourceSeed;
++}
++
+@@ -288,0 +307,16 @@
++bool walkable(Position position) {
++    return tile_at(position) != '#';
++}
++
++bool adjacent(Position left, Position right) {
++    const i32 DX = left.x - right.x;
++    const i32 DY = left.y - right.y;
++    return (DX == 0 and (DY == 1 or DY == -1)) or
++        (DY == 0 and (DX == 1 or DX == -1));
++}
++
++bool is_shot(Command command) {
++    return command == Command.ShootUp or command == Command.ShootLeft or
++        command == Command.ShootDown or command == Command.ShootRight;
++}
++
+@@ -302,12 +335,0 @@
+-}
+-
+-bool is_shot(Command command) {
+-    return command == Command.ShootUp or command == Command.ShootLeft or
+-        command == Command.ShootDown or command == Command.ShootRight;
+-}
+-
+-bool adjacent(Position left, Position right) {
+-    const i32 DX = left.x - right.x;
+-    const i32 DY = left.y - right.y;
+-    return (DX == 0 and (DY == 1 or DY == -1)) or
+-        (DY == 0 and (DX == 1 or DX == -1));
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/src/game_test.fl tutorial/checkpoints/07-final/src/game_test.fl
+--- tutorial/checkpoints/06-archery/src/game_test.fl
++++ tutorial/checkpoints/07-final/src/game_test.fl
+@@ -8,2 +8,13 @@
+-test safe_wall_is_free(&testing::UnitTest t) {
+-    state := game::Game::start();
++game::TurnResult approach_goblin(&game::Game state) {
++    state->apply(game::Command.MoveRight);
++    state->apply(game::Command.MoveLeft);
++    state->apply(game::Command.MoveRight);
++    state->apply(game::Command.MoveLeft);
++    state->apply(game::Command.MoveRight);
++    state->apply(game::Command.MoveLeft);
++    return state->apply(game::Command.MoveRight);
++}
++
++test wall_bumps_and_help_are_free(&testing::UnitTest t) {
++    state := game::Game::start(20261105);
++    goblinBefore := state.goblinPosition();
+@@ -10,0 +22,2 @@
++    help := state.apply(game::Command.Help);
++    goblinAfter := state.goblinPosition();
+@@ -14,2 +27,3 @@
+-            state.turn() == 0,
+-        "a safe wall bump does not advance the goblin"
++            help.player == game::PlayerEvent.Help and !help.spentTurn and
++            state.turn() == 0 and goblinBefore.equals(&goblinAfter),
++        "wall bumps and help neither spend a turn nor move the goblin"
+@@ -19,10 +33,7 @@
+-test approach_warns_before_a_later_attack(&testing::UnitTest t) {
+-    state := game::Game::start();
+-    state.apply(game::Command.MoveRight);
+-    state.apply(game::Command.MoveLeft);
+-    state.apply(game::Command.MoveRight);
+-    state.apply(game::Command.MoveLeft);
+-    state.apply(game::Command.MoveRight);
+-    state.apply(game::Command.MoveLeft);
+-    warning := state.apply(game::Command.MoveDown);
+-    blocked := state.apply(game::Command.MoveDown);
++test approach_warns_then_goblin_block_causes_damage(&testing::UnitTest t) {
++    state := game::Game::start(20261105);
++    warning := approach_goblin(&state);
++    player := state.playerPosition();
++    goblin := state.goblinPosition();
++    const u32 TURN_BEFORE = state.turn();
++    blocked := state.apply(game::Command.MoveRight);
+@@ -31,0 +43,3 @@
++            player.x + 1 == goblin.x and player.y == goblin.y and
++            state.health() == 2 and
++            blocked.player == game::PlayerEvent.GoblinBlocks and
+@@ -33,2 +47,98 @@
+-            state.health() == 2,
+-        "the first adjacency warns and a later failed response takes one HP"
++            blocked.spentTurn and state.turn() == TURN_BEFORE + 1,
++        "approach warns without damage, then blocking against the goblin hurts"
++    );
++}
++
++test shots_report_miss_hit_and_empty_quiver_without_underflow(
++    &testing::UnitTest t
++) {
++    missState := game::Game::start(20261105);
++    miss := missState.apply(game::Command.ShootUp);
++    hitState := game::Game::start(20261105);
++    hitState.apply(game::Command.MoveDown);
++    hitState.apply(game::Command.MoveDown);
++    hit := hitState.apply(game::Command.ShootRight);
++    hitState.apply(game::Command.ShootUp);
++    hitState.apply(game::Command.ShootUp);
++    const u32 TURN_BEFORE = hitState.turn();
++    empty := hitState.apply(game::Command.ShootUp);
++    asserts::is_true(
++        t,
++        miss.player == game::PlayerEvent.ShotMiss and
++            hit.player == game::PlayerEvent.ShotHit and
++            !hitState.isGoblinAlive() and hitState.arrows() == 0 and
++            empty.player == game::PlayerEvent.NoArrows and
++            !empty.spentTurn and hitState.turn() == TURN_BEFORE,
++        "shots distinguish miss, hit, and a free empty-quiver attempt"
++    );
++}
++
++test threatened_wall_and_empty_quiver_both_allow_the_attack(
++    &testing::UnitTest t
++) {
++    wallState := game::Game::start(20261105);
++    approach_goblin(&wallState);
++    wall := wallState.apply(game::Command.MoveUp);
++
++    emptyState := game::Game::start(20261105);
++    emptyState.apply(game::Command.ShootUp);
++    emptyState.apply(game::Command.ShootUp);
++    emptyState.apply(game::Command.ShootUp);
++    game::EnemyEvent approach = game::EnemyEvent.None;
++    u32 steps = 0;
++    while approach != game::EnemyEvent.Threatened and steps < 12 {
++        game::Command movement = game::Command.MoveRight;
++        if steps % 2 == 1 {
++            movement = game::Command.MoveLeft;
++        }
++        turn := emptyState.apply(movement);
++        approach = turn.enemy;
++        steps++;
++    }
++    empty := emptyState.apply(game::Command.ShootUp);
++    asserts::is_true(
++        t,
++        wall.player == game::PlayerEvent.Wall and
++            wall.enemy == game::EnemyEvent.Attacked and wallState.health() == 2 and
++            empty.player == game::PlayerEvent.NoArrows and
++            empty.enemy == game::EnemyEvent.Attacked and emptyState.health() == 2,
++        "under threat, a wall bump or empty quiver spends the turn and hurts"
++    );
++}
++
++test fleeing_or_killing_after_the_warning_avoids_damage(&testing::UnitTest t) {
++    fleeState := game::Game::start(20261105);
++    approach_goblin(&fleeState);
++    flee := fleeState.apply(game::Command.MoveLeft);
++    killState := game::Game::start(20261105);
++    approach_goblin(&killState);
++    kill := killState.apply(game::Command.ShootRight);
++    asserts::is_true(
++        t,
++        flee.player == game::PlayerEvent.Moved and
++            flee.enemy != game::EnemyEvent.Attacked and fleeState.health() == 3 and
++            kill.player == game::PlayerEvent.ShotHit and
++            kill.enemy == game::EnemyEvent.None and killState.health() == 3,
++        "a successful escape or killing shot answers the warning safely"
++    );
++}
++
++test both_documented_routes_win(&testing::UnitTest t) {
++    combat := game::Game::start(20261105);
++    combat.apply(game::Command.MoveDown);
++    combat.apply(game::Command.MoveDown);
++    combat.apply(game::Command.ShootRight);
++    combat.apply(game::Command.MoveDown);
++    combatResult := combat.apply(game::Command.MoveDown);
++    flee := game::Game::start(20261105);
++    flee.apply(game::Command.MoveDown);
++    flee.apply(game::Command.MoveDown);
++    flee.apply(game::Command.MoveDown);
++    flee.apply(game::Command.MoveDown);
++    asserts::is_true(
++        t,
++        combatResult.player == game::PlayerEvent.Won and
++            combat.outcome() == game::Outcome.Won and combat.turn() == 5 and
++            flee.outcome() == game::Outcome.Won and flee.isGoblinAlive() and
++            flee.health() == 3 and flee.turn() == 4,
++        "combat and no-combat routes both reach the exit"
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/src/input.fl tutorial/checkpoints/07-final/src/input.fl
+--- tutorial/checkpoints/06-archery/src/input.fl
++++ tutorial/checkpoints/07-final/src/input.fl
+@@ -52 +52 @@
+-        return (game::Command.Quit, none);
++        return (none, inputError);
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/src/input_test.fl tutorial/checkpoints/07-final/src/input_test.fl
+--- tutorial/checkpoints/06-archery/src/input_test.fl
++++ tutorial/checkpoints/07-final/src/input_test.fl
+@@ -9,3 +9,9 @@
+-test direct_key_diamonds_parse(&testing::UnitTest t) {
+-    move, moveError := input::parse("W");
+-    shot, shotError := input::parse("l");
++test parser_supports_both_key_diamonds_and_free_invalid_input(
++    &testing::UnitTest t
++) {
++    move, moveError := input::parse(" W ");
++    shot, shotError := input::parse("L");
++    downShot, downError := input::parse("k");
++    help, helpError := input::parse("H");
++    _, invalidError := input::parse("dance");
++    state := game::Game::start(1);
+@@ -15,2 +21,6 @@
+-            shotError == none and shot == game::Command.ShootRight,
+-        "WASD moves and IJKL shoots after one lowercase normalization"
++            shotError == none and shot == game::Command.ShootRight and
++            downError == none and downShot == game::Command.ShootDown and
++            helpError == none and help == game::Command.Help and
++            invalidError == input::CommandError.InvalidCommand and
++            state.turn() == 0,
++        "WASD and IJKL normalize once while invalid input never reaches the engine"
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/src/main.fl tutorial/checkpoints/07-final/src/main.fl
+--- tutorial/checkpoints/06-archery/src/main.fl
++++ tutorial/checkpoints/07-final/src/main.fl
+@@ -3 +3,2 @@
+-@imports :: root::game :: root::input :: root::render;
++@imports :: root::game :: root::input :: root::options :: root::render
++         :: lib::std::os::arguments;
+@@ -5,2 +6,31 @@
+-void main() {
+-    state := game::Game::start();
++i32 main() {
++    values, argumentError := arguments::capture();
++    if argumentError != none {
++        stdoutln("arrowfall: cannot read command-line options");
++        print_usage();
++        return 2;
++    }
++    parser := options::Parser::start();
++    error optionError = none;
++    loop usize index = 1; index < values.len(); index++ {
++        optionError = parser.consume(values[index].view());
++        if optionError != none {
++            break;
++        }
++    }
++    if optionError != none {
++        if optionError == options::OptionError.InvalidSeed {
++            stdoutln("arrowfall: seed must be a decimal u64");
++        } else {
++            stdoutln("arrowfall: unknown option");
++        }
++        print_usage();
++        return 2;
++    }
++    selected := parser.finish();
++
++    state := game::Game::start(selected.seed);
++    game::PlayerEvent lastPlayer = game::PlayerEvent.None;
++    game::EnemyEvent lastEnemy = game::EnemyEvent.None;
++    bool invalidCommand = false;
++    bool firstFrame = true;
+@@ -8,4 +38,4 @@
+-        frame, frameError := render::draw(&state);
+-        if frameError != none {
+-            stdoutln("Could not render the room.");
+-            return;
++        frame, renderError := render::draw(&state);
++        if renderError != none {
++            stdoutln("Could not render the dungeon.");
++            return 1;
+@@ -13 +43,13 @@
+-        stdoutln(frame);
++        present_frame(
++            frame.view(),
++            lastPlayer,
++            lastEnemy,
++            invalidCommand,
++            selected.clearFrames,
++            firstFrame
++        );
++        firstFrame = false;
++        lastPlayer = game::PlayerEvent.None;
++        lastEnemy = game::EnemyEvent.None;
++        invalidCommand = false;
++
+@@ -15 +57,7 @@
+-        stdoutln();
++        if !selected.clearFrames {
++            stdoutln();
++        }
++        if commandError == input::CommandError.InvalidCommand {
++            invalidCommand = true;
++            proceed;
++        }
+@@ -17 +65,3 @@
+-            stdoutln("Unknown command. No turn spent.");
++            stdoutln("Input closed.");
++            quitResult := state.apply(game::Command.Quit);
++            lastPlayer = quitResult.player;
+@@ -21,5 +71,2 @@
+-        stdoutln(render::player_message(result.player));
+-        enemyText := render::enemy_message(result.enemy);
+-        if enemyText.len() > 0 {
+-            stdoutln(enemyText);
+-        }
++        lastPlayer = result.player;
++        lastEnemy = result.enemy;
+@@ -26,0 +74 @@
++
+@@ -29 +77,8 @@
+-        stdoutln(finalFrame);
++        present_frame(
++            finalFrame.view(),
++            lastPlayer,
++            lastEnemy,
++            false,
++            selected.clearFrames,
++            false
++        );
+@@ -34,0 +90,40 @@
++    } else {
++        stdoutln("You leave the dungeon for another day.");
++    }
++    return 0;
++}
++
++void print_usage() {
++    stdoutln("usage: arrowfall [--no-clear] [--seed <u64>]");
++}
++
++void present_frame(
++    stringv frame,
++    game::PlayerEvent player,
++    game::EnemyEvent enemy,
++    bool invalidCommand,
++    bool clear,
++    bool first
++) {
++    clear_terminal(clear);
++    if clear or first {
++        stdoutln("ARROWFALL — reach >, survive g");
++        stdoutln(render::player_message(game::PlayerEvent.Help));
++    }
++    stdoutln(frame);
++    playerText := render::player_message(player);
++    enemyText := render::enemy_message(enemy);
++    if playerText.len() > 0 {
++        stdoutln(playerText);
++    }
++    if enemyText.len() > 0 {
++        stdoutln(enemyText);
++    }
++    if invalidCommand {
++        stdoutln("Unknown command. Type H for help. No turn spent.");
++    }
++}
++
++void clear_terminal(bool enabled) {
++    if !enabled {
++        return;
+@@ -35,0 +131,4 @@
++    stdout(27.cast<u8>.cast<char>);
++    stdout("[2J");
++    stdout(27.cast<u8>.cast<char>);
++    stdout("[H");
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/src/options.fl tutorial/checkpoints/07-final/src/options.fl
+--- tutorial/checkpoints/06-archery/src/options.fl
++++ tutorial/checkpoints/07-final/src/options.fl
+@@ -0,0 +1,70 @@
++module options;
++
++@imports :: lib::std::text::strings;
++
++export const u64 DEFAULT_SEED = 20261105;
++
++export error OptionError {
++    InvalidOption,
++    InvalidSeed
++}
++
++export structure Options {
++    bool clearFrames;
++    u64 seed;
++};
++
++export structure Parser {
++    private Options selected;
++    private bool expectsSeed;
++};
++
++Options Options::defaults() {
++    return build Options {
++        self.clearFrames = true;
++        self.seed = DEFAULT_SEED;
++    };
++}
++
++Parser Parser::start() {
++    return build Parser {
++        self.selected = Options::defaults();
++        self.expectsSeed = false;
++    };
++}
++
++error Parser::consume(&self, stringv value) {
++    if self->expectsSeed and !starts_with_option(value) {
++        self->expectsSeed = false;
++        if value.len() == 0 {
++            self->selected.seed = DEFAULT_SEED;
++            return none;
++        }
++        seed, seedError := strings::stringv_to_int<u64>(value);
++        if seedError != none {
++            return OptionError.InvalidSeed;
++        }
++        self->selected.seed = seed;
++        return none;
++    }
++
++    self->expectsSeed = false;
++    if value == "--no-clear" {
++        self->selected.clearFrames = false;
++        return none;
++    }
++    if value == "--seed" {
++        self->selected.seed = DEFAULT_SEED;
++        self->expectsSeed = true;
++        return none;
++    }
++    return OptionError.InvalidOption;
++}
++
++Options Parser::finish(&const self) {
++    return self->selected;
++}
++
++bool starts_with_option(stringv value) {
++    return value.len() >= 2 and value[0] == '-' and value[1] == '-';
++}
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/src/options_test.fl tutorial/checkpoints/07-final/src/options_test.fl
+--- tutorial/checkpoints/06-archery/src/options_test.fl
++++ tutorial/checkpoints/07-final/src/options_test.fl
+@@ -0,0 +1,69 @@
++module options_test;
++
++@imports
++    :: root::options
++    :: lib::std::tests::asserts
++    :: lib::std::tests::testing;
++
++test seed_defaults_for_every_empty_form(&testing::UnitTest t) {
++    absentParser := options::Parser::start();
++    emptyParser := options::Parser::start();
++    emptyError := emptyParser.consume("--seed");
++    emptyError = emptyParser.consume("");
++    missingParser := options::Parser::start();
++    missingError := missingParser.consume("--seed");
++    optionParser := options::Parser::start();
++    followedError := optionParser.consume("--seed");
++    followedError = optionParser.consume("--no-clear");
++    absent := absentParser.finish();
++    empty := emptyParser.finish();
++    missing := missingParser.finish();
++    followed := optionParser.finish();
++    asserts::is_true(
++        t,
++        emptyError == none and missingError == none and followedError == none and
++            absent.seed == options::DEFAULT_SEED and
++            empty.seed == options::DEFAULT_SEED and
++            missing.seed == options::DEFAULT_SEED and
++            followed.seed == options::DEFAULT_SEED and
++            !followed.clearFrames,
++        "absent, empty, missing, or option-followed seeds use the default"
++    );
++}
++
++test seed_and_plain_mode_accept_either_order(&testing::UnitTest t) {
++    firstParser := options::Parser::start();
++    error firstError = firstParser.consume("--seed");
++    firstError = firstParser.consume("42");
++    firstError = firstParser.consume("--no-clear");
++    secondParser := options::Parser::start();
++    error secondError = secondParser.consume("--no-clear");
++    secondError = secondParser.consume("--seed");
++    secondError = secondParser.consume("42");
++    first := firstParser.finish();
++    second := secondParser.finish();
++    asserts::is_true(
++        t,
++        firstError == none and secondError == none and first.seed == 42 and
++            second.seed == 42 and !first.clearFrames and !second.clearFrames,
++        "seed and no-clear compose in either order"
++    );
++}
++
++test invalid_seed_and_unknown_option_are_rejected(&testing::UnitTest t) {
++    invalidParser := options::Parser::start();
++    invalidParser.consume("--seed");
++    invalidError := invalidParser.consume("twelve");
++    overflowParser := options::Parser::start();
++    overflowParser.consume("--seed");
++    overflowError := overflowParser.consume("18446744073709551616");
++    unknownParser := options::Parser::start();
++    unknownError := unknownParser.consume("--wat");
++    asserts::is_true(
++        t,
++        invalidError == options::OptionError.InvalidSeed and
++            overflowError == options::OptionError.InvalidSeed and
++            unknownError == options::OptionError.InvalidOption,
++        "non-decimal, out-of-range, and unknown options fail explicitly"
++    );
++}
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/src/render.fl tutorial/checkpoints/07-final/src/render.fl
+--- tutorial/checkpoints/06-archery/src/render.fl
++++ tutorial/checkpoints/07-final/src/render.fl
+@@ -6 +6 @@
+-    canvas, allocationError := strings::StringBuilder::withCapacity(112);
++    canvas, allocationError := strings::StringBuilder::withCapacity(160);
+@@ -34 +34,3 @@
+-        canvas.appendInteger(state->turn()) != none {
++        canvas.appendInteger(state->turn()) != none or
++        canvas.append("  Seed: ") != none or
++        canvas.appendInteger(state->seed()) != none {
+@@ -40,0 +43,3 @@
++    if event == game::PlayerEvent.Moved {
++        return "You move.";
++    }
+@@ -42 +47 @@
+-        return "A wall blocks your way. No turn spent.";
++        return "A wall blocks your way.";
+@@ -58,0 +64,3 @@
++    if event == game::PlayerEvent.Quit {
++        return "You lower your bow.";
++    }
+@@ -62,4 +70 @@
+-    if event == game::PlayerEvent.Quit {
+-        return "You leave the room.";
+-    }
+-    return "You move.";
++    return "";
+@@ -73 +78 @@
+-        return "The goblin closes in! Move before its next turn.";
++        return "The goblin closes in! Move or shoot before its next turn.";
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/src/render_test.fl tutorial/checkpoints/07-final/src/render_test.fl
+--- tutorial/checkpoints/06-archery/src/render_test.fl
++++ tutorial/checkpoints/07-final/src/render_test.fl
+@@ -0,0 +1,24 @@
++module render_test;
++
++@imports
++    :: root::game
++    :: root::render
++    :: lib::std::tests::asserts
++    :: lib::std::tests::testing;
++
++test renderer_and_event_messages_explain_the_run(&testing::UnitTest t) {
++    state := game::Game::start(42);
++    frame, frameError := render::draw(&state);
++    const stringv EXPECTED = "#########\n#@......#\n#..###..#\n#......g#\n#..###..#\n#>......#\n#########\nHP: 3  Arrows: 3  Turn: 0  Seed: 42";
++    asserts::is_true(
++        t,
++        frameError == none and frame.view() == EXPECTED and
++            render::player_message(game::PlayerEvent.ShotHit) ==
++                "Your arrow hits! The goblin falls." and
++            render::player_message(game::PlayerEvent.ShotMiss) ==
++                "Your arrow misses; a wall stops it." and
++            render::enemy_message(game::EnemyEvent.Threatened) ==
++                "The goblin closes in! Move or shoot before its next turn.",
++        "the room, status, hit, miss, and danger messages are stable"
++    );
++}
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/tests/defeat_input.txt tutorial/checkpoints/07-final/tests/defeat_input.txt
+--- tutorial/checkpoints/06-archery/tests/defeat_input.txt
++++ tutorial/checkpoints/07-final/tests/defeat_input.txt
+@@ -0,0 +1,10 @@
++d
++a
++d
++a
++d
++a
++d
++d
++d
++d
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/tests/defeat_output.txt tutorial/checkpoints/07-final/tests/defeat_output.txt
+--- tutorial/checkpoints/06-archery/tests/defeat_output.txt
++++ tutorial/checkpoints/07-final/tests/defeat_output.txt
+@@ -0,0 +1,124 @@
++ARROWFALL — reach >, survive g
++Move       Shoot
++  W          I
++A S D      J K L
++H help | Q quit
++#########
++#@......#
++#..###..#
++#......g#
++#..###..#
++#>......#
++#########
++HP: 3  Arrows: 3  Turn: 0  Seed: 20261105
++command>
++#########
++#.@.....#
++#..###.g#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 3  Arrows: 3  Turn: 1  Seed: 20261105
++You move.
++The goblin moves closer.
++command>
++#########
++#@.....g#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 3  Arrows: 3  Turn: 2  Seed: 20261105
++You move.
++The goblin moves closer.
++command>
++#########
++#.@...g.#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 3  Arrows: 3  Turn: 3  Seed: 20261105
++You move.
++The goblin moves closer.
++command>
++#########
++#@...g..#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 3  Arrows: 3  Turn: 4  Seed: 20261105
++You move.
++The goblin moves closer.
++command>
++#########
++#.@.g...#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 3  Arrows: 3  Turn: 5  Seed: 20261105
++You move.
++The goblin moves closer.
++command>
++#########
++#@.g....#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 3  Arrows: 3  Turn: 6  Seed: 20261105
++You move.
++The goblin moves closer.
++command>
++#########
++#.@g....#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 3  Arrows: 3  Turn: 7  Seed: 20261105
++You move.
++The goblin closes in! Move or shoot before its next turn.
++command>
++#########
++#.@g....#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 2  Arrows: 3  Turn: 8  Seed: 20261105
++The goblin blocks that tile.
++The goblin attacks: -1 HP.
++command>
++#########
++#.@g....#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 1  Arrows: 3  Turn: 9  Seed: 20261105
++The goblin blocks that tile.
++The goblin attacks: -1 HP.
++command>
++#########
++#.@g....#
++#..###..#
++#.......#
++#..###..#
++#>......#
++#########
++HP: 0  Arrows: 3  Turn: 10  Seed: 20261105
++The goblin blocks that tile.
++The goblin attacks: -1 HP.
++The goblin caught you.
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/tests/frame.svg tutorial/checkpoints/07-final/tests/frame.svg
+--- tutorial/checkpoints/06-archery/tests/frame.svg
++++ tutorial/checkpoints/07-final/tests/frame.svg
+@@ -2,2 +2,2 @@
+-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="200" viewBox="0 0 360 200" role="img">
+-  <title>06-archery representative frame</title>
++<svg xmlns="http://www.w3.org/2000/svg" width="417" height="238" viewBox="0 0 417 238" role="img">
++  <title>07-final representative frame</title>
+@@ -13 +13,3 @@
+-  <text x="24" y="170" class="terminal">HP: 3  Arrows: 2  Turn: 5</text>
++  <text x="24" y="170" class="terminal">HP: 3  Arrows: 2  Turn: 5  Seed: 20261105</text>
++  <text x="24" y="189" class="terminal">You reach the exit.</text>
++  <text x="24" y="208" class="terminal">You escaped Arrowfall!</text>
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/tests/frame.txt tutorial/checkpoints/07-final/tests/frame.txt
+--- tutorial/checkpoints/06-archery/tests/frame.txt
++++ tutorial/checkpoints/07-final/tests/frame.txt
+@@ -8 +8,3 @@
+-HP: 3  Arrows: 2  Turn: 5
++HP: 3  Arrows: 2  Turn: 5  Seed: 20261105
++You reach the exit.
++You escaped Arrowfall!
+diff -rN -U0 --exclude target tutorial/checkpoints/06-archery/tests/output.txt tutorial/checkpoints/07-final/tests/output.txt
+--- tutorial/checkpoints/06-archery/tests/output.txt
++++ tutorial/checkpoints/07-final/tests/output.txt
+@@ -0,0 +1,5 @@
++ARROWFALL — reach >, survive g
++Move       Shoot
++  W          I
++A S D      J K L
++H help | Q quit
+@@ -8 +13 @@
+-HP: 3  Arrows: 3  Turn: 0
++HP: 3  Arrows: 3  Turn: 0  Seed: 20261105
+@@ -10,2 +14,0 @@
+-You move.
+-The goblin moves closer.
+@@ -14,2 +17,2 @@
+-#@.###..#
+-#.....g.#
++#@.###.g#
++#.......#
+@@ -19,2 +22 @@
+-HP: 3  Arrows: 3  Turn: 1
+-command>
++HP: 3  Arrows: 3  Turn: 1  Seed: 20261105
+@@ -22,0 +25 @@
++command>
+@@ -26 +29 @@
+-#@...g..#
++#@.....g#
+@@ -30 +33,3 @@
+-HP: 3  Arrows: 3  Turn: 2
++HP: 3  Arrows: 3  Turn: 2  Seed: 20261105
++You move.
++The goblin moves closer.
+@@ -32 +36,0 @@
+-Your arrow hits! The goblin falls.
+@@ -40 +44,2 @@
+-HP: 3  Arrows: 2  Turn: 3
++HP: 3  Arrows: 2  Turn: 3  Seed: 20261105
++Your arrow hits! The goblin falls.
+@@ -42 +46,0 @@
+-You move.
+@@ -50 +54,2 @@
+-HP: 3  Arrows: 2  Turn: 4
++HP: 3  Arrows: 2  Turn: 4  Seed: 20261105
++You move.
+@@ -52 +56,0 @@
+-You reach the exit.
+@@ -60 +64,2 @@
+-HP: 3  Arrows: 2  Turn: 5
++HP: 3  Arrows: 2  Turn: 5  Seed: 20261105
++You reach the exit.

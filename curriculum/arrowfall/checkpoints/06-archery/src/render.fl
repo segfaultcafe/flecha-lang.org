@@ -1,0 +1,79 @@
+module render;
+
+@imports :: root::game :: lib::std::text::strings;
+
+export (string, error) draw(&const game::Game state) {
+    canvas, allocationError := strings::StringBuilder::withCapacity(112);
+    if allocationError != none {
+        return (none, allocationError);
+    }
+    player := state->playerPosition();
+    goblin := state->goblinPosition();
+    loop i32 y = 0; y < 7; y++ {
+        loop i32 x = 0; x < 9; x++ {
+            position := game::Position::at(x, y);
+            char tile = game::tile_at(position);
+            if position.equals(&player) {
+                tile = '@';
+            } else if state->isGoblinAlive() and position.equals(&goblin) {
+                tile = 'g';
+            }
+            if canvas.appendChar(tile) != none {
+                return (none, AllocationError.OutOfMemory);
+            }
+        }
+        if canvas.appendChar('\n') != none {
+            return (none, AllocationError.OutOfMemory);
+        }
+    }
+    if canvas.append("HP: ") != none or
+        canvas.appendInteger(state->health()) != none or
+        canvas.append("  Arrows: ") != none or
+        canvas.appendInteger(state->arrows()) != none or
+        canvas.append("  Turn: ") != none or
+        canvas.appendInteger(state->turn()) != none {
+        return (none, AllocationError.OutOfMemory);
+    }
+    return canvas.toString();
+}
+
+export stringv player_message(game::PlayerEvent event) {
+    if event == game::PlayerEvent.Wall {
+        return "A wall blocks your way. No turn spent.";
+    }
+    if event == game::PlayerEvent.GoblinBlocks {
+        return "The goblin blocks that tile.";
+    }
+    if event == game::PlayerEvent.ShotHit {
+        return "Your arrow hits! The goblin falls.";
+    }
+    if event == game::PlayerEvent.ShotMiss {
+        return "Your arrow misses; a wall stops it.";
+    }
+    if event == game::PlayerEvent.NoArrows {
+        return "Your quiver is empty.";
+    }
+    if event == game::PlayerEvent.Help {
+        return "Move       Shoot\n  W          I\nA S D      J K L\nH help | Q quit";
+    }
+    if event == game::PlayerEvent.Won {
+        return "You reach the exit.";
+    }
+    if event == game::PlayerEvent.Quit {
+        return "You leave the room.";
+    }
+    return "You move.";
+}
+
+export stringv enemy_message(game::EnemyEvent event) {
+    if event == game::EnemyEvent.Moved {
+        return "The goblin moves closer.";
+    }
+    if event == game::EnemyEvent.Threatened {
+        return "The goblin closes in! Move before its next turn.";
+    }
+    if event == game::EnemyEvent.Attacked {
+        return "The goblin attacks: -1 HP.";
+    }
+    return "";
+}

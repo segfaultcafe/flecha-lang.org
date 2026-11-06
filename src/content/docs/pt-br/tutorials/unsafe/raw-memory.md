@@ -33,6 +33,22 @@ ponteiro não é nulo, está alinhado, aponta para `i32` vivo, permite o acesso 
 não é usado depois de `value` morrer. A prova é maior embora a sintaxe seja
 parecida.
 
+Execute o par verificado exato do repositório:
+
+```sh test="unsafe-first-run"
+flecha check curriculum/fixtures/unsafe-first/safe.fl
+flecha build curriculum/fixtures/unsafe-first/safe.fl -o build/safe-first
+build/safe-first
+flecha check curriculum/fixtures/unsafe-first/unsafe.fl
+flecha build curriculum/fixtures/unsafe-first/unsafe.fl -o build/unsafe-first
+build/unsafe-first
+```
+
+```text test="unsafe-first-run"
+42
+42
+```
+
 `new<T>` bruto também retorna erro de alocação e cria obrigação de limpeza.
 Associe cada sucesso a exatamente um `free`, inclusive em retornos antecipados.
 

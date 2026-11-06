@@ -18,11 +18,15 @@ npm run dev
 
 The generated reference and example pages are committed so the website can deploy independently. Run `npm run sync:content` after the compiler documentation changes.
 
-The ordered learning path is defined once in
-[`src/data/curriculum.mjs`](src/data/curriculum.mjs). It generates the tutorial
-sidebar and Previous/Next links. Each route has matching English and Brazilian
-Portuguese content. Standalone references and examples intentionally do not
-render curriculum pagination.
+The main Beginner → Basic → Intermediate → Advanced → Unsafe learning path is
+defined once in [`src/data/curriculum.mjs`](src/data/curriculum.mjs). The
+independent seven-step ARROWFALL project tutorial is defined in
+[`src/data/arrowfall.mjs`](src/data/arrowfall.mjs). The two series generate
+separate sidebar and Previous/Next sequences and have matching English and
+Brazilian Portuguese routes. ARROWFALL's frozen cumulative source projects live
+in [`curriculum/arrowfall`](curriculum/arrowfall) at commit `56bb003`; concrete
+main-track practice evidence lives in [`curriculum/main-evidence`](curriculum/main-evidence).
+Standalone references and examples intentionally do not render pagination.
 
 ## Validation
 
@@ -35,14 +39,15 @@ npm run check:links
 npx --no-install wrangler deploy --dry-run
 ```
 
-`check:curriculum` compares every marked executable documentation block with a
-curated fixture, then checks/builds/runs it through the official Flecha 0.3.0
-compiler or Longbow. It asserts exact stdout, stderr, and exit status where the
-tutorial documents them. `check:links` validates internal links, exact EN/PT
-curriculum order, explicit onward recommendations, and the absence of
-curriculum pagination on standalone pages. CI downloads the tagged Linux
-toolchain and verifies it against the release `SHA256SUMS` before running the
-same qualification.
+`check:curriculum` validates the original marked examples, 15 concrete
+main-track practice checkpoints, and all seven ARROWFALL snapshots. With
+`--toolchain`, it executes their documented Flecha/Longbow 0.3.0 checks,
+builds, tests, and runs; compares exact output and exit status; and runs
+ARROWFALL's final ANSI, seed, option, victory, and defeat golden campaign.
+`check:links` validates internal links, both independent EN/PT Previous/Next
+orders, explicit onward recommendations, and the absence of pagination on
+standalone pages. CI downloads the tagged Linux toolchain and verifies it
+against the release `SHA256SUMS` before running the same qualification.
 
 ## Deployment
 

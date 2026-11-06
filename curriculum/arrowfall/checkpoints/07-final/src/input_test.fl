@@ -1,0 +1,28 @@
+module input_test;
+
+@imports
+    :: root::game
+    :: root::input
+    :: lib::std::tests::asserts
+    :: lib::std::tests::testing;
+
+test parser_supports_both_key_diamonds_and_free_invalid_input(
+    &testing::UnitTest t
+) {
+    move, moveError := input::parse(" W ");
+    shot, shotError := input::parse("L");
+    downShot, downError := input::parse("k");
+    help, helpError := input::parse("H");
+    _, invalidError := input::parse("dance");
+    state := game::Game::start(1);
+    asserts::is_true(
+        t,
+        moveError == none and move == game::Command.MoveUp and
+            shotError == none and shot == game::Command.ShootRight and
+            downError == none and downShot == game::Command.ShootDown and
+            helpError == none and help == game::Command.Help and
+            invalidError == input::CommandError.InvalidCommand and
+            state.turn() == 0,
+        "WASD and IJKL normalize once while invalid input never reaches the engine"
+    );
+}
