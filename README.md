@@ -33,6 +33,7 @@ Standalone references and examples intentionally do not render pagination.
 ```sh
 npm ci
 npm run check
+npm run check:editorial
 npm run check:curriculum -- --toolchain /path/to/flecha-0.3.0-Linux-x86_64
 npm run build
 npm run check:links
@@ -44,9 +45,12 @@ main-track practice checkpoints, and all seven ARROWFALL snapshots. With
 `--toolchain`, it executes their documented Flecha/Longbow 0.3.0 checks,
 builds, tests, and runs; compares exact output and exit status; and runs
 ARROWFALL's final ANSI, seed, option, victory, and defeat golden campaign.
+`check:editorial` enforces the structural parts of the repository's normative
+Vulkan-standard documentation policy in [`AGENTS.md`](AGENTS.md).
 `check:links` validates internal links, both independent EN/PT Previous/Next
-orders, explicit onward recommendations, and the absence of pagination on
-standalone pages. CI downloads the tagged Linux toolchain and verifies it
+orders, explicit onward recommendations, the absence of pagination on
+standalone pages, and byte-equivalence between rendered code blocks and the
+committed sources compiled by curriculum qualification. CI downloads the tagged Linux toolchain and verifies it
 against the release `SHA256SUMS` before running the same qualification.
 
 ## Deployment

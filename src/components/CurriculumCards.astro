@@ -4,32 +4,14 @@ import { curriculumPath, curriculumTracks } from '../data/curriculum.mjs';
 const locale = Astro.url.pathname.startsWith('/pt-br/') ? 'pt-br' : 'en';
 ---
 
-<div class="curriculum-grid">
+<div>
 	{curriculumTracks.map((track, index) => (
-		<article class={`track-card track-${track.id}`}>
-			<p class="eyebrow">{locale === 'pt-br' ? `Nível ${index + 1}` : `Level ${index + 1}`}</p>
+		<section>
 			<h2>{locale === 'pt-br' ? track.titlePt : track.title}</h2>
 			<p>{locale === 'pt-br' ? track.outcomePt : track.outcome}</p>
-			<dl>
-				<dt>{locale === 'pt-br' ? 'Pré-requisito' : 'Prerequisite'}</dt>
-				<dd>{locale === 'pt-br' ? track.prerequisitePt : track.prerequisite}</dd>
-				<dt>{locale === 'pt-br' ? 'Escopo' : 'Scope'}</dt>
-				<dd>{locale === 'pt-br' ? track.scopePt : track.scope}</dd>
-			</dl>
-			<a class="start" href={curriculumPath(track.lessons[0].slug, locale)}>
-				{locale === 'pt-br' ? 'Começar esta trilha' : 'Start this track'} →
-			</a>
-		</article>
+			<p><strong>{locale === 'pt-br' ? 'Pré-requisito' : 'Prerequisite'}:</strong> {locale === 'pt-br' ? track.prerequisitePt : track.prerequisite}</p>
+			<p><strong>{locale === 'pt-br' ? 'Escopo' : 'Scope'}:</strong> {locale === 'pt-br' ? track.scopePt : track.scope}</p>
+			<p><a href={curriculumPath(track.lessons[0].slug, locale)}>{index + 1}. {locale === 'pt-br' ? track.titlePt : track.title}</a></p>
+		</section>
 	))}
 </div>
-
-<style>
-	.curriculum-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr)); }
-	.track-card { border: 1px solid var(--sl-color-gray-5); border-top: .3rem solid var(--sl-color-accent); border-radius: .75rem; padding: 1.25rem; background: color-mix(in srgb, var(--sl-color-bg-nav) 88%, transparent); box-shadow: var(--sl-shadow-md); }
-	.track-card h2 { margin-top: .25rem; }
-	.eyebrow { color: var(--sl-color-accent-high); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: var(--sl-text-xs); }
-	dl { margin-block: 1rem; }
-	dt { font-weight: 700; }
-	dd { margin-inline-start: 0; margin-bottom: .65rem; color: var(--sl-color-gray-2); }
-	.start { display: inline-block; font-weight: 700; text-decoration: none; }
-</style>

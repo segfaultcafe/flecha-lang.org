@@ -1,7 +1,7 @@
 ---
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { Code } from 'astro:components';
+import { Code } from 'astro-expressive-code/components';
 import { arrowfallById, arrowfallLessons, arrowfallPath } from '../data/arrowfall.mjs';
 
 interface Props {
@@ -42,187 +42,132 @@ const local = <T,>(english: T, portuguese: T) => locale === 'pt-br' ? portuguese
 const field = (name: string) => (lesson as unknown as Record<string, any>)[locale === 'pt-br' ? `${name}Pt` : name];
 const title = (item: (typeof arrowfallLessons)[number]) => locale === 'pt-br' ? item.titlePt : item.title;
 const publicFrame = (checkpointId: string) => `/arrowfall/frames/${checkpointId}.svg`;
-const lang = (path: string) => path.endsWith('.toml') ? 'toml' : 'text';
+const lang = (path: string) => path.endsWith('.fl') ? 'flecha' : path.endsWith('.toml') ? 'toml' : path.endsWith('.sh') ? 'sh' : 'text';
 const commands = deliverable.commands.join('\n');
 ---
 
 <article data-arrowfall-lesson={id}>
-<div class="checkpoint-identity">
-	<span>{local('ARROWFALL checkpoint', 'Checkpoint ARROWFALL')} {index + 1}/7</span>
-	<span>Flecha {manifest.toolchain.version}</span>
-	<span>{id}</span>
-</div>
+<p><strong>{local('Current source', 'Fonte atual')}:</strong> <code>curriculum/arrowfall/checkpoints/{id}</code> · Flecha {manifest.toolchain.version} · {index + 1}/7.</p>
 
-<aside class="built-panel" aria-labelledby="already-built">
-	<h2 id="already-built">{local('You already built', 'Você já construiu')}</h2>
-	<p>{field('built')}</p>
-</aside>
+<h2 id="already-built">{local('Current state', 'Estado atual')}</h2>
+<p>{field('built')}</p>
 
-<h2 id="run-the-current-checkpoint">{local('1. Run the current checkpoint', '1. Execute o checkpoint atual')}</h2>
-
+<h2 id="run-the-current-checkpoint">{local('Run the current version', 'Execute a versão atual')}</h2>
 <p>{local(
-	'Begin with the program as it exists now. From the canonical Arrowfall source tree, run the recorded command and give it the recorded input.',
-	'Comece com o programa como ele existe agora. Na árvore de fontes canônica do Arrowfall, execute o comando registrado e forneça a entrada registrada.',
+	'The command below runs this version with its recorded standard input. Running it first establishes the behavior that the rest of the page changes.',
+	'O comando abaixo executa esta versão com a entrada padrão registrada. Executá-lo primeiro estabelece o comportamento alterado no restante da página.',
 )}</p>
+<Code code={deliverable.commands[3]} lang="sh" meta={`title="${local('Run command', 'Comando de execução')}"`} />
 
-<Code code={deliverable.commands[3]} lang="sh" />
+<h3>{local('Standard input', 'Entrada padrão')}</h3>
+<Code code={input || local('(empty)', '(vazia)')} lang="text" meta={`title="${local('Standard input', 'Entrada padrão')}"`} />
 
-<details>
-	<summary>{local('Scripted stdin', 'Entrada stdin roteirizada')}</summary>
-	<pre class="terminal transcript"><code>{input || local('(empty)', '(vazia)')}</code></pre>
-</details>
+<figure>
+	<img src={publicFrame(id)} alt={local(`Terminal frame produced by version ${index + 1}: ${lesson.title}`, `Frame de terminal produzido pela versão ${index + 1}: ${lesson.titlePt}`)} />
+	<figcaption>{local('Frame generated from the recorded output.', 'Frame gerado a partir da saída registrada.')}</figcaption>
+</figure>
 
-<div class="frame-grid">
-	<figure>
-		<img src={publicFrame(id)} alt={local(`Validated terminal frame for checkpoint ${index + 1}: ${lesson.title}`, `Frame de terminal validado do checkpoint ${index + 1}: ${lesson.titlePt}`)} />
-		<figcaption>{local('The actual validated frame for this checkpoint.', 'O frame real validado deste checkpoint.')}</figcaption>
-	</figure>
-	<div>
-		<p class="visual-label">{local('Accessible frame transcript', 'Transcrição acessível do frame')}</p>
-		<pre class="terminal frame-text"><code>{frame}</code></pre>
-	</div>
-</div>
+<h3>{local('Frame as text', 'Frame em texto')}</h3>
+<Code code={frame} lang="text" meta={`title="${local('Frame as text', 'Frame em texto')}"`} />
 
 {predecessor && (
-	<details class="comparison">
-		<summary>{local('Compare with the previous playable result', 'Compare com o resultado jogável anterior')}</summary>
-		<div class="frame-grid compact">
-			<figure>
-				<img src={publicFrame(predecessor.id)} alt={local(`Previous frame: ${predecessor.title}`, `Frame anterior: ${predecessor.titlePt}`)} />
-				<figcaption>{title(predecessor)}</figcaption>
-			</figure>
-			<figure>
-				<img src={publicFrame(id)} alt={local(`Current frame: ${lesson.title}`, `Frame atual: ${lesson.titlePt}`)} />
-				<figcaption>{title(lesson)}</figcaption>
-			</figure>
-		</div>
+	<details>
+		<summary>{local('Previous and current frames', 'Frames anterior e atual')}</summary>
+		<p><strong>{local('Previous', 'Anterior')}:</strong> {title(predecessor)}</p>
+		<img src={publicFrame(predecessor.id)} alt={local(`Previous frame: ${predecessor.title}`, `Frame anterior: ${predecessor.titlePt}`)} />
+		<p><strong>{local('Current', 'Atual')}:</strong> {title(lesson)}</p>
+		<img src={publicFrame(id)} alt={local(`Current frame: ${lesson.title}`, `Frame atual: ${lesson.titlePt}`)} />
 	</details>
 )}
 
-<h2 id="observed-limitation">{local('2. Observe the limitation', '2. Observe a limitação')}</h2>
+<h2 id="observed-limitation">{local('Current limitation', 'Limitação atual')}</h2>
 <p>{field('limitation')}</p>
 
-<h2 id="desired-behaviour">{local('3. Decide what the game needs next', '3. Decida o que o jogo precisa agora')}</h2>
+<h2 id="desired-behaviour">{local('Required behavior', 'Comportamento necessário')}</h2>
 <p>{field('desired')}</p>
 
-<h2 id="design-decision">{local('4. Choose the smallest model', '4. Escolha o menor modelo')}</h2>
+<h2 id="design-decision">{local('Design', 'Projeto da mudança')}</h2>
 <p>{field('decision')}</p>
-
-<h2 id="flecha-concept">{local('5. Introduce the Flecha concept—because it is needed now', '5. Introduza o conceito Flecha — porque ele é necessário agora')}</h2>
 <p>{field('concept')}</p>
 
-<h2 id="implement">{local('6. Implement the change', '6. Implemente a mudança')}</h2>
-
+<h2 id="implement">{local('Implementation', 'Implementação')}</h2>
+<p>{local(
+	'This version makes the following changes. The excerpts identify the relevant implementation points; they are not standalone programs. The complete source follows them and is the source compiled by the verification commands.',
+	'Esta versão faz as mudanças abaixo. Os trechos identificam os pontos relevantes da implementação; eles não são programas independentes. O código completo vem depois e é a fonte compilada pelos comandos de verificação.',
+)}</p>
 <ul>
 	{field('changes').map((change: string) => <li>{change}</li>)}
 </ul>
 
 {snippets.map((snippet) => (
-	<section class="snippet">
-		<h3>{locale === 'pt-br' ? snippet.labelPt : snippet.label}</h3>
-		<p class="source-location">{snippet.file}:{snippet.start}–{snippet.end}</p>
-		<Code code={snippet.code} lang="text" />
+	<section>
+		<h3>{local('Excerpt', 'Trecho')}: {locale === 'pt-br' ? snippet.labelPt : snippet.label}</h3>
+		<p><code>{snippet.file}:{snippet.start}–{snippet.end}</code></p>
+		<Code code={snippet.code} lang="flecha" meta={`title="${snippet.file}:${snippet.start}-${snippet.end} (excerpt)"`} />
 	</section>
 ))}
 
-<details class="source-bundle">
-	<summary>{local(`Complete checkpoint source (${sourceFiles.length} files)`, `Código completo do checkpoint (${sourceFiles.length} arquivos)`)}</summary>
+<details>
+	<summary>{local(`Complete tested source (${sourceFiles.length} files)`, `Código completo testado (${sourceFiles.length} arquivos)`)}</summary>
 	{sourceFiles.map((path) => (
 		<section>
-			<h3>{path}</h3>
-			<Code code={read(path)} lang={lang(path)} />
+			<h3><code>{path}</code></h3>
+			<Code code={read(path)} lang={lang(path)} meta={`title="${path}"`} />
 		</section>
 	))}
 </details>
 
-<details class="source-diff">
-	<summary>{local('Exact cumulative diff from the previous checkpoint', 'Diff cumulativo exato desde o checkpoint anterior')}</summary>
+<details>
+	<summary>{local('Exact diff from the preceding version', 'Diff exato desde a versão anterior')}</summary>
 	<Code code={diff} lang="diff" />
 </details>
 
-<h2 id="run-and-compare">{local('7. Run it and compare', '7. Execute e compare')}</h2>
-
+<h2 id="run-and-compare">{local('Verification', 'Verificação')}</h2>
 <p>{local(
-	'These are the exact commands recorded in the frozen manifest. Check, test, and build must all succeed before the transcript is accepted.',
-	'Estes são os comandos exatos registrados no manifesto congelado. Check, test e build devem passar antes de a transcrição ser aceita.',
+	'These commands check, test, build, and run the complete source shown above. The final command uses the committed input file; its stdout must match the recorded output byte for byte.',
+	'Estes comandos verificam, testam, compilam e executam o código completo mostrado acima. O último comando usa o arquivo de entrada versionado; sua stdout deve corresponder byte a byte à saída registrada.',
 )}</p>
+<Code code={commands} lang="sh" meta={`title="${local('Verification commands', 'Comandos de verificação')}"`} />
 
-<Code code={commands} lang="sh" />
+<h3>{local('Expected stdout', 'Stdout esperada')}</h3>
+<Code code={output} lang="text" meta={`title="${local('Expected stdout', 'Stdout esperada')}"`} />
 
-<details open>
-	<summary>{local('Exact expected stdout', 'Stdout esperado exato')}</summary>
-	<pre class="terminal transcript"><code>{output}</code></pre>
-</details>
+<h2 id="challenge">{local('Exercise', 'Exercício')}</h2>
+<p>{field('challenge')}</p>
 
-<aside class="acceptance">
-	<h2 id="challenge">{local('Small challenge and acceptance', 'Pequeno desafio e aceite')}</h2>
-	<p>{field('challenge')}</p>
-</aside>
-
-<h2 id="cumulative-timeline">{local('Cumulative timeline', 'Linha do tempo cumulativa')}</h2>
-<ol class="timeline">
+<h2 id="cumulative-timeline">{local('Versions in this tutorial', 'Versões deste tutorial')}</h2>
+<ol>
 	{arrowfallLessons.slice(0, index + 1).map((item, itemIndex) => (
-		<li class={item.id === id ? 'current' : undefined}>
-			{item.id === id
-				? <strong>{itemIndex + 1}. {title(item)}</strong>
-				: <a href={arrowfallPath(item.slug, locale)}>{itemIndex + 1}. {title(item)}</a>}
-		</li>
+		<li>{item.id === id
+			? <strong>{itemIndex + 1}. {title(item)}</strong>
+			: <a href={arrowfallPath(item.slug, locale)}>{itemIndex + 1}. {title(item)}</a>}</li>
 	))}
 </ol>
 
 {next ? (
 	<>
-		<h2 id={locale === 'pt-br' ? 'o-que-aprender-a-seguir' : 'what-to-learn-next'}>{local('What to learn next', 'O que aprender a seguir')}</h2>
+		<h2 id={locale === 'pt-br' ? 'o-que-aprender-a-seguir' : 'what-to-learn-next'}>{local('Next version', 'Próxima versão')}</h2>
 		<p>{field('next')}</p>
-		<p><a href={arrowfallPath(next.slug, locale)}><strong>{local('Continue to', 'Continue para')} {title(next)} →</strong></a></p>
+		<p><a href={arrowfallPath(next.slug, locale)}>{title(next)}</a></p>
 	</>
 ) : (
 	<>
-		<h2 id="project-complete">{local('ARROWFALL is qualified', 'ARROWFALL está qualificado')}</h2>
+		<h2 id="project-complete">{local('Result and scope', 'Resultado e escopo')}</h2>
 		<p>{field('next')}</p>
 		<p>{local(
-			'The final safe game intentionally has no unsafe subsystem. That boundary remains a separate reference topic, not a required tutorial step.',
-			'O jogo seguro final intencionalmente não tem subsistema unsafe. Essa fronteira continua como referência separada, não como etapa obrigatória do tutorial.',
+			'The final game does not include an unsafe subsystem. Unsafe code is outside the scope of this tutorial because the game has no measured native boundary that requires it.',
+			'O jogo final não inclui subsistema unsafe. Código unsafe está fora do escopo deste tutorial porque o jogo não tem uma fronteira nativa medida que o exija.',
 		)}</p>
 	</>
 )}
 
-<h2 id="references">{local('Reference after the checkpoint', 'Referência depois do checkpoint')}</h2>
+<h2 id="references">{local('References', 'Referências')}</h2>
 <ul>
 	{(locale === 'pt-br' ? lesson.referencesPt : lesson.references).map(([label, href]) => <li><a href={href}>{label}</a></li>)}
 </ul>
 
-<p class="provenance">{local(
-	`Source frozen at Arrowfall commit 56bb003; qualified with official Flecha ${manifest.toolchain.version}. Code, input, output, diffs, and frames on this page are rendered from that committed snapshot.`,
-	`Fonte congelada no commit Arrowfall 56bb003; qualificada com Flecha oficial ${manifest.toolchain.version}. Código, entrada, saída, diffs e frames desta página são renderizados desse snapshot versionado.`,
+<p>{local(
+	`Source: Arrowfall commit 56bb003, verified with official Flecha ${manifest.toolchain.version}. The source, input, output, diff, and frame on this page are read from that committed snapshot.`,
+	`Fonte: commit Arrowfall 56bb003, verificado com Flecha oficial ${manifest.toolchain.version}. Código, entrada, saída, diff e frame desta página são lidos desse snapshot versionado.`,
 )}</p>
 </article>
-
-<style>
-	.checkpoint-identity { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem 1.5rem; }
-	.checkpoint-identity span { border: 1px solid var(--sl-color-gray-5); border-radius: 999px; padding: .3rem .7rem; color: var(--sl-color-gray-2); font-size: var(--sl-text-sm); }
-	.built-panel, .acceptance { border-inline-start: .3rem solid var(--sl-color-accent); border-radius: .4rem; padding: .5rem 1rem; background: color-mix(in srgb, var(--sl-color-accent-low) 30%, transparent); }
-	.built-panel h2, .acceptance h2 { margin-top: .35rem; }
-	.frame-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr)); gap: 1rem; align-items: start; margin-block: 1.25rem; }
-	.frame-grid.compact { grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); }
-	figure { margin: 0; min-width: 0; }
-	figure img { display: block; width: 100%; height: auto; border: 1px solid var(--sl-color-gray-5); border-radius: .55rem; background: #07100d; }
-	figcaption, .source-location, .provenance { color: var(--sl-color-gray-2); font-size: var(--sl-text-sm); }
-	.visual-label { font-weight: 700; margin-top: 0; }
-	.terminal { max-width: 100%; overflow: auto; border: 1px solid var(--sl-color-gray-5); border-radius: .55rem; padding: 1rem; background: #07100d; color: #d8f3dc; font-family: var(--__sl-font-mono); font-size: var(--sl-text-sm); line-height: 1.45; }
-	.frame-text { min-height: 10rem; }
-	.transcript { max-height: 32rem; }
-	details { margin-block: 1rem; border: 1px solid var(--sl-color-gray-5); border-radius: .55rem; padding: .75rem; }
-	summary { cursor: pointer; font-weight: 700; }
-	.snippet, .source-bundle section { min-width: 0; }
-	.source-bundle h3 { overflow-wrap: anywhere; }
-	.timeline { border-inline-start: 2px solid var(--sl-color-gray-5); padding-inline-start: 1.5rem; }
-	.timeline li { padding-block: .25rem; }
-	.timeline .current { color: var(--sl-color-accent-high); }
-	.provenance { border-top: 1px solid var(--sl-color-gray-5); padding-top: 1rem; }
-	@media (max-width: 40rem) {
-		.frame-grid { grid-template-columns: 1fr; }
-		.terminal { font-size: .78rem; }
-		details { padding: .6rem; }
-	}
-</style>

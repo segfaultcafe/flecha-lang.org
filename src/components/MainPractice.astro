@@ -1,7 +1,7 @@
 ---
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { Code } from 'astro:components';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
+import { Code } from 'astro-expressive-code/components';
 import { mainPractice } from '../data/main-practice.mjs';
 
 interface Props {
@@ -12,28 +12,116 @@ const { id, locale } = Astro.props;
 const practice = mainPractice[id];
 if (!practice) throw new Error(`Unknown main curriculum practice: ${id}`);
 const source = readFileSync(join(process.cwd(), practice.source), 'utf8');
-const snippet = source.split('\n').slice(practice.start - 1, practice.end).join('\n');
+const excerpt = source.split('\n').slice(practice.start - 1, practice.end).join('\n');
 const goal = locale === 'pt-br' ? practice.goalPt : practice.goal;
 const output = practice.expectedStdout || (locale === 'pt-br' ? '(stdout vazio)' : '(empty stdout)');
+const projectRoot = practice.kind === 'single' ? undefined : dirname(dirname(practice.source));
+const projectFiles = projectRoot
+	? ['longbow.toml', 'longbow.lock', ...readdirSync(join(process.cwd(), projectRoot, 'src'), { recursive: true, withFileTypes: true })
+		.filter((entry) => entry.isFile())
+		.map((entry) => relative(join(process.cwd(), projectRoot), join(entry.parentPath, entry.name)))
+		.sort()].filter((path) => existsSync(join(process.cwd(), projectRoot, path)))
+	: [];
+const explanations: Record<string, { en: string; 'pt-br': string }> = {
+	'basic-modules': {
+		en: 'The lifecycle method initializes both fields before the value is used. The member call then makes the receiver explicit, so construction and behavior remain attached to the declared type.',
+		'pt-br': 'O método de ciclo de vida inicializa os dois campos antes do uso do valor. A chamada de membro torna o receptor explícito, mantendo construção e comportamento ligados ao tipo declarado.',
+	},
+	'basic-control': {
+		en: 'The array owns five integers at a fixed size. sort receives a checked mutable reference, and both loops derive their limits from that known length instead of using an unchecked pointer.',
+		'pt-br': 'O array possui cinco inteiros com tamanho fixo. sort recebe uma referência mutável verificada, e os dois loops derivam seus limites desse tamanho conhecido em vez de usar um ponteiro não verificado.',
+	},
+	'basic-errors': {
+		en: 'Division returns a value and an error separately. The caller tests the error before using the value, so failure stays visible in the function signature and at the call site.',
+		'pt-br': 'A divisão retorna valor e erro separadamente. O chamador testa o erro antes de usar o valor, mantendo a falha visível na assinatura e no ponto de chamada.',
+	},
+	'basic-project': {
+		en: 'The excerpt is one test module inside a Longbow package. The complete bundle shows the public function and manifest that the test depends on; the commands check that package boundary rather than an isolated file.',
+		'pt-br': 'O trecho é um módulo de teste dentro de um pacote Longbow. O bundle completo mostra a função pública e o manifesto dos quais o teste depende; os comandos verificam o pacote, não um arquivo isolado.',
+	},
+	'intermediate-ownership': {
+		en: 'Each binding represents a distinct ownership or borrowing operation. Reading the sequence in order shows when mutation is allowed, when a handle moves, and when only shared reads remain valid.',
+		'pt-br': 'Cada binding representa uma operação distinta de propriedade ou empréstimo. A sequência mostra quando a mutação é permitida, quando um handle é movido e quando apenas leituras compartilhadas continuam válidas.',
+	},
+	'intermediate-collections': {
+		en: 'The callable signatures preserve their parameter and result types through composition. The generic relay does not erase those contracts, so incompatible functions still fail during checking.',
+		'pt-br': 'As assinaturas dos callables preservam tipos de parâmetros e resultados durante a composição. O relay genérico não apaga esses contratos, então funções incompatíveis ainda falham na verificação.',
+	},
+	'intermediate-systems': {
+		en: 'The main module owns CLI parsing and maps host failures to exit codes. Filesystem scanning and manifest behavior stay in sibling modules, which keeps operating-system effects at an explicit package boundary.',
+		'pt-br': 'O módulo main possui o parsing da CLI e mapeia falhas do host para códigos de saída. Varredura do sistema de arquivos e comportamento do manifesto ficam em módulos separados, mantendo efeitos do sistema operacional em uma fronteira explícita.',
+	},
+	'intermediate-project': {
+		en: 'The selected branch coordinates the already-separated scanner, manifest, and process modules. The complete package is required because its behavior is the interaction among those modules, not the excerpt alone.',
+		'pt-br': 'O ramo selecionado coordena os módulos já separados de scanner, manifesto e processo. O pacote completo é necessário porque o comportamento resulta da interação entre esses módulos, não do trecho isolado.',
+	},
+	'advanced-contracts': {
+		en: 'Allocation, initialization, transfer, and destruction occur under one ownership contract. Keeping those operations together makes the point where responsibility changes visible to both the compiler and reviewer.',
+		'pt-br': 'Alocação, inicialização, transferência e destruição ocorrem sob um contrato de propriedade. Manter essas operações juntas torna visível o ponto em que a responsabilidade muda para o compilador e para a revisão.',
+	},
+	'advanced-native': {
+		en: 'The small deterministic workload provides a stable exit status before LLVM or native output is inspected. It is evidence for code-generation inspection, not a performance conclusion by itself.',
+		'pt-br': 'O workload pequeno e determinístico fornece um status estável antes da inspeção de LLVM ou código nativo. Ele serve como evidência para inspeção de codegen, não como conclusão de desempenho por si só.',
+	},
+	'advanced-failure': {
+		en: 'The CLI boundary translates typed ledger errors once. Domain modules remain independent of terminal wording, while callers receive stable messages and exit codes suitable for automation.',
+		'pt-br': 'A fronteira da CLI traduz erros tipados do ledger uma vez. Os módulos de domínio não dependem do texto do terminal, enquanto os chamadores recebem mensagens e códigos de saída estáveis para automação.',
+	},
+	'advanced-project': {
+		en: 'The model excerpt defines the records shared by codec, storage, and command modules. The complete package and six tests are shown because determinism depends on their combined serialization and file behavior.',
+		'pt-br': 'O trecho do modelo define os registros compartilhados por codec, armazenamento e comandos. O pacote completo e os seis testes são mostrados porque o determinismo depende da serialização e do comportamento de arquivos combinados.',
+	},
+	'unsafe-boundary': {
+		en: 'The safe binding keeps ordinary address copying outside unsafe. Only the operation that dereferences the raw pointer crosses the boundary, which limits the invariant a reviewer must establish.',
+		'pt-br': 'O binding seguro mantém a cópia comum de endereços fora de unsafe. Apenas a operação que dereferencia o ponteiro bruto cruza a fronteira, limitando a invariante que a revisão precisa estabelecer.',
+	},
+	'unsafe-native': {
+		en: 'The external declaration matches one scalar C function and returns immediately to typed Flecha. This example does not cover structures, callbacks, ownership transfer, or target-specific ABI differences.',
+		'pt-br': 'A declaração externa corresponde a uma função C escalar e retorna imediatamente para Flecha tipada. O exemplo não cobre estruturas, callbacks, transferência de propriedade nem diferenças de ABI entre alvos.',
+	},
+	'unsafe-containment': {
+		en: 'The two raw accesses are short and surrounded by safe values that can be checked before and after the boundary. Expanding the raw region would make the same invariant apply to more code without adding capability.',
+		'pt-br': 'Os dois acessos brutos são curtos e cercados por valores seguros verificáveis antes e depois da fronteira. Ampliar a região bruta faria a mesma invariante valer para mais código sem adicionar capacidade.',
+	},
+};
+const explanation = explanations[id]?.[locale];
+if (!explanation) throw new Error(`Missing main curriculum explanation: ${id}/${locale}`);
 ---
 
-<aside class="practice" data-main-practice={id}>
-	<p class="eyebrow">{locale === 'pt-br' ? 'Checkpoint prático validado' : 'Validated practice checkpoint'}</p>
-	<h2>{locale === 'pt-br' ? 'Faça o conceito trabalhar' : 'Make the concept do work'}</h2>
+<section data-main-practice={id}>
+	<h2>{locale === 'pt-br' ? 'Exemplo testado' : 'Tested example'}</h2>
 	<p>{goal}</p>
-	<p class="source">{practice.source}:{practice.start}–{practice.end}</p>
-	<Code code={snippet} lang="text" />
-	<h3>{locale === 'pt-br' ? 'Verifique com Flecha v0.3.0' : 'Verify with Flecha v0.3.0'}</h3>
-	<Code code={practice.commands.join('\n')} lang="sh" />
-	<h3>{locale === 'pt-br' ? 'Resultado registrado' : 'Recorded result'}</h3>
-	<pre><code>{`${output}\n${locale === 'pt-br' ? 'status de saída' : 'exit status'}: ${practice.expectedStatus}`}</code></pre>
-	<p><a href={locale === 'pt-br' ? `/pt-br${practice.href}` : practice.href}>{locale === 'pt-br' ? 'Abra o exemplo ou contrato completo' : 'Open the complete example or contract'} →</a></p>
-</aside>
-
-<style>
-	.practice { margin-block: 2rem; border: 1px solid var(--sl-color-gray-5); border-inline-start: .3rem solid var(--sl-color-accent); border-radius: .6rem; padding: 1rem; background: color-mix(in srgb, var(--sl-color-bg-nav) 90%, transparent); }
-	.practice h2 { margin-top: .25rem; }
-	.eyebrow { margin: 0; color: var(--sl-color-accent-high); font-size: var(--sl-text-xs); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-	.source { color: var(--sl-color-gray-2); font-family: var(--__sl-font-mono); font-size: var(--sl-text-sm); overflow-wrap: anywhere; }
-	pre { max-width: 100%; overflow: auto; border: 1px solid var(--sl-color-gray-5); border-radius: .45rem; padding: .8rem; background: #07100d; color: #d8f3dc; }
-</style>
+	{practice.kind === 'single' ? (
+		<>
+			<p><strong>{locale === 'pt-br' ? 'Arquivo' : 'File'}:</strong> <code>{practice.source}</code></p>
+			<Code code={source} lang="flecha" meta={`title="${practice.source}"`} />
+			<p>{locale === 'pt-br'
+				? 'O bloco acima é o arquivo completo executado pelos comandos abaixo.'
+				: 'The block above is the complete file executed by the commands below.'}</p>
+		</>
+	) : (
+		<>
+			<h3>{locale === 'pt-br' ? 'Trecho em foco' : 'Excerpt in focus'}</h3>
+			<p><code>{practice.source}:{practice.start}–{practice.end}</code></p>
+			<Code code={excerpt} lang="flecha" meta={`title="${practice.source} (excerpt)"`} />
+			<p>{locale === 'pt-br'
+				? 'Este trecho depende dos outros arquivos do pacote. O código completo compilado está disponível abaixo.'
+				: 'This excerpt depends on the other package files. The complete compiled source is available below.'}</p>
+			<details>
+				<summary>{locale === 'pt-br' ? `Código completo do pacote (${projectFiles.length} arquivos)` : `Complete package source (${projectFiles.length} files)`}</summary>
+				{projectFiles.map((path) => (
+					<section>
+						<h4><code>{path}</code></h4>
+						<Code code={readFileSync(join(process.cwd(), projectRoot!, path), 'utf8')} lang={path.endsWith('.fl') ? 'flecha' : 'toml'} meta={`title="${path}"`} />
+					</section>
+				))}
+			</details>
+		</>
+	)}
+	<p>{explanation}</p>
+	<h3>{locale === 'pt-br' ? 'Comandos' : 'Commands'}</h3>
+	<Code code={practice.commands.join('\n')} lang="sh" meta={`title="${locale === 'pt-br' ? 'Comandos' : 'Commands'}"`} />
+	<h3>{locale === 'pt-br' ? 'Saída esperada' : 'Expected output'}</h3>
+	<Code code={`${output}\n${locale === 'pt-br' ? 'status de saída' : 'exit status'}: ${practice.expectedStatus}`} lang="text" meta={`title="${locale === 'pt-br' ? 'Saída esperada' : 'Expected output'}"`} />
+	<p>{locale === 'pt-br' ? 'Referência relacionada' : 'Related reference'}: <a href={locale === 'pt-br' ? `/pt-br${practice.href}` : practice.href}>{practice.href}</a>.</p>
+</section>
