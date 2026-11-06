@@ -3,8 +3,8 @@
   "project": "Arrowfall",
   "language": "Flecha",
   "toolchain": {
-    "version": "0.3.0",
-    "tag_commit": "6dcea41dbdbee65773747b8474780977b6bb5fd0"
+    "version": "0.3.1",
+    "tag_commit": "d434150d0a486ce2fa16043d904f4b443f409ffd"
   },
   "style": {
     "braces": "K&R expanded bodies",

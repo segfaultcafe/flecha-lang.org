@@ -1,9 +1,9 @@
 # Tutorial checkpoint qualification
 
-Qualified on 2026-11-05 with official Linux x86-64 Flecha/Longbow 0.3.0,
+Qualified on 2026-11-06 with official Linux x86-64 Flecha/Longbow 0.3.1,
 release commit `6dcea41dbdbee65773747b8474780977b6bb5fd0`.
 
-`LONGBOW=<official-0.3.0-longbow> tutorial/validate.sh` rebuilt and executed
+`LONGBOW=<official-0.3.1-longbow> tutorial/validate.sh` rebuilt and executed
 all seven snapshots from their own directories, then compared real stdout with
 the checked-in transcript byte for byte.
 

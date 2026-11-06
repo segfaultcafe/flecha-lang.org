@@ -131,8 +131,8 @@ const assertOutput = (label, actual, expected) => {
 	if (actual !== expected) throw new Error(`${label}: expected ${JSON.stringify(expected)}, received ${JSON.stringify(actual)}`);
 };
 
-assertOutput('flecha version', run(flecha, ['--version']).stdout, 'flecha 0.3.0');
-assertOutput('longbow version', run(longbow, ['--version']).stdout, 'longbow 0.3.0');
+assertOutput('flecha version', run(flecha, ['--version']).stdout, 'flecha 0.3.1');
+assertOutput('longbow version', run(longbow, ['--version']).stdout, 'longbow 0.3.1');
 
 const workRoot = mkdtempSync(join(tmpdir(), 'flecha-curriculum-'));
 try {
@@ -171,4 +171,4 @@ try {
 	rmSync(workRoot, { recursive: true, force: true });
 }
 
-console.log(`Qualified all marked curriculum snippets with Flecha and Longbow 0.3.0.`);
+console.log(`Qualified all marked curriculum snippets with Flecha and Longbow 0.3.1.`);

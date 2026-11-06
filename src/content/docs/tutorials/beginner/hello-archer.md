@@ -1,10 +1,10 @@
 ---
 title: '1. Hello, Archer!'
-description: Install the v0.3.0 toolchain, create one Longbow project, and compile and run your first Flecha program.
+description: Install the v0.3.1 toolchain, create one Longbow project, and compile and run your first Flecha program.
 ---
 
-**Prerequisite:** [install Flecha v0.3.0](/install/) and confirm that `flecha
---version` and `longbow --version` both report `0.3.0`.
+**Prerequisite:** [install Flecha v0.3.1](/install/) and confirm that `flecha
+--version` and `longbow --version` both report `0.3.1`.
 
 Create a project:
 

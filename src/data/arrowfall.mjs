@@ -2,8 +2,8 @@ export const arrowfallLessons = [
 	{
 		id: '01-scene', slug: 'arrowfall/01-scene',
 		title: 'Render the first room', titlePt: 'Renderize a primeira sala',
-		built: 'You start with an installed Flecha v0.3.0 toolchain and an empty program.',
-		builtPt: 'Você começa com o toolchain Flecha v0.3.0 instalado e um programa vazio.',
+		built: 'You start with an installed Flecha v0.3.1 toolchain and an empty program.',
+		builtPt: 'Você começa com o toolchain Flecha v0.3.1 instalado e um programa vazio.',
 		limitation: 'There is nothing to play or recognize yet.',
 		limitationPt: 'Ainda não há nada para jogar ou reconhecer.',
 		desired: 'Make one unmistakable terminal frame before adding state or rules.',

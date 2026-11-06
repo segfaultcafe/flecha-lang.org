@@ -1,10 +1,10 @@
 ---
 title: '1. Olá, Arqueiro!'
-description: Instale o toolchain v0.3.0, crie um projeto Longbow e compile e execute seu primeiro programa Flecha.
+description: Instale o toolchain v0.3.1, crie um projeto Longbow e compile e execute seu primeiro programa Flecha.
 ---
 
-**Pré-requisito:** [instale Flecha v0.3.0](/pt-br/install/) e confirme que
-`flecha --version` e `longbow --version` mostram `0.3.0`.
+**Pré-requisito:** [instale Flecha v0.3.1](/pt-br/install/) e confirme que
+`flecha --version` e `longbow --version` mostram `0.3.1`.
 
 Crie um projeto:
 

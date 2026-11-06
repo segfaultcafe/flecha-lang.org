@@ -7,8 +7,8 @@ const title = (lesson: (typeof arrowfallLessons)[number]) => locale === 'pt-br' 
 
 <section>
 	<p>{locale === 'pt-br'
-		? 'O tutorial ARROWFALL contém sete versões cumulativas de um jogo de terminal. Cada versão é compilada e executada com Flecha v0.3.0; entradas e saídas são verificadas contra fixtures versionadas.'
-		: 'The ARROWFALL tutorial contains seven cumulative versions of a terminal game. Each version is compiled and run with Flecha v0.3.0; input and output are checked against committed fixtures.'}</p>
+		? 'O tutorial ARROWFALL contém sete versões cumulativas de um jogo de terminal. Cada versão é compilada e executada com Flecha v0.3.1; entradas e saídas são verificadas contra fixtures versionadas.'
+		: 'The ARROWFALL tutorial contains seven cumulative versions of a terminal game. Each version is compiled and run with Flecha v0.3.1; input and output are checked against committed fixtures.'}</p>
 	<ol>
 		{arrowfallLessons.map((lesson, index) => (
 			<li><a href={arrowfallPath(lesson.slug, locale)}>{index + 1}. {title(lesson)}</a></li>

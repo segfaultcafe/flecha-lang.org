@@ -18,7 +18,7 @@ const failures = [];
 const narrativeCounts = [];
 
 const expectedCommit = '56bb003740c8a7ddc7ab8aa6215609768f49d85e';
-const expectedRelease = '6dcea41dbdbee65773747b8474780977b6bb5fd0';
+const expectedRelease = 'd434150d0a486ce2fa16043d904f4b443f409ffd';
 const normalize = (value) => value.replace(/\r\n/g, '\n').trimEnd();
 const allFiles = (root) => {
 	const files = [];
@@ -35,7 +35,7 @@ const allFiles = (root) => {
 
 if (provenance.commit !== expectedCommit) failures.push(`snapshot commit is ${provenance.commit}, expected ${expectedCommit}`);
 if (provenance.release_commit !== expectedRelease) failures.push(`release commit is ${provenance.release_commit}, expected ${expectedRelease}`);
-if (provenance.flecha !== '0.3.0' || manifest.toolchain.version !== '0.3.0') failures.push('snapshot must use Flecha 0.3.0');
+if (provenance.flecha !== '0.3.1' || manifest.toolchain.version !== '0.3.1') failures.push('snapshot must use Flecha 0.3.1');
 if (manifest.toolchain.tag_commit !== expectedRelease) failures.push('manifest release commit differs from provenance');
 if (manifest.style.braces !== 'K&R expanded bodies'
 	|| manifest.style.types !== 'PascalCase'
@@ -206,8 +206,8 @@ const assertOutput = (label, actual, expected) => {
 	if (actual !== expected) throw new Error(`${label}: expected ${JSON.stringify(expected)}, received ${JSON.stringify(actual)}`);
 };
 
-assertOutput('flecha version', run(flecha, ['--version']).stdout, 'flecha 0.3.0');
-assertOutput('longbow version', run(longbow, ['--version']).stdout, 'longbow 0.3.0');
+assertOutput('flecha version', run(flecha, ['--version']).stdout, 'flecha 0.3.1');
+assertOutput('longbow version', run(longbow, ['--version']).stdout, 'longbow 0.3.1');
 
 const workRoot = mkdtempSync(join(tmpdir(), 'arrowfall-curriculum-'));
 try {
@@ -231,4 +231,4 @@ try {
 	rmSync(workRoot, { recursive: true, force: true });
 }
 
-console.log('Qualified all seven cumulative Arrowfall checkpoints and final golden campaign with official Flecha/Longbow 0.3.0.');
+console.log('Qualified all seven cumulative Arrowfall checkpoints and final golden campaign with official Flecha/Longbow 0.3.1.');

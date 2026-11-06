@@ -31,7 +31,7 @@ fixture or package, not the exact range shown as if it were copyable by itself.
 - Every selected ARROWFALL range is labeled `Excerpt`/`Trecho`. The complete
   checkpoint manifest and source bundle appear on the same page. The seven
   bundles are checked, tested, built, run, and compared with committed golden
-  output using official Flecha/Longbow v0.3.0.
+  output using official Flecha/Longbow v0.3.1.
 - `scripts/check-published-code.mjs` reads the generated HTML, extracts the
   rendered code blocks, and requires byte-equivalence with every complete
   source file and every labeled excerpt selected from the committed fixtures.

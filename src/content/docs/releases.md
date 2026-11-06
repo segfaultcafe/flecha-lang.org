@@ -3,6 +3,14 @@ title: Releases
 description: Current Flecha releases and project status.
 ---
 
+## 0.3.1
+
+Released November 6, 2026. Flecha 0.3.1 fixes generated JSON methods for slice fields. Writers now serialize `own []T` as JSON arrays, and readers deserialize arrays into owning slices whose storage outlives the Reader.
+
+Derivation is recursive across primitives, owning strings, nested owning slices, and decorated structures. Borrowed slices remain outside the derived JSON contract because decoded storage needs an owner. Parse and allocation failures destroy partially decoded elements before returning the error.
+
+[Download v0.3.1 on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.1) or read the [complete JSON slice bug-fix notes](/docs/reference/release_0_3_1/).
+
 ## 0.3.0
 
 Released November 5, 2026. Flecha 0.3.0 is the application-capable release: it adds a substantially broader portable standard library, deterministic source-package resolution and registry workflows, stronger compiler hardening, and clean installed-package qualification on Linux, Windows, and both macOS architectures.
@@ -89,8 +97,8 @@ Flecha has not reached a stable language or ABI. Read each release's notes and p
 
 ## Current development
 
-Flecha v0.3.0 is the latest tagged release. The `master` branch may contain
+Flecha v0.3.1 is the latest tagged release. The `master` branch may contain
 changes intended for a future release; use the tag when you need the documented
-0.3.0 contract.
+0.3.1 contract.
 
-Read the [v0.3.0 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0), the [complete release and upgrade notes](/docs/reference/release_0_3_0/), or the [current changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Read the [v0.3.1 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.1), the [complete JSON slice bug-fix notes](/docs/reference/release_0_3_1/), or the [current changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).

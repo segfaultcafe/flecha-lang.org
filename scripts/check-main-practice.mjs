@@ -29,8 +29,8 @@ const routes = {
 };
 
 const provenance = JSON.parse(readFileSync(join(evidenceRoot, 'provenance.json'), 'utf8'));
-if (provenance.commit !== 'fc9576f22289b15abc5ad1ebf85eb1cdf541fac4' || provenance.toolchain !== '0.3.0') {
-	failures.push('main practice provenance must name protected Flecha master fc9576f and toolchain 0.3.0');
+if (provenance.commit !== 'fc9576f22289b15abc5ad1ebf85eb1cdf541fac4' || provenance.toolchain !== '0.3.1') {
+	failures.push('main practice provenance must name protected Flecha master fc9576f and toolchain 0.3.1');
 }
 for (const [id, practice] of Object.entries(mainPractice)) {
 	if (!routes[id]) failures.push(`${id}: no main curriculum route`);
@@ -133,4 +133,4 @@ try {
 	rmSync(workRoot, { recursive: true, force: true });
 }
 
-console.log('Qualified all main-track practice programs with official Flecha/Longbow 0.3.0.');
+console.log('Qualified all main-track practice programs with official Flecha/Longbow 0.3.1.');

@@ -1,13 +1,13 @@
 ---
 title: Instalar a Flecha
-description: Baixe a Flecha 0.3.0 ou compile o compilador e a ferramenta de projetos Longbow a partir do código-fonte.
+description: Baixe a Flecha 0.3.1 ou compile o compilador e a ferramenta de projetos Longbow a partir do código-fonte.
 ---
 
 Flecha é um software em estágio inicial. Use um arquivo de versão marcada
 para um toolchain reproduzível ou compile `master` quando quiser explicitamente
 comportamento de desenvolvimento ainda não lançado.
 
-[Baixe a Flecha v0.3.0 para Linux, Windows ou macOS](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0). A versão inclui checksums, o compilador, Longbow, runtime e biblioteca padrão, suporte ao Neovim e uma extensão para VS Code. Leia as [notas de lançamento e atualização — em inglês](/docs/reference/release_0_3_0/) antes de migrar um projeto 0.2.x.
+[Baixe a Flecha v0.3.1 para Linux, Windows ou macOS](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.1). A versão inclui checksums, o compilador, Longbow, runtime e biblioteca padrão, suporte ao Neovim e uma extensão para VS Code. Leia as [notas da correção de slices JSON da v0.3.1 — em inglês](/docs/reference/release_0_3_1/); projetos que já usam v0.3.0 não precisam alterar campos JSON com slices proprietários.
 
 :::caution[Antes de começar]
 A linguagem, a CLI do compilador e a ABI podem mudar entre versões. Use uma versão marcada quando precisar de um toolchain reproduzível.
@@ -23,7 +23,7 @@ A linguagem, a CLI do compilador e a ABI podem mudar entre versões. Use uma ver
 
 A [matriz de toolchains](/docs/reference/toolchains/) permanece em inglês enquanto a referência técnica é traduzida.
 O arquivo para Windows usa MSYS2 UCRT64 com Clang e ABI MinGW. MSVC nativo não
-é compatível com a versão 0.3.0.
+é compatível com a versão 0.3.1.
 
 ## Compilar do código-fonte
 

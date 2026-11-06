@@ -34,7 +34,7 @@ Standalone references and examples intentionally do not render pagination.
 npm ci
 npm run check
 npm run check:editorial
-npm run check:curriculum -- --toolchain /path/to/flecha-0.3.0-Linux-x86_64
+npm run check:curriculum -- --toolchain /path/to/flecha-0.3.1-Linux-x86_64
 npm run build
 npm run check:links
 npx --no-install wrangler deploy --dry-run
@@ -42,7 +42,7 @@ npx --no-install wrangler deploy --dry-run
 
 `check:curriculum` validates the original marked examples, 15 concrete
 main-track practice checkpoints, and all seven ARROWFALL snapshots. With
-`--toolchain`, it executes their documented Flecha/Longbow 0.3.0 checks,
+`--toolchain`, it executes their documented Flecha/Longbow 0.3.1 checks,
 builds, tests, and runs; compares exact output and exit status; and runs
 ARROWFALL's final ANSI, seed, option, victory, and defeat golden campaign.
 `check:editorial` enforces the structural parts of the repository's normative

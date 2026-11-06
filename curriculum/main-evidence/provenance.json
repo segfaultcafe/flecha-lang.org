@@ -1,7 +1,7 @@
 {
   "repository": "segfaultcafe/flecha",
   "commit": "fc9576f22289b15abc5ad1ebf85eb1cdf541fac4",
-  "toolchain": "0.3.0",
+  "toolchain": "0.3.1",
   "purpose": "Concrete, compiler-qualified practice evidence for the main five-level curriculum",
   "adaptations": [
     "project manifests resolve the v0.3.0 toolchain standard library instead of a source-tree-relative copy",

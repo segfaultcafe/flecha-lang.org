@@ -1,7 +1,7 @@
 # Arrowfall cumulative tutorial source
 
 These seven independent snapshots are the canonical technical inputs for the
-website tutorial. Every directory is a complete Flecha 0.3.0 project that can
+website tutorial. Every directory is a complete Flecha 0.3.1 project that can
 be checked, tested, built, and run without the later checkpoints.
 
 The order follows observable needs rather than a language feature catalogue:
@@ -22,7 +22,7 @@ to the Frontender without scraping prose.
 
 ## Clean campaign
 
-From the Arrowfall repository root with official Flecha/Longbow 0.3.0 on PATH:
+From the Arrowfall repository root with official Flecha/Longbow 0.3.1 on PATH:
 
 ```sh
 LONGBOW=longbow tutorial/validate.sh

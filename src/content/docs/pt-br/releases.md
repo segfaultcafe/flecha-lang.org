@@ -3,6 +3,14 @@ title: Versões
 description: Versões atuais da Flecha e status do projeto.
 ---
 
+## 0.3.1
+
+Lançada em 6 de novembro de 2026. Flecha 0.3.1 corrige os métodos JSON gerados para campos de slice. Writers agora serializam `own []T` como arrays JSON, e Readers desserializam arrays em slices proprietários cujo armazenamento permanece válido depois do Reader.
+
+A derivação é recursiva para tipos primitivos, strings proprietárias, slices proprietários aninhados e estruturas decoradas. Slices emprestados ficam fora do contrato JSON derivado porque o armazenamento decodificado precisa de um proprietário. Falhas de análise ou alocação destroem elementos parcialmente decodificados antes de retornar o erro.
+
+[Baixe a v0.3.1 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.1) ou leia as [notas completas da correção de slices JSON — em inglês](/docs/reference/release_0_3_1/).
+
 ## 0.3.0
 
 Lançada em 5 de novembro de 2026. Flecha 0.3.0 é a versão voltada à criação de aplicativos: ela traz uma biblioteca padrão portátil muito mais ampla, resolução determinística de pacotes-fonte e fluxos de registro, maior robustez do compilador e qualificação de pacotes instalados de forma limpa em Linux, Windows e nas duas arquiteturas macOS.
@@ -89,8 +97,8 @@ Flecha ainda não possui uma linguagem ou ABI estável. Leia as notas de cada ve
 
 ## Desenvolvimento atual
 
-Flecha v0.3.0 é a versão marcada mais recente. O branch `master` pode conter
+Flecha v0.3.1 é a versão marcada mais recente. O branch `master` pode conter
 mudanças destinadas a uma versão futura; use a tag quando precisar do contrato
-0.3.0 documentado.
+0.3.1 documentado.
 
-Consulte a [versão v0.3.0 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0), as [notas completas de lançamento e atualização — em inglês](/docs/reference/release_0_3_0/) ou o [changelog atual no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Consulte a [versão v0.3.1 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.1), as [notas completas da correção de slices JSON — em inglês](/docs/reference/release_0_3_1/) ou o [changelog atual no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).

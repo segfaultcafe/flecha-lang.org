@@ -1,13 +1,13 @@
 ---
 title: Install Flecha
-description: Download Flecha 0.3.0 or build the compiler and Longbow project tool from source.
+description: Download Flecha 0.3.1 or build the compiler and Longbow project tool from source.
 ---
 
 Flecha is early-stage software. Use a tagged platform archive for a repeatable
 toolchain or build `master` when you intentionally want unreleased development
 behavior.
 
-[Download Flecha v0.3.0 for Linux, Windows, or macOS](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0). The release includes checksums, the compiler, Longbow, the runtime and standard library, Neovim support, and a VS Code extension. Read the [release and upgrade notes](/docs/reference/release_0_3_0/) before migrating a 0.2.x project.
+[Download Flecha v0.3.1 for Linux, Windows, or macOS](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.1). The release includes checksums, the compiler, Longbow, the runtime and standard library, Neovim support, and a VS Code extension. Read the [v0.3.1 JSON slice bug-fix notes](/docs/reference/release_0_3_1/); projects already using v0.3.0 need no source changes for owning-slice JSON fields.
 
 :::caution[Before you begin]
 The language, compiler CLI, and ABI may change between releases. Use a tagged release when you need a repeatable toolchain.
@@ -23,7 +23,7 @@ The language, compiler CLI, and ABI may change between releases. Use a tagged re
 
 See the [supported toolchains](/docs/reference/toolchains/) for the tested platform matrix.
 The Windows archive targets MSYS2 UCRT64 with Clang and the MinGW ABI. Native
-MSVC is not supported in 0.3.0.
+MSVC is not supported in 0.3.1.
 
 ## Build from source
 

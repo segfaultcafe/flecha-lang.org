@@ -6,9 +6,9 @@ description: Documentação da linguagem, compilador, ferramentas, implementaç�
 A documentação da Flecha é sincronizada do repositório do compilador. A jornada principal está disponível em português do Brasil; a referência técnica completa permanece em inglês durante a tradução gradual.
 
 :::note[Limite de versão]
-Os tutoriais usam o toolchain v0.3.0 marcado. A referência sincronizada também
+Os tutoriais usam o toolchain v0.3.1 marcado. A referência sincronizada também
 mostra o desenvolvimento atual de `master`; use as notas de versão e o
-toolchain marcado quando precisar do contrato v0.3.0 congelado.
+toolchain marcado quando precisar do contrato v0.3.1 congelado.
 :::
 
 ## Comece aqui

@@ -5,8 +5,8 @@ export const curriculumTracks = [
 		titlePt: 'Iniciante',
 		outcome: 'Build, run, and share a small Flecha command-line program.',
 		outcomePt: 'Compile, execute e compartilhe um pequeno programa de linha de comando em Flecha.',
-		prerequisite: 'No Flecha experience; install the v0.3.0 toolchain first.',
-		prerequisitePt: 'Nenhuma experiência com Flecha; instale primeiro o toolchain v0.3.0.',
+		prerequisite: 'No Flecha experience; install the v0.3.1 toolchain first.',
+		prerequisitePt: 'Nenhuma experiência com Flecha; instale primeiro o toolchain v0.3.1.',
 		scope: 'About 60–90 minutes',
 		scopePt: 'Cerca de 60–90 minutos',
 		lessons: [

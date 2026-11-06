@@ -6,9 +6,9 @@ description: Current Flecha v0.3 language, standard-library, package, compiler, 
 Flecha's documentation is synced from the compiler repository so the guides here track the implementation while this website remains independently deployable.
 
 :::note[Version boundary]
-The tutorials target the tagged v0.3.0 toolchain. Synced reference pages also
+The tutorials target the tagged v0.3.1 toolchain. Synced reference pages also
 show current `master` development, so use the release notes and a tagged
-toolchain when you need the frozen v0.3.0 contract.
+toolchain when you need the frozen v0.3.1 contract.
 :::
 
 ## Start here
