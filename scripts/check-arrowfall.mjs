@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { arrowfallLessons } from '../src/data/arrowfall.mjs';
 import { arrowfallPath } from '../src/data/arrowfall.mjs';
+import { arrowfallNarrative } from '../src/data/arrowfall-narrative.mjs';
 
 const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const snapshotRoot = join(siteRoot, 'curriculum', 'arrowfall');
@@ -14,6 +15,7 @@ const publicFrameRoot = join(siteRoot, 'public', 'arrowfall', 'frames');
 const manifest = JSON.parse(readFileSync(join(snapshotRoot, 'manifest.json'), 'utf8'));
 const provenance = JSON.parse(readFileSync(join(snapshotRoot, 'provenance.json'), 'utf8'));
 const failures = [];
+const narrativeCounts = [];
 
 const expectedCommit = '56bb003740c8a7ddc7ab8aa6215609768f49d85e';
 const expectedRelease = '6dcea41dbdbee65773747b8474780977b6bb5fd0';
@@ -58,6 +60,50 @@ for (const [index, lesson] of arrowfallLessons.entries()) {
 	}
 	for (const field of ['changes', 'changesPt', 'references', 'referencesPt', 'snippets']) {
 		if (!Array.isArray(lesson[field]) || !lesson[field].length) failures.push(`${lesson.id}: missing ${field}`);
+	}
+	const narrative = arrowfallNarrative[lesson.id];
+	if (!narrative) {
+		failures.push(`${lesson.id}: missing structured tutorial narrative`);
+	} else {
+		const requiredTerms = {
+			'01-scene': { en: ['visual contract', 'stdoutln', 'invariant'], 'pt-br': ['contrato visual', 'stdoutln', 'invariante'] },
+			'02-state': { en: ['source of truth', 'const reference', 'traverses'], 'pt-br': ['fonte de verdade', 'referência', 'percorre'] },
+			'03-movement': { en: ['normalization', 'mutable checked reference', 'delta'], 'pt-br': ['normalização', 'referência mutável verificada', 'delta'] },
+			'04-map': { en: ['row-major', 'checked slice', 'no-op'], 'pt-br': ['ordem por linhas', 'slice const verificado', 'no-op'] },
+			'05-goblin': { en: ['DANGER_BEFORE', 'spentTurn', 'CLI', 'no-op'], 'pt-br': ['DANGER_BEFORE', 'spentTurn', 'CLI', 'no-op'] },
+			'06-archery': { en: ['line-of-sight', 'arrowCount', 'goblinAlive'], 'pt-br': ['linha de visão', 'arrowCount', 'goblinAlive'] },
+			'07-final': { en: ['sourceSeed', 'Generator', 'golden'], 'pt-br': ['sourceSeed', 'Generator', 'golden'] },
+		}[lesson.id];
+		for (const locale of ['en', 'pt-br']) {
+			const text = narrative[locale];
+			if (!text) {
+				failures.push(`${lesson.id}: missing ${locale} narrative`);
+				continue;
+			}
+			for (const [field, minimum] of [['context', 2], ['model', 3], ['run', 2], ['conclusion', 2]]) {
+				if (!Array.isArray(text[field]) || text[field].length < minimum || text[field].some((paragraph) => !paragraph.trim())) {
+					failures.push(`${lesson.id}: ${locale} ${field} lacks the required multi-paragraph technical narrative`);
+				}
+			}
+			if (!Array.isArray(text.snippets) || text.snippets.length !== lesson.snippets.length) {
+				failures.push(`${lesson.id}: ${locale} narrative must explain every published excerpt`);
+			} else {
+				for (const [snippetIndex, explanation] of text.snippets.entries()) {
+					if (!Array.isArray(explanation.before) || explanation.before.length < 1
+						|| !Array.isArray(explanation.after) || explanation.after.length < 2) {
+						failures.push(`${lesson.id}: ${locale} excerpt ${snippetIndex + 1} needs context before and consequences after the code`);
+					}
+				}
+			}
+			const fullText = [...text.context, ...text.model, ...text.run, ...text.conclusion,
+				...text.snippets.flatMap((snippet) => [...snippet.before, ...snippet.after])].join('\n');
+			for (const term of requiredTerms[locale]) {
+				if (!fullText.includes(term)) failures.push(`${lesson.id}: ${locale} narrative does not explain required concept ${JSON.stringify(term)}`);
+			}
+			const paragraphs = text.context.length + text.model.length + text.run.length + text.conclusion.length
+				+ text.snippets.reduce((total, snippet) => total + snippet.before.length + snippet.after.length, 0);
+			narrativeCounts.push(`${lesson.id} ${locale}: ${paragraphs} paragraphs, ${lesson.snippets.length} excerpts`);
+		}
 	}
 
 	const checkpoint = join(checkpointRoot, lesson.id);
@@ -133,6 +179,9 @@ if (failures.length) {
 	for (const failure of [...new Set(failures)]) console.error(`- ${failure}`);
 	process.exit(1);
 }
+
+console.log('Arrowfall narrative coverage:');
+for (const count of narrativeCounts) console.log(`- ${count}`);
 
 const toolchainArg = process.argv.indexOf('--toolchain');
 if (toolchainArg === -1) {

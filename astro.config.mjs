@@ -32,8 +32,8 @@ const curriculumSidebar = curriculumTracks.map((track) => ({
 	})),
 }));
 const arrowfallSidebar = {
-	label: 'Build ARROWFALL',
-	translations: { 'pt-br': 'Construa ARROWFALL' },
+	label: 'ARROWFALL tutorial',
+	translations: { 'pt-br': 'Tutorial ARROWFALL' },
 	items: arrowfallLessons.map((lesson) => ({
 		label: lesson.title,
 		translations: { 'pt-br': lesson.titlePt },

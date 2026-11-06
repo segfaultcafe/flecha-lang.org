@@ -20,6 +20,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - run: npm run check:editorial
       - name: Download and verify the Flecha v0.3.0 toolchain
         run: |
           curl --fail --location --retry 3 --output /tmp/flecha-0.3.0-Linux-x86_64.tar.gz \
@@ -50,7 +51,7 @@ jobs:
         with:
           name: site-dist
           path: dist
-      - run: node scripts/check-built-links.mjs
+      - run: npm run check:links
 
   deploy-dry-run:
     name: Deploy dry run

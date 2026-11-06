@@ -65,7 +65,7 @@ for (const locale of ['en', 'pt-br']) {
 				'id="implement"',
 				'id="run-and-compare"',
 				`src="/arrowfall/frames/${lesson.id}.svg"`,
-				locale === 'pt-br' ? 'Stdout esperado exato' : 'Exact expected stdout',
+				locale === 'pt-br' ? 'Stdout esperada' : 'Expected stdout',
 			]) {
 				if (!html.includes(marker)) navigationErrors.push(`${route}: missing required project-led lesson marker ${marker}`);
 			}
