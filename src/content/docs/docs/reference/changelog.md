@@ -5,6 +5,53 @@ editUrl: https://github.com/segfaultcafe/flecha/edit/master/CHANGELOG.md
 ---
 ## Unreleased
 
+## 0.3.2 - 2026-11-09
+
+Flecha 0.3.2 introduces the compiler-side analyzer protocol used by language
+servers and fixes several parser, semantic-analysis, and diagnostic issues.
+See the [0.3.2 release notes](/docs/reference/release_0_3_2/) for integration and
+upgrade details.
+
+### Added
+
+- The compiler now exposes `flecha analyze --stdio`, a framed JSON protocol
+  for versioned document overlays and project-aware diagnostics.
+- The Visual Studio Code extension now starts `flecha-lsp` for live compiler
+  diagnostics, with configurable server/compiler paths, protocol tracing, and
+  a restart command for development builds.
+- The Neovim plugin can run the enclosing Longbow project with `<leader>rr`,
+  display compiler output in quickfix, and open a selected diagnostic at its
+  exact source line with `<leader>fe`.
+- The Neovim plugin can run verbose Flecha tests for the enclosing Longbow
+  project with `<leader>rt` or `:LongbowTest`; failed test declarations are
+  navigable from quickfix with `<leader>fe`.
+
+### Fixed
+
+- Allocation analysis now summarizes safe resource-helper calls after
+  verifying their bodies once, preventing exponential compile times in code
+  that uses layered parsers and other allocation-backed abstractions.
+- Borrow origins now propagate recursively through tuple results, preventing
+  checked references captured by aggregate values from escaping their scope.
+- Missing block braces before top-level declarations now produce a focused
+  closing-brace diagnostic instead of reporting the declaration as an invalid
+  expression.
+- Missing enum and error variants now use stable source-level type names in
+  diagnostics instead of internal module-qualified names.
+
+## 0.3.1 - 2026-11-06
+
+Flecha 0.3.1 fixes derived JSON support for slices.
+
+### Fixed
+
+- Generated JSON writers serialize owning slices as arrays, recursively
+  including nested slices and decorated structure elements.
+- Generated JSON readers deserialize arrays into `own []T`, preserving
+  ownership and cleaning up partially decoded elements on parse or allocation
+  failure. Borrowed slice destinations now produce a precise compile-time
+  diagnostic.
+
 ## 0.3.0 - 2026-11-05
 
 Flecha 0.3.0 makes the toolchain application-capable with a substantially

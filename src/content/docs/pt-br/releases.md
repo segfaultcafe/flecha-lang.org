@@ -3,6 +3,34 @@ title: Versões
 description: Versões atuais da Flecha e status do projeto.
 ---
 
+## 0.3.2
+
+Lançada em 9 de novembro de 2026. A Flecha 0.3.2 introduz o serviço de análise
+do compilador usado pelos language servers da Flecha. `flecha analyze --stdio`
+mantém buffers versionados do editor em memória, resolve o grafo de pacotes do
+Longbow e retorna diagnósticos sintáticos e semânticos do projeto sem modificar
+os arquivos no disco.
+
+A versão também limita uma regressão de performance na análise semântica,
+preserva origens de empréstimo em resultados de tupla, melhora diagnósticos de
+chaves ausentes e usa nomes estáveis do código-fonte para variantes inexistentes.
+O [`flecha-lsp` v0.1.0](https://github.com/segfaultcafe/flecha-lsp/releases/tag/v0.1.0),
+distribuído separadamente, conecta VS Code, Neovim e outros clientes LSP a esse
+analisador.
+
+[Baixe a Flecha v0.3.2 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.2)
+ou leia as [notas completas — em inglês](/docs/reference/release_0_3_2/).
+
+## 0.3.1
+
+Lançada em 6 de novembro de 2026. A Flecha 0.3.1 corrige o suporte a JSON
+derivado pelo compilador para slices proprietários, inclusive slices aninhados
+e elementos de estruturas decoradas. Readers gerados preservam ownership e
+liberam valores parcialmente decodificados; destinos emprestados geram um
+diagnóstico em tempo de compilação.
+
+[Ver v0.3.1 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.1)
+
 ## 0.3.0
 
 Lançada em 5 de novembro de 2026. Flecha 0.3.0 é a versão voltada à criação de aplicativos: ela traz uma biblioteca padrão portátil muito mais ampla, resolução determinística de pacotes-fonte e fluxos de registro, maior robustez do compilador e qualificação de pacotes instalados de forma limpa em Linux, Windows e nas duas arquiteturas macOS.
@@ -89,8 +117,8 @@ Flecha ainda não possui uma linguagem ou ABI estável. Leia as notas de cada ve
 
 ## Desenvolvimento atual
 
-Flecha v0.3.0 é a versão marcada mais recente. O branch `master` pode conter
+Flecha v0.3.2 é a versão marcada mais recente. O branch `master` pode conter
 mudanças destinadas a uma versão futura; use a tag quando precisar do contrato
-0.3.0 documentado.
+do toolchain 0.3.2.
 
-Consulte a [versão v0.3.0 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0), as [notas completas de lançamento e atualização — em inglês](/docs/reference/release_0_3_0/) ou o [changelog atual no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Consulte a [versão v0.3.2 no GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.2), as [notas completas — em inglês](/docs/reference/release_0_3_2/) ou o [changelog atual no GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
