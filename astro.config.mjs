@@ -235,6 +235,7 @@ export default defineConfig({
 							translations: { 'pt-br': 'Histórico do projeto' },
 							items: [
 								{ label: 'Changelog and current development', slug: 'docs/reference/changelog' },
+								{ label: 'Flecha 0.3.2 release', slug: 'docs/reference/release_0_3_2' },
 								{ label: 'Flecha 0.3 milestone', slug: 'docs/reference/release_0_3' },
 								{ label: 'Tagged releases', slug: 'releases' },
 							],

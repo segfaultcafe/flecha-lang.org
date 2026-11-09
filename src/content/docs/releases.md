@@ -3,6 +3,32 @@ title: Releases
 description: Current Flecha releases and project status.
 ---
 
+## 0.3.2
+
+Released November 9, 2026. Flecha 0.3.2 introduces the compiler-side analysis
+service used by Flecha language servers. `flecha analyze --stdio` keeps
+versioned editor buffers in memory, resolves the Longbow package graph, and
+returns project-aware syntax and semantic diagnostics without changing files on
+disk.
+
+The release also bounds a semantic-analysis performance regression, preserves
+borrow origins through tuple results, improves missing-brace diagnostics, and
+uses stable source-level names for missing enum and error variants. The separate
+[`flecha-lsp` v0.1.0 release](https://github.com/segfaultcafe/flecha-lsp/releases/tag/v0.1.0)
+connects VS Code, Neovim, and other LSP clients to this analyzer.
+
+[Download Flecha v0.3.2 on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.2)
+or read the [complete release and upgrade notes](/docs/reference/release_0_3_2/).
+
+## 0.3.1
+
+Released November 6, 2026. Flecha 0.3.1 corrects compiler-derived JSON support
+for owning slices, including nested slices and decorated structure elements.
+Generated readers preserve ownership and clean up partially decoded values;
+borrowed slice destinations produce a compile-time diagnostic.
+
+[View release v0.3.1 on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.1)
+
 ## 0.3.0
 
 Released November 5, 2026. Flecha 0.3.0 is the application-capable release: it adds a substantially broader portable standard library, deterministic source-package resolution and registry workflows, stronger compiler hardening, and clean installed-package qualification on Linux, Windows, and both macOS architectures.
@@ -89,8 +115,8 @@ Flecha has not reached a stable language or ABI. Read each release's notes and p
 
 ## Current development
 
-Flecha v0.3.0 is the latest tagged release. The `master` branch may contain
+Flecha v0.3.2 is the latest tagged release. The `master` branch may contain
 changes intended for a future release; use the tag when you need the documented
-0.3.0 contract.
+0.3.2 toolchain.
 
-Read the [v0.3.0 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.0), the [complete release and upgrade notes](/docs/reference/release_0_3_0/), or the [current changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
+Read the [v0.3.2 release on GitHub](https://github.com/segfaultcafe/flecha/releases/tag/v0.3.2), the [complete release and upgrade notes](/docs/reference/release_0_3_2/), or the [current changelog on GitHub](https://github.com/segfaultcafe/flecha/blob/master/CHANGELOG.md).
